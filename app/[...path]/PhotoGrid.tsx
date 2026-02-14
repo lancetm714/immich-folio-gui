@@ -6,6 +6,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import { Lightbox } from '@/components/Lightbox';
 
 export interface PhotoItem {
@@ -14,14 +15,24 @@ export interface PhotoItem {
     previewUrl: string;
     originalUrl: string;
     exifUrl: string;
+    blurDataURL?: string;
+    dominantColor?: string;
+    /** Compact EXIF summary for hover overlay */
+    camera?: string;
+    lens?: string;
+    focalLength?: string;
+    /** Natural image aspect ratio (width/height) for masonry layout */
+    aspectRatio?: number;
 }
 
 interface PhotoGridProps {
     assets: PhotoItem[];
     albumId: string;
+    layout?: 'masonry' | 'uniform';
+    gridStyle?: React.CSSProperties;
 }
 
-export function PhotoGrid({ assets }: PhotoGridProps) {
+export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridProps) {
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
     const openLightbox = useCallback((index: number) => {
@@ -74,18 +85,34 @@ export function PhotoGrid({ assets }: PhotoGridProps) {
 
     return (
         <>
-            <div className="photo-grid">
+            <div className={`photo-grid photo-grid--${layout}`} style={gridStyle}>
                 {assets.map((asset, index) => (
                     <div
                         key={asset.id}
                         className="photo-grid__item"
                         onClick={() => openLightbox(index)}
+                        style={{
+                            ...(asset.dominantColor ? { backgroundColor: asset.dominantColor } : {}),
+                            ...(layout === 'masonry' && asset.aspectRatio
+                                ? { aspectRatio: `${asset.aspectRatio}` }
+                                : {}),
+                        }}
                     >
-                        <img
+                        <Image
                             src={asset.thumbUrl}
                             alt=""
+                            fill
+                            sizes="(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
                             loading={index < 6 ? 'eager' : 'lazy'}
+                            {...(asset.blurDataURL
+                                ? { placeholder: 'blur' as const, blurDataURL: asset.blurDataURL }
+                                : {})}
                         />
+                        {(asset.camera || asset.lens) && (
+                            <div className="photo-grid__item-exif">
+                                {[asset.camera, asset.lens, asset.focalLength].filter(Boolean).join(' · ')}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -102,3 +129,4 @@ export function PhotoGrid({ assets }: PhotoGridProps) {
         </>
     );
 }
+

@@ -44,6 +44,7 @@ export function Lightbox({
     const [showExif, setShowExif] = useState(false);
     const [exifData, setExifData] = useState<ExifData | null>(null);
     const [exifLoading, setExifLoading] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const overlayRef = useRef<HTMLDivElement>(null);
     const touchStartX = useRef<number>(0);
     const touchStartY = useRef<number>(0);
@@ -64,6 +65,7 @@ export function Lightbox({
     // Reset EXIF data when switching images; refetch if panel is open
     useEffect(() => {
         setExifData(null);
+        setImageLoaded(false);
         if (showExif && current) {
             fetchExif(current.exifUrl);
         }
@@ -149,12 +151,22 @@ export function Lightbox({
             </button>
 
             {/* Image */}
-            <div className="lightbox__image-container">
+            <div
+                className="lightbox__image-container"
+                style={{
+                    backgroundColor: current.dominantColor || '#000',
+                    backgroundImage: current.blurDataURL ? `url(${current.blurDataURL})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                    className="lightbox__image"
+                    className={`lightbox__image${imageLoaded ? ' lightbox__image--loaded' : ''}`}
                     src={current.previewUrl}
                     alt=""
                     draggable={false}
+                    onLoad={() => setImageLoaded(true)}
                 />
             </div>
 

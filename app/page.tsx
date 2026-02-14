@@ -1,13 +1,14 @@
 /**
  * Homepage — Split hero layout.
  * Left panel: site title, subtitle, navigation links.
- * Right panel: hero image from Immich.
+ * Right panel: hero image carousel from Immich.
  */
 
 import Link from 'next/link';
 import { immich } from '@/lib/immich';
 import { getConfig } from '@/lib/config';
-import { imageUrl } from '@/lib/urls';
+import { imageUrl, assetPlaceholder } from '@/lib/urls';
+import { HeroCarousel } from '@/components/HeroCarousel';
 
 // Render at request time — requires live Immich connection
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,18 @@ export default async function HomePage() {
     immich.getSubpages(),
     immich.getStandaloneAlbums(),
   ]);
+
+  // Fetch ThumbHash for all hero images
+  const heroData = await Promise.all(
+    config.heroImages.map(async (id) => {
+      const asset = await immich.getAssetInfo(id);
+      const ph = asset ? assetPlaceholder(asset) : null;
+      return {
+        src: imageUrl(id, 'preview'),
+        ...(ph ? { blurDataURL: ph.blurDataURL } : {}),
+      };
+    }),
+  );
 
   return (
     <div className="hero">
@@ -52,18 +65,11 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── Right Panel (Hero Image) ────────────────── */}
+      {/* ── Right Panel (Hero Carousel) ─────────────── */}
       <div className="hero__right">
-        {config.heroImage ? (
-          <img
-            src={imageUrl(config.heroImage, 'preview')}
-            alt=""
-            className="hero__image"
-          />
-        ) : (
-          <div className="hero__image-placeholder" />
-        )}
+        <HeroCarousel images={heroData} />
       </div>
     </div>
   );
 }
+

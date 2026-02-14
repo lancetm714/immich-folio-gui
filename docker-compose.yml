@@ -4,7 +4,7 @@ services:
     container_name: immich-lightbox
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "7211:7211"
     environment:
       - IMMICH_API_URL=${IMMICH_API_URL}
       - IMMICH_API_KEY=${IMMICH_API_KEY}

@@ -119,8 +119,9 @@ img {
   padding: 48px 24px 96px;
 }
 
-/* Homepage hero uses full bleed — override main padding */
-.main:has(.hero) {
+/* Homepage hero + About page use full bleed — override main padding */
+.main:has(.hero),
+.main:has(.about) {
   max-width: none;
   padding: 0;
 }
@@ -203,6 +204,17 @@ img {
   width: 100%;
   height: 100%;
   background: var(--bg-secondary);
+}
+
+/* ── Hero Carousel Crossfade ────────────────────── */
+.hero__carousel-image {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+
+.hero__carousel-image--active {
+  opacity: 1;
 }
 
 /* ── Section Labels ──────────────────────────────── */
@@ -387,22 +399,36 @@ img {
 }
 
 .photo-grid {
-  column-count: 3;
-  column-gap: 12px;
+  column-count: var(--grid-columns, 3);
+  column-gap: var(--grid-gap, 12px);
+}
+
+/* Uniform layout: CSS Grid with fixed aspect ratio */
+.photo-grid--uniform {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns, 3), 1fr);
+  gap: var(--grid-gap, 12px);
+  column-count: unset;
 }
 
 .photo-grid__item {
   break-inside: avoid;
-  margin-bottom: 12px;
+  margin-bottom: var(--grid-gap, 12px);
   border-radius: var(--radius-sm);
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  aspect-ratio: var(--grid-aspect-ratio, 1);
+}
+
+.photo-grid--uniform .photo-grid__item {
+  margin-bottom: 0;
 }
 
 .photo-grid__item img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
   transition: filter var(--transition-normal), transform var(--transition-slow);
 }
@@ -410,6 +436,31 @@ img {
 .photo-grid__item:hover img {
   filter: brightness(0.85);
   transform: scale(1.02);
+}
+
+/* EXIF hover overlay */
+.photo-grid__item-exif {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 10px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: 2;
+}
+
+.photo-grid__item:hover .photo-grid__item-exif {
+  opacity: 1;
 }
 
 /* ── Lightbox ─────────────────────────────────────── */
@@ -455,6 +506,8 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .lightbox__image {
@@ -464,6 +517,12 @@ img {
   border-radius: var(--radius-sm);
   user-select: none;
   -webkit-user-drag: none;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.lightbox__image--loaded {
+  opacity: 1;
 }
 
 .lightbox__close {
@@ -649,10 +708,101 @@ img {
   font-weight: 300;
 }
 
+/* ── Password Gate ────────────────────────────────── */
+.password-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-height));
+  padding: 24px;
+}
+
+.password-gate__card {
+  text-align: center;
+  padding: 48px 40px;
+  max-width: 400px;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.password-gate__title {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.password-gate__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+
+.password-gate__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.password-gate__input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.password-gate__input:focus {
+  border-color: var(--accent);
+}
+
+.password-gate__input::placeholder {
+  color: var(--text-muted);
+}
+
+.password-gate__button {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.password-gate__button:hover {
+  opacity: 0.9;
+}
+
+.password-gate__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.password-gate__error {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #e74c3c;
+  font-weight: 400;
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 1024px) {
   .photo-grid {
-    column-count: 2;
+    --grid-columns: 2;
   }
 
   .album-grid {
@@ -679,7 +829,7 @@ img {
   }
 
   .photo-grid {
-    column-count: 1;
+    --grid-columns: 1;
   }
 
   .album-grid {
@@ -722,5 +872,9 @@ img {
 
   .lightbox__nav--next {
     right: 8px;
+  }
+
+  .password-gate__card {
+    padding: 36px 24px;
   }
 }

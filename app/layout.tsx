@@ -8,9 +8,24 @@ import Link from 'next/link';
 import './globals.css';
 import { SubpageNav } from '@/components/SubpageNav';
 
+const siteTitle = process.env.SITE_TITLE || 'Gallery';
+const siteDescription = 'A curated photography portfolio';
+
 export const metadata: Metadata = {
-  title: process.env.SITE_TITLE || 'Gallery',
-  description: 'A curated photography portfolio',
+  title: siteTitle,
+  description: siteDescription,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    type: 'website',
+    images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+    images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +42,9 @@ export default function RootLayout({
               Home
             </Link>
             <SubpageNav />
+            <Link href="/about" className="header__nav-link">
+              About
+            </Link>
           </nav>
         </header>
         <main className="main">{children}</main>

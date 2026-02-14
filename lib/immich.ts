@@ -44,6 +44,8 @@ export interface ImmichExifInfo {
     fNumber: number | null;
     exposureTime: string | null;
     iso: number | null;
+    exifImageWidth: number | null;
+    exifImageHeight: number | null;
     city: string | null;
     state: string | null;
     country: string | null;
