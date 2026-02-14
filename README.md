@@ -1,17 +1,29 @@
 # Immich Folio
 
-A self-hosted photography portfolio powered by [Immich](https://immich.app). Turns your Immich albums into a beautiful, public-facing gallery — no database required.
+A self-hosted photography portfolio powered by [Immich](https://immich.app). Turns your Immich albums into a beautiful, public-facing gallery — without ever exposing your Immich server to the internet.
+
+Immich Folio acts as a **secure reverse proxy** between your visitors and your private Immich instance. Your Immich server stays on your local network, completely invisible to the outside world.
 
 ## Features
 
 - **Portfolio-style navigation** — horizontal nav bar with all your collections
 - **Split hero homepage** — configurable hero image with navigation links
 - **Subpage grouping** — organize albums under named collections (e.g. `/japan/tokyo-2023`)
-- **Image proxy** — serves Immich assets without exposing your server or API key
-- **Obfuscated URLs** — asset IDs are encrypted, never exposed to the public
 - **Masonry photo grid** — responsive layout with lightbox viewer
 - **EXIF metadata** — camera, lens, and settings displayed on demand
 - **Aggressive caching** — configurable TTL for fast repeat loads
+
+## Security
+
+Immich Folio adds a full security layer between the public internet and your Immich instance:
+
+| Concern | Protection |
+|---------|-----------|
+| **Server exposure** | Immich URL and port are never sent to the browser — all requests are proxied server-side |
+| **API key** | Stored only in `.env.local`, never included in client-side code or responses |
+| **Asset IDs** | Immich UUIDs are encrypted (AES-256) into opaque tokens — visitors cannot guess or enumerate asset IDs |
+| **Album scope** | Only albums explicitly listed in `LIGHTBOX_ALBUMS` are accessible — everything else is blocked |
+| **No direct access** | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
 
 ## Quick Start
 
