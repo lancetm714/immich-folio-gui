@@ -27,15 +27,15 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 
 ### Security
 
-| Concern | Protection |
-|---------|-----------| 
-| **Server exposure** | Immich URL and port are never sent to the browser — all requests are proxied server-side |
-| **API key** | Stored only in `.env.local`, never included in client-side code or responses |
-| **Asset IDs** | Immich UUIDs are encrypted (AES-256) into opaque tokens — visitors cannot guess or enumerate asset IDs |
-| **Album scope** | Only albums explicitly listed in `gallery.yaml` are accessible — everything else is blocked |
-| **Password protection** | Individual subpages can require a password before content is revealed |
-| **Rate limiting** | Per-IP sliding-window rate limiter on the image proxy (configurable RPM) |
-| **No direct access** | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
+| Concern                 | Protection                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Server exposure**     | Immich URL and port are never sent to the browser — all requests are proxied server-side                |
+| **API key**             | Stored only in `.env.local`, never included in client-side code or responses                            |
+| **Asset IDs**           | Immich UUIDs are encrypted (AES-256) into opaque tokens — visitors cannot guess or enumerate asset IDs  |
+| **Album scope**         | Only albums explicitly listed in `gallery.yaml` are accessible — everything else is blocked             |
+| **Password protection** | Individual subpages can require a password before content is revealed                                   |
+| **Rate limiting**       | Per-IP sliding-window rate limiter on the image proxy (configurable RPM)                                |
+| **No direct access**    | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
 
 ### Infrastructure
 
@@ -108,7 +108,7 @@ subpages:
     grid:
       columns: 4
       layout: uniform
-      aspectRatio: "3/2"
+      aspectRatio: '3/2'
     albums:
       - uuid-tokyo
       - uuid-kyoto
@@ -147,7 +147,7 @@ services:
     container_name: immich-folio
     restart: unless-stopped
     ports:
-      - "7211:7211"
+      - '7211:7211'
     env_file:
       - .env.local
     volumes:

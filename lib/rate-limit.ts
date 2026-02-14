@@ -5,8 +5,8 @@
  */
 
 interface RateLimitEntry {
-    count: number;
-    expiresAt: number;
+  count: number;
+  expiresAt: number;
 }
 
 const store = new Map<string, RateLimitEntry>();
@@ -16,12 +16,12 @@ let lastCleanup = Date.now();
 const CLEANUP_INTERVAL = 60_000;
 
 function cleanup() {
-    const now = Date.now();
-    if (now - lastCleanup < CLEANUP_INTERVAL) return;
-    lastCleanup = now;
-    for (const [key, entry] of store) {
-        if (now > entry.expiresAt) store.delete(key);
-    }
+  const now = Date.now();
+  if (now - lastCleanup < CLEANUP_INTERVAL) return;
+  lastCleanup = now;
+  for (const [key, entry] of store) {
+    if (now > entry.expiresAt) store.delete(key);
+  }
 }
 
 /**
@@ -31,29 +31,29 @@ function cleanup() {
  * @returns { success, remaining, resetAt (epoch ms) }
  */
 export function checkRateLimit(
-    ip: string,
-    maxRpm: number,
+  ip: string,
+  maxRpm: number,
 ): { success: boolean; remaining: number; resetAt: number } {
-    cleanup();
+  cleanup();
 
-    const now = Date.now();
-    const windowMs = 60_000;
-    const key = `rl:${ip}`;
+  const now = Date.now();
+  const windowMs = 60_000;
+  const key = `rl:${ip}`;
 
-    const entry = store.get(key);
+  const entry = store.get(key);
 
-    // New window or expired
-    if (!entry || now > entry.expiresAt) {
-        const resetAt = now + windowMs;
-        store.set(key, { count: 1, expiresAt: resetAt });
-        return { success: true, remaining: maxRpm - 1, resetAt };
-    }
+  // New window or expired
+  if (!entry || now > entry.expiresAt) {
+    const resetAt = now + windowMs;
+    store.set(key, { count: 1, expiresAt: resetAt });
+    return { success: true, remaining: maxRpm - 1, resetAt };
+  }
 
-    // Within window
-    entry.count++;
-    if (entry.count > maxRpm) {
-        return { success: false, remaining: 0, resetAt: entry.expiresAt };
-    }
+  // Within window
+  entry.count++;
+  if (entry.count > maxRpm) {
+    return { success: false, remaining: 0, resetAt: entry.expiresAt };
+  }
 
-    return { success: true, remaining: maxRpm - entry.count, resetAt: entry.expiresAt };
+  return { success: true, remaining: maxRpm - entry.count, resetAt: entry.expiresAt };
 }

@@ -6,71 +6,66 @@
  */
 
 import { useState } from 'react';
+import styles from './PasswordGate.module.css';
 
 interface PasswordGateProps {
-    slug: string;
-    title: string;
+  slug: string;
+  title: string;
 }
 
 export default function PasswordGate({ slug, title }: PasswordGateProps) {
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-        try {
-            const res = await fetch('/api/auth', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slug, password }),
-            });
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, password }),
+      });
 
-            if (res.ok) {
-                window.location.reload();
-            } else {
-                setError('Wrong password');
-                setPassword('');
-            }
-        } catch {
-            setError('Something went wrong');
-        } finally {
-            setLoading(false);
-        }
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        setError('Wrong password');
+        setPassword('');
+      }
+    } catch {
+      setError('Something went wrong');
+    } finally {
+      setLoading(false);
     }
+  }
 
-    return (
-        <div className="password-gate">
-            <div className="password-gate__card">
-                <h2 className="password-gate__title">{title}</h2>
-                <p className="password-gate__subtitle">
-                    This gallery is password-protected.
-                </p>
+  return (
+    <div className={styles.gate}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>{title}</h2>
+        <p className={styles.subtitle}>This gallery is password-protected.</p>
 
-                <form onSubmit={handleSubmit} className="password-gate__form">
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        className="password-gate__input"
-                        autoFocus
-                        required
-                    />
-                    <button
-                        type="submit"
-                        className="password-gate__button"
-                        disabled={loading}
-                    >
-                        {loading ? 'Verifying…' : 'Enter'}
-                    </button>
-                </form>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password"
+            className={styles.input}
+            autoFocus
+            required
+          />
+          <button type="submit" className={styles.button} disabled={loading}>
+            {loading ? 'Verifying…' : 'Enter'}
+          </button>
+        </form>
 
-                {error && <p className="password-gate__error">{error}</p>}
-            </div>
-        </div>
-    );
+        {error && <p className={styles.error}>{error}</p>}
+      </div>
+    </div>
+  );
 }

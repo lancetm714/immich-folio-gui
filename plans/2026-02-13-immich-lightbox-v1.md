@@ -20,6 +20,7 @@ Build a public-facing web gallery that connects to a private Immich server via i
 The Lightbox Server sits between visitors and Immich. It proxies images, caches API responses, and holds the album selection config. The Immich server stays private and serves album data and original images only to the Lightbox Server.
 
 **Stack:**
+
 - **Next.js 15** (App Router) — SSR for fast first paint, API routes for proxying
 - **TypeScript** — End-to-end type safety
 - **CSS Modules + CSS custom properties** — Clean, maintainable dark-theme styling

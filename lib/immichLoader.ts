@@ -13,12 +13,12 @@
 'use client';
 
 interface ImageLoaderParams {
-    src: string;
-    width: number;
-    quality?: number;
+  src: string;
+  width: number;
+  quality?: number;
 }
 
 export default function immichLoader({ src, width, quality }: ImageLoaderParams): string {
-    const separator = src.includes('?') ? '&' : '?';
-    return `${src}${separator}w=${width}&q=${quality || 75}`;
+  const separator = src.includes('?') ? '&' : '?';
+  return `${src}${separator}w=${width}&q=${quality || 75}`;
 }

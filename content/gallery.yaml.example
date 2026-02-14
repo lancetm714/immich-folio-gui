@@ -42,3 +42,10 @@ subpages:
     password: clientpass123  # visitors must enter this to view
     albums:
       - 55555555-5555-5555-5555-555555555555
+
+# Footer — optional minimal footer with social links
+# footer:
+#   name: John Doe
+#   instagram: johndoe
+#   email: hello@example.com
+#   website: https://example.com

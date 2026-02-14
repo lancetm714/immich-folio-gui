@@ -136,10 +136,10 @@ Upgrade the developer tooling and quality infrastructure for immich-lightbox. Th
 
 ## Suggested Implementation Order
 
-| Phase | Feature | Dependency |
-|-------|---------|------------|
-| 1 | Prettier + ESLint | None — clean baseline first |
-| 2 | Vitest unit tests | None — tests existing code |
-| 3 | Zod env validation | Unit tests can verify schemas |
-| 4 | CSS Modules migration | Lint/format tools catch issues |
-| 5 | Playwright e2e tests | All other changes landed first |
+| Phase | Feature               | Dependency                     |
+| ----- | --------------------- | ------------------------------ |
+| 1     | Prettier + ESLint     | None — clean baseline first    |
+| 2     | Vitest unit tests     | None — tests existing code     |
+| 3     | Zod env validation    | Unit tests can verify schemas  |
+| 4     | CSS Modules migration | Lint/format tools catch issues |
+| 5     | Playwright e2e tests  | All other changes landed first |

@@ -9,6 +9,7 @@ import { immich } from '@/lib/immich';
 import { getConfig } from '@/lib/config';
 import { imageUrl, assetPlaceholder } from '@/lib/urls';
 import { HeroCarousel } from '@/components/HeroCarousel';
+import { FadeIn } from '@/components/FadeIn';
 
 // Render at request time — requires live Immich connection
 export const dynamic = 'force-dynamic';
@@ -37,31 +38,29 @@ export default async function HomePage() {
       {/* ── Left Panel ──────────────────────────────── */}
       <div className="hero__left">
         <div className="hero__content">
-          <h1 className="hero__title">{config.siteTitle}</h1>
+          <FadeIn delay={0}>
+            <h1 className="hero__title">{config.siteTitle}</h1>
+          </FadeIn>
           {config.siteSubtitle && (
-            <p className="hero__subtitle">{config.siteSubtitle}</p>
+            <FadeIn delay={100}>
+              <p className="hero__subtitle">{config.siteSubtitle}</p>
+            </FadeIn>
           )}
 
-          <nav className="hero__nav">
-            {subpages.map((sp) => (
-              <Link
-                key={sp.slug}
-                href={`/${sp.slug}`}
-                className="hero__nav-link"
-              >
-                {sp.name}
-              </Link>
-            ))}
-            {albums.map((album) => (
-              <Link
-                key={album.id}
-                href={`/${album.slug}`}
-                className="hero__nav-link"
-              >
-                {album.albumName}
-              </Link>
-            ))}
-          </nav>
+          <FadeIn delay={200}>
+            <nav className="hero__nav">
+              {subpages.map((sp) => (
+                <Link key={sp.slug} href={`/${sp.slug}`} className="hero__nav-link">
+                  {sp.name}
+                </Link>
+              ))}
+              {albums.map((album) => (
+                <Link key={album.id} href={`/${album.slug}`} className="hero__nav-link">
+                  {album.albumName}
+                </Link>
+              ))}
+            </nav>
+          </FadeIn>
         </div>
       </div>
 
@@ -72,4 +71,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

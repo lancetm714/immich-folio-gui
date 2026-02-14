@@ -11,83 +11,81 @@ import { NextRequest } from 'next/server';
 export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
-    const { searchParams } = request.nextUrl;
-    const title = searchParams.get('title') || 'Gallery';
-    const subtitle = searchParams.get('subtitle') || '';
+  const { searchParams } = request.nextUrl;
+  const title = searchParams.get('title') || 'Gallery';
+  const subtitle = searchParams.get('subtitle') || '';
 
-    return new ImageResponse(
-        (
-            <div
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#0a0a0a',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    padding: '60px',
-                }}
-            >
-                {/* Decorative top line */}
-                <div
-                    style={{
-                        width: '60px',
-                        height: '2px',
-                        backgroundColor: '#d4af37',
-                        marginBottom: '40px',
-                    }}
-                />
+  return new ImageResponse(
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0a0a0a',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        padding: '60px',
+      }}
+    >
+      {/* Decorative top line */}
+      <div
+        style={{
+          width: '60px',
+          height: '2px',
+          backgroundColor: '#d4af37',
+          marginBottom: '40px',
+        }}
+      />
 
-                {/* Title */}
-                <div
-                    style={{
-                        fontSize: '64px',
-                        fontWeight: 600,
-                        color: '#f0f0f0',
-                        letterSpacing: '0.02em',
-                        textAlign: 'center',
-                        lineHeight: 1.2,
-                        maxWidth: '900px',
-                    }}
-                >
-                    {title}
-                </div>
+      {/* Title */}
+      <div
+        style={{
+          fontSize: '64px',
+          fontWeight: 600,
+          color: '#f0f0f0',
+          letterSpacing: '0.02em',
+          textAlign: 'center',
+          lineHeight: 1.2,
+          maxWidth: '900px',
+        }}
+      >
+        {title}
+      </div>
 
-                {/* Subtitle */}
-                {subtitle && (
-                    <div
-                        style={{
-                            fontSize: '24px',
-                            color: '#999999',
-                            fontWeight: 300,
-                            marginTop: '16px',
-                            letterSpacing: '0.08em',
-                            textTransform: 'lowercase',
-                        }}
-                    >
-                        {subtitle}
-                    </div>
-                )}
+      {/* Subtitle */}
+      {subtitle && (
+        <div
+          style={{
+            fontSize: '24px',
+            color: '#999999',
+            fontWeight: 300,
+            marginTop: '16px',
+            letterSpacing: '0.08em',
+            textTransform: 'lowercase',
+          }}
+        >
+          {subtitle}
+        </div>
+      )}
 
-                {/* Bottom decorative line */}
-                <div
-                    style={{
-                        width: '60px',
-                        height: '2px',
-                        backgroundColor: '#d4af37',
-                        marginTop: '40px',
-                    }}
-                />
-            </div>
-        ),
-        {
-            width: 1200,
-            height: 630,
-            headers: {
-                'Cache-Control': 'public, max-age=86400, s-maxage=86400',
-            },
-        },
-    );
+      {/* Bottom decorative line */}
+      <div
+        style={{
+          width: '60px',
+          height: '2px',
+          backgroundColor: '#d4af37',
+          marginTop: '40px',
+        }}
+      />
+    </div>,
+    {
+      width: 1200,
+      height: 630,
+      headers: {
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+      },
+    },
+  );
 }

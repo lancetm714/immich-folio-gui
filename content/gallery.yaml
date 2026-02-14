@@ -23,3 +23,10 @@ subpages:
     password: clientpass123
     albums:
       - 4ad0ed89-55de-4e69-937f-2d9988f63ad1
+      
+# Footer — optional minimal footer with social links
+footer:
+  name: Ralf Ohlenbostel
+  instagram: quasiralf
+#  email: hello@example.com
+#  website: https://example.com

@@ -11,16 +11,16 @@ import { immich } from '@/lib/immich';
 const startTime = Date.now();
 
 export async function GET() {
-    const immichOk = await immich.ping();
+  const immichOk = await immich.ping();
 
-    const body = {
-        status: immichOk ? 'ok' : 'degraded',
-        immich: immichOk ? 'connected' : 'unreachable',
-        uptime: Math.floor((Date.now() - startTime) / 1000),
-    };
+  const body = {
+    status: immichOk ? 'ok' : 'degraded',
+    immich: immichOk ? 'connected' : 'unreachable',
+    uptime: Math.floor((Date.now() - startTime) / 1000),
+  };
 
-    return NextResponse.json(body, {
-        status: immichOk ? 200 : 503,
-        headers: { 'Cache-Control': 'no-store' },
-    });
+  return NextResponse.json(body, {
+    status: immichOk ? 200 : 503,
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }

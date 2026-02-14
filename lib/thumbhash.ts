@@ -11,8 +11,8 @@ import { thumbHashToRGBA, thumbHashToDataURL } from 'thumbhash';
  * suitable for next/image's blurDataURL prop.
  */
 export function thumbHashToBlurDataUrl(base64: string): string {
-    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-    return thumbHashToDataURL(bytes);
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  return thumbHashToDataURL(bytes);
 }
 
 /**
@@ -20,23 +20,29 @@ export function thumbHashToBlurDataUrl(base64: string): string {
  * Computes the weighted average of all non-transparent pixels.
  */
 export function thumbHashToDominantHex(base64: string): string {
-    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-    const { w, h, rgba } = thumbHashToRGBA(bytes);
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const { w, h, rgba } = thumbHashToRGBA(bytes);
 
-    let r = 0, g = 0, b = 0, total = 0;
-    for (let i = 0; i < w * h; i++) {
-        const a = rgba[i * 4 + 3];
-        if (a > 0) {
-            const weight = a / 255;
-            r += rgba[i * 4] * weight;
-            g += rgba[i * 4 + 1] * weight;
-            b += rgba[i * 4 + 2] * weight;
-            total += weight;
-        }
+  let r = 0,
+    g = 0,
+    b = 0,
+    total = 0;
+  for (let i = 0; i < w * h; i++) {
+    const a = rgba[i * 4 + 3];
+    if (a > 0) {
+      const weight = a / 255;
+      r += rgba[i * 4] * weight;
+      g += rgba[i * 4 + 1] * weight;
+      b += rgba[i * 4 + 2] * weight;
+      total += weight;
     }
+  }
 
-    if (total === 0) return '#888888';
+  if (total === 0) return '#888888';
 
-    const avg = (v: number) => Math.round(v / total).toString(16).padStart(2, '0');
-    return `#${avg(r)}${avg(g)}${avg(b)}`;
+  const avg = (v: number) =>
+    Math.round(v / total)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${avg(r)}${avg(g)}${avg(b)}`;
 }
