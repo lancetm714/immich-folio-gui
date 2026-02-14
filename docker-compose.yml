@@ -5,11 +5,7 @@ services:
     restart: unless-stopped
     ports:
       - "7211:7211"
-    environment:
-      - IMMICH_API_URL=${IMMICH_API_URL}
-      - IMMICH_API_KEY=${IMMICH_API_KEY}
-      - LIGHTBOX_ALBUMS=${LIGHTBOX_ALBUMS}
-      - SITE_TITLE=${SITE_TITLE:-Gallery}
-      - CACHE_TTL=${CACHE_TTL:-300}
     env_file:
       - .env.local
+    volumes:
+      - ./content:/app/content:ro
