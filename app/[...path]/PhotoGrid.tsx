@@ -1,11 +1,14 @@
 /**
  * PhotoGrid — client component wrapping the masonry grid and lightbox.
  * Handles image click → lightbox open, keyboard nav, and EXIF fetching.
+ *
+ * Deep-link support: syncs lightbox index with the URL hash (#photo-N).
+ * Sharing a link with a hash opens the lightbox to that photo directly.
  */
 
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Lightbox } from '@/components/Lightbox';
 import { FadeIn } from '@/components/FadeIn';
@@ -33,15 +36,73 @@ interface PhotoGridProps {
   gridStyle?: React.CSSProperties;
 }
 
+/** Parse `#photo-N` from a hash string. Returns index or null. */
+function parsePhotoHash(hash: string): number | null {
+  const match = hash.match(/^#photo-(\d+)$/);
+  if (!match) return null;
+  const idx = parseInt(match[1], 10) - 1; // 1-indexed in URL, 0-indexed internally
+  return idx >= 0 ? idx : null;
+}
+
+/** Build the hash string for a given 0-based index. */
+function buildPhotoHash(index: number): string {
+  return `#photo-${index + 1}`; // 1-indexed for user-friendliness
+}
+
 export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const isInitialized = useRef(false);
 
-  const openLightbox = useCallback((index: number) => {
-    setLightboxIndex(index);
-  }, []);
+  // ── On mount: check URL hash for a deep-link ──────────────────
+  useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
+    const idx = parsePhotoHash(window.location.hash);
+    if (idx !== null && idx < assets.length) {
+      setLightboxIndex(idx);
+    }
+  }, [assets.length]);
+
+  // ── Sync URL hash when lightbox state changes ─────────────────
+  useEffect(() => {
+    if (lightboxIndex !== null && lightboxIndex < assets.length) {
+      const hash = buildPhotoHash(lightboxIndex);
+      // Use replaceState to avoid flooding history with every prev/next tap
+      if (window.location.hash !== hash) {
+        window.history.replaceState(null, '', hash);
+      }
+    }
+  }, [lightboxIndex, assets.length]);
+
+  // ── Listen for browser back/forward (hash change) ─────────────
+  useEffect(() => {
+    const handleHashChange = () => {
+      const idx = parsePhotoHash(window.location.hash);
+      if (idx !== null && idx < assets.length) {
+        setLightboxIndex(idx);
+      } else {
+        setLightboxIndex(null);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [assets.length]);
+
+  const openLightbox = useCallback(
+    (index: number) => {
+      setLightboxIndex(index);
+      // Push state (not replace) so the user can press Back to close
+      window.history.pushState(null, '', buildPhotoHash(index));
+    },
+    [],
+  );
 
   const closeLightbox = useCallback(() => {
     setLightboxIndex(null);
+    // Remove hash from URL cleanly
+    window.history.pushState(null, '', window.location.pathname + window.location.search);
   }, []);
 
   const goNext = useCallback(() => {

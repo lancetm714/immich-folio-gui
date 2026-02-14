@@ -227,3 +227,29 @@
     right: 8px;
   }
 }
+
+/* ── Studio-Inspired Lightbox Defaults ───────────── */
+.overlay {
+  background: rgba(0, 0, 0, 0.98);
+}
+
+.close,
+.nav,
+.counter {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.overlay:hover .close,
+.overlay:hover .nav,
+.overlay:hover .counter {
+  opacity: 1;
+}
+
+.imageContainer {
+  border-radius: 0;
+}
+
+.image {
+  border-radius: 0;
+}

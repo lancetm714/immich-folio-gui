@@ -17,6 +17,9 @@ const siteDescription = 'A curated photography portfolio';
 export const metadata: Metadata = {
   title: siteTitle,
   description: siteDescription,
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     title: siteTitle,
     description: siteDescription,

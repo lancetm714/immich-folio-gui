@@ -41,7 +41,7 @@ function applyTheme(theme: Theme) {
 // Initialize from localStorage on module load (client-side only)
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('theme') as Theme | null;
-  currentTheme = stored || 'dark';
+  currentTheme = stored === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
 }
 
