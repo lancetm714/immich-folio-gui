@@ -29,8 +29,8 @@ Immich Folio adds a full security layer between the public internet and your Imm
 
 ```bash
 # Clone and install
-git clone https://github.com/YOUR_USER/immich-lightbox.git
-cd immich-lightbox
+git clone https://github.com/ralksta/immich-folio.git
+cd immich-folio
 npm install
 
 # Configure
@@ -76,8 +76,8 @@ CACHE_TTL=300
 ## Docker
 
 ```bash
-docker build -t immich-lightbox .
-docker run -p 3000:3000 --env-file .env.local immich-lightbox
+docker build -t immich-folio .
+docker run -p 3000:3000 --env-file .env.local immich-folio
 ```
 
 ## License
