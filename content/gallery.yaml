@@ -2,7 +2,10 @@
 # Album and subpage definitions for your public gallery.
 # Secrets (API key, server URL) stay in .env.local.
 
-hero: 03c0df0e-01d7-4cc7-8352-cf30d2289ad6
+hero:
+  - 03c0df0e-01d7-4cc7-8352-cf30d2289ad6
+  - a492300b-14ca-4167-a2c9-815c820a8802
+  - 7fdc0891-8e9d-48f1-9f1b-a8697c6dbea1
 
 # Standalone albums shown directly on the homepage
 albums:
