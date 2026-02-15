@@ -1,5 +1,7 @@
 # Immich Lightbox — Public Photo Gallery
 
+> **Status: ✅ Complete** — All items implemented and shipped.
+
 ## Objective
 
 Build a public-facing web gallery that connects to a private Immich server via its API, selects specific albums, and presents them as a beautiful, Lightroom-style portfolio website — similar in spirit to [ralfo.myportfolio.com](http://ralfo.myportfolio.com/). The Immich server stays behind the firewall; only curated album images flow outward through this app.
@@ -30,31 +32,31 @@ The Lightbox Server sits between visitors and Immich. It proxies images, caches 
 
 ## Implementation Plan
 
-- [ ] 1. **Scaffold the Next.js project** — Initialize a Next.js 15 app with TypeScript in the current workspace directory using `npx -y create-next-app@latest ./`. Configure project settings (app router, TypeScript, ESLint). This is the foundation everything else builds on.
+- [x] 1. **Scaffold the Next.js project** — Initialize a Next.js 15 app with TypeScript in the current workspace directory using `npx -y create-next-app@latest ./`. Configure project settings (app router, TypeScript, ESLint). This is the foundation everything else builds on.
 
-- [ ] 2. **Create the Immich API client module** — Build a server-only module (`lib/immich.ts`) that wraps the Immich REST API. This module handles authentication (API key from env vars), album listing (`GET /api/albums`), album detail fetching (`GET /api/albums/{id}`), and asset thumbnail/original URL construction. All API calls happen server-side only — the API key never reaches the browser.
+- [x] 2. **Create the Immich API client module** — Build a server-only module (`lib/immich.ts`) that wraps the Immich REST API. This module handles authentication (API key from env vars), album listing (`GET /api/albums`), album detail fetching (`GET /api/albums/{id}`), and asset thumbnail/original URL construction. All API calls happen server-side only — the API key never reaches the browser.
 
-- [ ] 3. **Create environment configuration** — Set up `.env.local.example` documenting required variables: `IMMICH_API_URL` (the Immich server base URL), `IMMICH_API_KEY` (service account key), and `LIGHTBOX_ALBUMS` (comma-separated album IDs to publish). Add a `lib/config.ts` module that validates and exports typed config at startup.
+- [x] 3. **Create environment configuration** — Set up `.env.local.example` documenting required variables: `IMMICH_API_URL` (the Immich server base URL), `IMMICH_API_KEY` (service account key), and `LIGHTBOX_ALBUMS` (comma-separated album IDs to publish). Add a `lib/config.ts` module that validates and exports typed config at startup.
 
-- [ ] 4. **Build the image proxy API route** — Create `app/api/image/[id]/route.ts` that proxies image requests through to Immich. Accepts an asset ID and optional `size` query param (thumbnail vs. original). Streams the response from Immich to the client, setting appropriate cache headers (long `Cache-Control` since images are immutable). This keeps the Immich server unexposed while serving images to visitors.
+- [x] 4. **Build the image proxy API route** — Create `app/api/image/[id]/route.ts` that proxies image requests through to Immich. Accepts an asset ID and optional `size` query param (thumbnail vs. original). Streams the response from Immich to the client, setting appropriate cache headers (long `Cache-Control` since images are immutable). This keeps the Immich server unexposed while serving images to visitors.
 
-- [ ] 5. **Design and implement the global layout and theme** — Create the root layout (`app/layout.tsx`) and global styles (`app/globals.css`). Establish a dark, minimal design system: near-black backgrounds, subtle borders, elegant typography (Google Fonts — Inter or similar). Include a minimal header/nav with the site title and responsive breakpoints. The aesthetic should feel premium and image-focused, not app-like.
+- [x] 5. **Design and implement the global layout and theme** — Create the root layout (`app/layout.tsx`) and global styles (`app/globals.css`). Establish a dark, minimal design system: near-black backgrounds, subtle borders, elegant typography (Google Fonts — Inter or similar). Include a minimal header/nav with the site title and responsive breakpoints. The aesthetic should feel premium and image-focused, not app-like.
 
-- [ ] 6. **Build the homepage — album grid** — Create `app/page.tsx` as a server component that fetches the configured albums from Immich, displays them in a responsive grid layout. Each album card shows its cover image (fetched via the proxy), album title, and asset count. Clicking an album navigates to its detail page. Add hover effects (subtle scale, overlay with title) for an engaging, interactive feel.
+- [x] 6. **Build the homepage — album grid** — Create `app/page.tsx` as a server component that fetches the configured albums from Immich, displays them in a responsive grid layout. Each album card shows its cover image (fetched via the proxy), album title, and asset count. Clicking an album navigates to its detail page. Add hover effects (subtle scale, overlay with title) for an engaging, interactive feel.
 
-- [ ] 7. **Build the album detail page — photo grid** — Create `app/album/[id]/page.tsx` as a server component. Fetches all assets in the selected album from Immich, displays them in a masonry or justified grid using CSS Grid. Shows thumbnails initially for fast loading. A back-to-home navigation link or breadcrumb provides context. Each image is clickable to open a fullscreen lightbox.
+- [x] 7. **Build the album detail page — photo grid** — Create `app/album/[id]/page.tsx` as a server component. Fetches all assets in the selected album from Immich, displays them in a masonry or justified grid using CSS Grid. Shows thumbnails initially for fast loading. A back-to-home navigation link or breadcrumb provides context. Each image is clickable to open a fullscreen lightbox.
 
-- [ ] 8. **Build the client-side lightbox component** — Create a `components/Lightbox.tsx` client component. When a user clicks a photo in the album grid, an overlay opens showing the full-resolution image with smooth fade/slide transitions. Include previous/next navigation (arrow keys + swipe on mobile), close button (Esc key support), and an optional EXIF info overlay (camera, lens, ISO, aperture, shutter speed — data from Immich). Preload adjacent images for snappy navigation.
+- [x] 8. **Build the client-side lightbox component** — Create a `components/Lightbox.tsx` client component. When a user clicks a photo in the album grid, an overlay opens showing the full-resolution image with smooth fade/slide transitions. Include previous/next navigation (arrow keys + swipe on mobile), close button (Esc key support), and an optional EXIF info overlay (camera, lens, ISO, aperture, shutter speed — data from Immich). Preload adjacent images for snappy navigation.
 
-- [ ] 9. **Add EXIF metadata display** — Enhance the Immich API client to fetch asset EXIF data (`GET /api/assets/{id}`). Display this in the lightbox as an optional info panel: camera model, lens, focal length, aperture, shutter speed, ISO. This adds the "photographer's portfolio" feel that distinguishes this from a basic gallery.
+- [x] 9. **Add EXIF metadata display** — Enhance the Immich API client to fetch asset EXIF data (`GET /api/assets/{id}`). Display this in the lightbox as an optional info panel: camera model, lens, focal length, aperture, shutter speed, ISO. This adds the "photographer's portfolio" feel that distinguishes this from a basic gallery.
 
-- [ ] 10. **Implement image loading optimizations** — Use Next.js `<Image>` component with blur placeholder data-URLs (generated server-side from Immich thumbnails). Implement progressive loading: show tiny blurred thumbnails instantly, then swap to full thumbnails on load. Apply `loading="lazy"` on below-the-fold images. Set proper `sizes` attributes for responsive image delivery.
+- [x] 10. **Implement image loading optimizations** — Use Next.js `<Image>` component with blur placeholder data-URLs (generated server-side from Immich thumbnails). Implement progressive loading: show tiny blurred thumbnails instantly, then swap to full thumbnails on load. Apply `loading="lazy"` on below-the-fold images. Set proper `sizes` attributes for responsive image delivery.
 
-- [ ] 11. **Add server-side caching layer** — Implement an in-memory LRU cache (or file-based cache in production) for Immich API responses. Album lists and metadata rarely change, so cache with a configurable TTL (default 5 minutes). Image proxy responses rely on HTTP cache headers; no server-side image caching needed. This dramatically reduces Immich API load.
+- [x] 11. **Add server-side caching layer** — Implement an in-memory LRU cache (or file-based cache in production) for Immich API responses. Album lists and metadata rarely change, so cache with a configurable TTL (default 5 minutes). Image proxy responses rely on HTTP cache headers; no server-side image caching needed. This dramatically reduces Immich API load.
 
-- [ ] 12. **Create the Docker deployment setup** — Write a `Dockerfile` (multi-stage: build + runtime) and `docker-compose.yml`. The compose file references env vars for Immich connection details. Include health check and proper signal handling. Document deployment in `README.md`.
+- [x] 12. **Create the Docker deployment setup** — Write a `Dockerfile` (multi-stage: build + runtime) and `docker-compose.yml`. The compose file references env vars for Immich connection details. Include health check and proper signal handling. Document deployment in `README.md`.
 
-- [ ] 13. **Write the README and configuration guide** — Create a comprehensive `README.md` covering: project overview, screenshots, setup instructions (how to get an Immich API key, how to find album IDs, env var reference), Docker deployment, and development workflow.
+- [x] 13. **Write the README and configuration guide** — Create a comprehensive `README.md` covering: project overview, screenshots, setup instructions (how to get an Immich API key, how to find album IDs, env var reference), Docker deployment, and development workflow.
 
 ---
 

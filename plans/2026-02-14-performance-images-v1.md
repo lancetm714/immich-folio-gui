@@ -1,5 +1,7 @@
 # Performance & Images
 
+> **Status: ✅ Complete** — All items implemented and shipped.
+
 ## Objective
 
 Replace all raw `<img>` tags with `next/image`, add ThumbHash blur-up placeholders from Immich metadata, and extract dominant-color placeholders — giving every image a near-instant perceived load with automatic WebP/AVIF optimization and responsive srcsets.
@@ -19,33 +21,33 @@ Replace all raw `<img>` tags with `next/image`, add ThumbHash blur-up placeholde
 
 ## Implementation Plan
 
-- [ ] 1. **Extend the image proxy to accept width/quality params** — Modify [route.ts](file:///Users/ralfo/git/immich-lightbox/app/api/image/[id]/route.ts) to accept optional `w` (width) and `q` (quality) query parameters. When `w` is provided, map it to the closest Immich size tier (`thumbnail` ≤ 250, `preview` ≤ 1440, `original` otherwise). Keep backward compatibility so existing `?size=` calls continue to work unchanged.
+- [x] 1. **Extend the image proxy to accept width/quality params** — Modify [route.ts](file:///Users/ralfo/git/immich-lightbox/app/api/image/[id]/route.ts) to accept optional `w` (width) and `q` (quality) query parameters. When `w` is provided, map it to the closest Immich size tier (`thumbnail` ≤ 250, `preview` ≤ 1440, `original` otherwise). Keep backward compatibility so existing `?size=` calls continue to work unchanged.
 
-- [ ] 2. **Create a custom `next/image` loader** — Add [immichLoader.ts](file:///Users/ralfo/git/immich-lightbox/lib/immichLoader.ts) exporting a loader function that generates `/api/image/:token?w=WIDTH&q=QUALITY` URLs. Must be a standalone file referenced via `loaderFile` in `next.config.ts` (required for App Router). Handles the `src → token → proxy URL` mapping.
+- [x] 2. **Create a custom `next/image` loader** — Add [immichLoader.ts](file:///Users/ralfo/git/immich-lightbox/lib/immichLoader.ts) exporting a loader function that generates `/api/image/:token?w=WIDTH&q=QUALITY` URLs. Must be a standalone file referenced via `loaderFile` in `next.config.ts` (required for App Router). Handles the `src → token → proxy URL` mapping.
 
-- [ ] 3. **Configure Next.js for the custom loader** — Modify [next.config.ts](file:///Users/ralfo/git/immich-lightbox/next.config.ts) to add `images.loader: 'custom'` and `images.loaderFile: './lib/immichLoader.ts'` so `next/image` uses our proxy globally.
+- [x] 3. **Configure Next.js for the custom loader** — Modify [next.config.ts](file:///Users/ralfo/git/immich-lightbox/next.config.ts) to add `images.loader: 'custom'` and `images.loaderFile: './lib/immichLoader.ts'` so `next/image` uses our proxy globally.
 
-- [ ] 4. **Add `thumbhash` dependency** — Modify [package.json](file:///Users/ralfo/git/immich-lightbox/package.json) to add the `thumbhash` npm package (~2 KB, pure JS, no native deps). Run `npm install`.
+- [x] 4. **Add `thumbhash` dependency** — Modify [package.json](file:///Users/ralfo/git/immich-lightbox/package.json) to add the `thumbhash` npm package (~2 KB, pure JS, no native deps). Run `npm install`.
 
-- [ ] 5. **Create ThumbHash helper utilities** — Add [thumbhash.ts](file:///Users/ralfo/git/immich-lightbox/lib/thumbhash.ts) with two helpers: `thumbHashToDataUrl(base64)` converting Immich's base64-encoded ThumbHash into a tiny data URL for `next/image`'s `blurDataURL` prop, and `thumbHashToDominantColor(base64)` extracting the average/dominant color as a hex string from the ThumbHash's decoded RGBA data. Since ThumbHash encodes both shape and color, both blur placeholder and dominant color come from the same Immich field — no extra API calls.
+- [x] 5. **Create ThumbHash helper utilities** — Add [thumbhash.ts](file:///Users/ralfo/git/immich-lightbox/lib/thumbhash.ts) with two helpers: `thumbHashToDataUrl(base64)` converting Immich's base64-encoded ThumbHash into a tiny data URL for `next/image`'s `blurDataURL` prop, and `thumbHashToDominantColor(base64)` extracting the average/dominant color as a hex string from the ThumbHash's decoded RGBA data. Since ThumbHash encodes both shape and color, both blur placeholder and dominant color come from the same Immich field — no extra API calls.
 
-- [ ] 6. **Add placeholder helper to URL utilities** — Modify [urls.ts](file:///Users/ralfo/git/immich-lightbox/lib/urls.ts) to add an `assetPlaceholder(asset)` helper returning `{ blurDataURL, dominantColor } | null`. This encapsulates ThumbHash → placeholder conversion server-side so page components just pass it through as props.
+- [x] 6. **Add placeholder helper to URL utilities** — Modify [urls.ts](file:///Users/ralfo/git/immich-lightbox/lib/urls.ts) to add an `assetPlaceholder(asset)` helper returning `{ blurDataURL, dominantColor } | null`. This encapsulates ThumbHash → placeholder conversion server-side so page components just pass it through as props.
 
-- [ ] 7. **Migrate homepage hero to `next/image`** — Modify [page.tsx](file:///Users/ralfo/git/immich-lightbox/app/page.tsx) to replace the raw `<img>` (line 58) with `next/image` using `fill` layout and `priority` (above-the-fold LCP image). Add `blurDataURL` and `placeholder="blur"` from the hero asset's ThumbHash. Fetch ThumbHash via `immich.getAssetInfo()` for the hero image ID.
+- [x] 7. **Migrate homepage hero to `next/image`** — Modify [page.tsx](file:///Users/ralfo/git/immich-lightbox/app/page.tsx) to replace the raw `<img>` (line 58) with `next/image` using `fill` layout and `priority` (above-the-fold LCP image). Add `blurDataURL` and `placeholder="blur"` from the hero asset's ThumbHash. Fetch ThumbHash via `immich.getAssetInfo()` for the hero image ID.
 
-- [ ] 8. **Migrate subpage album covers to `next/image`** — Modify [page.tsx](file:///Users/ralfo/git/immich-lightbox/app/[...path]/page.tsx) to replace album cover `<img>` tags (line 98) with `next/image` using `fill` layout. Pass `blurDataURL` and `placeholder="blur"` from each album's thumbnail asset ThumbHash. Batch-fetch ThumbHash data for `albumThumbnailAssetId` when loading subpage data.
+- [x] 8. **Migrate subpage album covers to `next/image`** — Modify [page.tsx](file:///Users/ralfo/git/immich-lightbox/app/[...path]/page.tsx) to replace album cover `<img>` tags (line 98) with `next/image` using `fill` layout. Pass `blurDataURL` and `placeholder="blur"` from each album's thumbnail asset ThumbHash. Batch-fetch ThumbHash data for `albumThumbnailAssetId` when loading subpage data.
 
-- [ ] 9. **Migrate about page portrait to `next/image`** — Modify [about/page.tsx](file:///Users/ralfo/git/immich-lightbox/app/about/page.tsx) to replace the portrait `<img>` (line 33) with `next/image` using `fill` layout and ThumbHash blur placeholder.
+- [x] 9. **Migrate about page portrait to `next/image`** — Modify [about/page.tsx](file:///Users/ralfo/git/immich-lightbox/app/about/page.tsx) to replace the portrait `<img>` (line 33) with `next/image` using `fill` layout and ThumbHash blur placeholder.
 
-- [ ] 10. **Migrate photo grid thumbnails to `next/image`** — Modify [PhotoGrid.tsx](file:///Users/ralfo/git/immich-lightbox/app/[...path]/PhotoGrid.tsx) to replace grid `<img>` tags (line 84) with `next/image` using `fill` layout and `sizes` attribute for responsive sizing. Extend the `PhotoItem` interface with optional `blurDataURL` and `dominantColor` fields, generated server-side and passed as props. Use `placeholder="blur"` when available. Use `dominantColor` as CSS `background-color` on the grid item container for an instant color flash.
+- [x] 10. **Migrate photo grid thumbnails to `next/image`** — Modify [PhotoGrid.tsx](file:///Users/ralfo/git/immich-lightbox/app/[...path]/PhotoGrid.tsx) to replace grid `<img>` tags (line 84) with `next/image` using `fill` layout and `sizes` attribute for responsive sizing. Extend the `PhotoItem` interface with optional `blurDataURL` and `dominantColor` fields, generated server-side and passed as props. Use `placeholder="blur"` when available. Use `dominantColor` as CSS `background-color` on the grid item container for an instant color flash.
 
-- [ ] 11. **Add placeholders to the Lightbox** — Modify [Lightbox.tsx](file:///Users/ralfo/git/immich-lightbox/components/Lightbox.tsx) to keep using raw `<img>` for fullscreen preview but add dominant-color background on `.lightbox__image-container` and show the ThumbHash blur as a CSS `background-image` while the main image loads, fading it out with a CSS transition on the image's `onload` event.
+- [x] 11. **Add placeholders to the Lightbox** — Modify [Lightbox.tsx](file:///Users/ralfo/git/immich-lightbox/components/Lightbox.tsx) to keep using raw `<img>` for fullscreen preview but add dominant-color background on `.lightbox__image-container` and show the ThumbHash blur as a CSS `background-image` while the main image loads, fading it out with a CSS transition on the image's `onload` event.
 
-- [ ] 12. **Add CSS for placeholder transitions** — Modify [globals.css](file:///Users/ralfo/git/immich-lightbox/app/globals.css) to add smooth blur-to-sharp opacity transitions on grid items (pseudo-element or background-image), dominant color background styling for grid items, lightbox container, and album covers.
+- [x] 12. **Add CSS for placeholder transitions** — Modify [globals.css](file:///Users/ralfo/git/immich-lightbox/app/globals.css) to add smooth blur-to-sharp opacity transitions on grid items (pseudo-element or background-image), dominant color background styling for grid items, lightbox container, and album covers.
 
-- [ ] 13. **Verify build and lint** — Run `npm run build` and `npm run lint` to confirm no TypeScript or ESLint errors.
+- [x] 13. **Verify build and lint** — Run `npm run build` and `npm run lint` to confirm no TypeScript or ESLint errors.
 
-- [ ] 14. **Manual visual verification** — Run `npm run dev`, test homepage hero blur, subpage album cover placeholders, photo grid blur-up, lightbox dominant color background, and about page portrait placeholder. Throttle to Slow 3G in DevTools to validate placeholder visibility.
+- [x] 14. **Manual visual verification** — Run `npm run dev`, test homepage hero blur, subpage album cover placeholders, photo grid blur-up, lightbox dominant color background, and about page portrait placeholder. Throttle to Slow 3G in DevTools to validate placeholder visibility.
 
 ## Verification Criteria
 

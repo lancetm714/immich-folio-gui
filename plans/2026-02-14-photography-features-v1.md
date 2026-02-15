@@ -1,5 +1,7 @@
 # Photography Features
 
+> **Status: ✅ Complete** — All items implemented and shipped.
+
 ## Objective
 
 Implement four photography-focused enhancements to the gallery: a hero image carousel with crossfade transitions, automatic full-bleed rendering when a subpage contains only one album, EXIF metadata on grid hover with a global toggle, and a configurable grid layout system supporting masonry vs. uniform modes, custom column counts, gaps, and aspect ratios.
@@ -10,47 +12,47 @@ Implement four photography-focused enhancements to the gallery: a hero image car
 
 ### Feature 1 — Hero Carousel
 
-- [ ] 1. **Add `hero` list support to `gallery.yaml` and config** — Extend the `GalleryYaml` interface in `lib/config.ts:32` so that `hero` accepts either a single UUID string (backward compatible) or an array of UUID strings. Add a validation step that normalizes the value to an array (`heroImages: string[]`) in `AppConfig` at `lib/config.ts:100`. Update `gallery.yaml.example` with a commented example showing the array syntax. This lets users define 3–5 hero images.
+- [x] 1. **Add `hero` list support to `gallery.yaml` and config** — Extend the `GalleryYaml` interface in `lib/config.ts:32` so that `hero` accepts either a single UUID string (backward compatible) or an array of UUID strings. Add a validation step that normalizes the value to an array (`heroImages: string[]`) in `AppConfig` at `lib/config.ts:100`. Update `gallery.yaml.example` with a commented example showing the array syntax. This lets users define 3–5 hero images.
 
-- [ ] 2. **Create `HeroCarousel` client component** — Create a new `components/HeroCarousel.tsx` client component. It receives a list of `{ src, blurDataURL }` objects. It rotates through images on a timer (e.g. 6 seconds), crossfading by layering two `next/image` elements with CSS opacity transitions. Only two are mounted at any time (current + next). Use `priority` on the first image only. Clear/restart the interval on unmount. If only one image is provided, render a single static image with no timer — this maintains backward compatibility with the current single-hero setup.
+- [x] 2. **Create `HeroCarousel` client component** — Create a new `components/HeroCarousel.tsx` client component. It receives a list of `{ src, blurDataURL }` objects. It rotates through images on a timer (e.g. 6 seconds), crossfading by layering two `next/image` elements with CSS opacity transitions. Only two are mounted at any time (current + next). Use `priority` on the first image only. Clear/restart the interval on unmount. If only one image is provided, render a single static image with no timer — this maintains backward compatibility with the current single-hero setup.
 
-- [ ] 3. **Update homepage to use `HeroCarousel`** — Modify `app/page.tsx:62-79` to replace the single `<Image>` with the `HeroCarousel` component. Fetch `getAssetInfo` for each hero image in `config.heroImages`, generate placeholder data via `assetPlaceholder`, and pass the array to the carousel. If no hero images are configured, fall back to the existing placeholder div.
+- [x] 3. **Update homepage to use `HeroCarousel`** — Modify `app/page.tsx:62-79` to replace the single `<Image>` with the `HeroCarousel` component. Fetch `getAssetInfo` for each hero image in `config.heroImages`, generate placeholder data via `assetPlaceholder`, and pass the array to the carousel. If no hero images are configured, fall back to the existing placeholder div.
 
-- [ ] 4. **Add carousel CSS** — Add CSS rules in `app/globals.css` for the carousel: stack images with `position: absolute`, crossfade using `opacity` transitions with `var(--transition-slow)`, handle `z-index` layering. Ensure the `.hero__right` container already has `position: relative; overflow: hidden` (it does) so images fill correctly.
+- [x] 4. **Add carousel CSS** — Add CSS rules in `app/globals.css` for the carousel: stack images with `position: absolute`, crossfade using `opacity` transitions with `var(--transition-slow)`, handle `z-index` layering. Ensure the `.hero__right` container already has `position: relative; overflow: hidden` (it does) so images fill correctly.
 
 ---
 
 ### Feature 2 — Full-Bleed Single Albums
 
-- [ ] 5. **Detect single-album subpages in the catch-all route** — In `app/[...path]/page.tsx:150-202` (the subpage rendering branch), after fetching `getSubpageAlbums`, check if `albums.length === 1`. If so, skip the subpage album grid entirely and instead render the album detail view (album header + `PhotoGrid`) directly, consistent with how a standalone album renders. Include the back-link pointing to `/` since the intermediate subpage grid is being bypassed.
+- [x] 5. **Detect single-album subpages in the catch-all route** — In `app/[...path]/page.tsx:150-202` (the subpage rendering branch), after fetching `getSubpageAlbums`, check if `albums.length === 1`. If so, skip the subpage album grid entirely and instead render the album detail view (album header + `PhotoGrid`) directly, consistent with how a standalone album renders. Include the back-link pointing to `/` since the intermediate subpage grid is being bypassed.
 
-- [ ] 6. **Preserve metadata for single-album subpages** — In `generateMetadata` at `app/[...path]/page.tsx:46-48`, when the slug is a subpage, also check if only one album exists. If so, generate metadata using the album name and photo count instead of the subpage name, since the user lands directly in the album.
+- [x] 6. **Preserve metadata for single-album subpages** — In `generateMetadata` at `app/[...path]/page.tsx:46-48`, when the slug is a subpage, also check if only one album exists. If so, generate metadata using the album name and photo count instead of the subpage name, since the user lands directly in the album.
 
 ---
 
 ### Feature 3 — EXIF on Hover
 
-- [ ] 7. **Extend `PhotoItem` with EXIF summary fields** — Add optional `camera` (string), `lens` (string), and `focalLength` (string) fields to the `PhotoItem` interface in `app/[...path]/PhotoGrid.tsx:12-20`. These are compact summary strings derived server-side from `ImmichExifInfo.model`, `ImmichExifInfo.lensModel`, and `ImmichExifInfo.focalLength` on each asset.
+- [x] 7. **Extend `PhotoItem` with EXIF summary fields** — Add optional `camera` (string), `lens` (string), and `focalLength` (string) fields to the `PhotoItem` interface in `app/[...path]/PhotoGrid.tsx:12-20`. These are compact summary strings derived server-side from `ImmichExifInfo.model`, `ImmichExifInfo.lensModel`, and `ImmichExifInfo.focalLength` on each asset.
 
-- [ ] 8. **Pass EXIF summary data from server pages** — In `app/[...path]/page.tsx`, when building the `PhotoItem` array for `PhotoGrid`, extract the EXIF summary from `asset.exifInfo` (already present on `ImmichAsset`). Construct the compact strings (e.g. `"Leica M11"`, `"50mm Summilux"`, `"50mm"`) and include them in each `PhotoItem`. Only include fields that are non-null.
+- [x] 8. **Pass EXIF summary data from server pages** — In `app/[...path]/page.tsx`, when building the `PhotoItem` array for `PhotoGrid`, extract the EXIF summary from `asset.exifInfo` (already present on `ImmichAsset`). Construct the compact strings (e.g. `"Leica M11"`, `"50mm Summilux"`, `"50mm"`) and include them in each `PhotoItem`. Only include fields that are non-null.
 
-- [ ] 9. **Add EXIF hover tooltip to `PhotoGrid`** — In `PhotoGrid.tsx`, render a small overlay div inside each `.photo-grid__item` when `camera` or `lens` is present. The overlay shows camera + lens + focal length in a compact one-line format. Use CSS `opacity: 0` by default and `opacity: 1` on `.photo-grid__item:hover`, matching the existing hover transition timing. Position at the bottom of the grid cell.
+- [x] 9. **Add EXIF hover tooltip to `PhotoGrid`** — In `PhotoGrid.tsx`, render a small overlay div inside each `.photo-grid__item` when `camera` or `lens` is present. The overlay shows camera + lens + focal length in a compact one-line format. Use CSS `opacity: 0` by default and `opacity: 1` on `.photo-grid__item:hover`, matching the existing hover transition timing. Position at the bottom of the grid cell.
 
-- [ ] 10. **Add an `exifOnHover` toggle to `gallery.yaml`** — Add an optional boolean `exifOnHover` field (default `true`) to the `GalleryYaml` interface and `AppConfig` in `lib/config.ts`. When `false`, the server pages skip attaching the EXIF data to `PhotoItem`, and the overlay elements are not rendered. Pass the flag through to `PhotoGrid` as a prop.
+- [x] 10. **Add an `exifOnHover` toggle to `gallery.yaml`** — Add an optional boolean `exifOnHover` field (default `true`) to the `GalleryYaml` interface and `AppConfig` in `lib/config.ts`. When `false`, the server pages skip attaching the EXIF data to `PhotoItem`, and the overlay elements are not rendered. Pass the flag through to `PhotoGrid` as a prop.
 
-- [ ] 11. **Add CSS for EXIF hover overlay** — Add styles in `app/globals.css` for `.photo-grid__item-exif`: positioned at the bottom of the grid cell using `position: absolute; bottom: 0`, with a dark gradient background, small white text (font-size ~0.7rem), `opacity: 0` transitioning to `1` on parent hover, with `pointer-events: none` so it doesn't interfere with click-to-lightbox.
+- [x] 11. **Add CSS for EXIF hover overlay** — Add styles in `app/globals.css` for `.photo-grid__item-exif`: positioned at the bottom of the grid cell using `position: absolute; bottom: 0`, with a dark gradient background, small white text (font-size ~0.7rem), `opacity: 0` transitioning to `1` on parent hover, with `pointer-events: none` so it doesn't interfere with click-to-lightbox.
 
 ---
 
 ### Feature 4 — Customizable Grid Layout
 
-- [ ] 12. **Add grid configuration to `gallery.yaml`** — Extend `GalleryYaml` and `AppConfig` in `lib/config.ts` with a `grid` object containing: `columns` (number, default 3), `gap` (number in px, default 12), `aspectRatio` (string like `"1"`, `"3/2"`, `"auto"`, default `"1"`), and `layout` (enum `"masonry"` | `"uniform"`, default `"masonry"`). Parse and validate these in `getConfig()`. Update `gallery.yaml.example` with commented examples.
+- [x] 12. **Add grid configuration to `gallery.yaml`** — Extend `GalleryYaml` and `AppConfig` in `lib/config.ts` with a `grid` object containing: `columns` (number, default 3), `gap` (number in px, default 12), `aspectRatio` (string like `"1"`, `"3/2"`, `"auto"`, default `"1"`), and `layout` (enum `"masonry"` | `"uniform"`, default `"masonry"`). Parse and validate these in `getConfig()`. Update `gallery.yaml.example` with commented examples.
 
-- [ ] 13. **Pass grid config as CSS custom properties** — In the server page components (`app/[...path]/page.tsx`), wrap `PhotoGrid` in a container div that sets CSS custom properties from the grid config: `--grid-columns`, `--grid-gap`, `--grid-aspect-ratio`. This keeps the client component simple — it just reads props and the CSS handles the rest.
+- [x] 13. **Pass grid config as CSS custom properties** — In the server page components (`app/[...path]/page.tsx`), wrap `PhotoGrid` in a container div that sets CSS custom properties from the grid config: `--grid-columns`, `--grid-gap`, `--grid-aspect-ratio`. This keeps the client component simple — it just reads props and the CSS handles the rest.
 
-- [ ] 14. **Update `PhotoGrid` to accept grid layout prop** — Add a `layout` prop (`"masonry" | "uniform"`) to `PhotoGridProps`. When `"masonry"`, use the existing CSS `column-count` approach. When `"uniform"`, switch to CSS `display: grid` with `grid-template-columns: repeat(var(--grid-columns), 1fr)`. Apply different classnames: `.photo-grid--masonry` vs `.photo-grid--uniform`.
+- [x] 14. **Update `PhotoGrid` to accept grid layout prop** — Add a `layout` prop (`"masonry" | "uniform"`) to `PhotoGridProps`. When `"masonry"`, use the existing CSS `column-count` approach. When `"uniform"`, switch to CSS `display: grid` with `grid-template-columns: repeat(var(--grid-columns), 1fr)`. Apply different classnames: `.photo-grid--masonry` vs `.photo-grid--uniform`.
 
-- [ ] 15. **Update CSS grid styles** — Replace the hardcoded `column-count: 3`, `column-gap: 12px`, and `aspect-ratio: 1` values in `app/globals.css:390-414` with CSS custom properties: `column-count: var(--grid-columns)`, `column-gap: var(--grid-gap)`, `aspect-ratio: var(--grid-aspect-ratio)`. Add `.photo-grid--uniform` styles that use CSS Grid instead of columns. Update responsive breakpoints to adjust `--grid-columns` accordingly. When `aspectRatio` is `"auto"`, remove the fixed aspect ratio from masonry items and restore `height: auto`.
+- [x] 15. **Update CSS grid styles** — Replace the hardcoded `column-count: 3`, `column-gap: 12px`, and `aspect-ratio: 1` values in `app/globals.css:390-414` with CSS custom properties: `column-count: var(--grid-columns)`, `column-gap: var(--grid-gap)`, `aspect-ratio: var(--grid-aspect-ratio)`. Add `.photo-grid--uniform` styles that use CSS Grid instead of columns. Update responsive breakpoints to adjust `--grid-columns` accordingly. When `aspectRatio` is `"auto"`, remove the fixed aspect ratio from masonry items and restore `height: auto`.
 
 ---
 

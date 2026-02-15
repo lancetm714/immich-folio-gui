@@ -792,7 +792,9 @@
 
   .hero__right {
     order: -1;
-    max-height: 40vh;
+    height: 50vh;
+    height: 50svh;
+    min-height: 200px;
   }
 
   .hero__left {
