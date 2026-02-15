@@ -7,7 +7,7 @@ const cspDirectives = [
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://*.basemaps.cartocdn.com",
+  "img-src 'self' data: https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://unpkg.com",
   "connect-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
