@@ -105,6 +105,9 @@ export function MapView() {
                 map.fitBounds(group.getBounds().pad(0.15));
             }
 
+            // Force Leaflet to recalculate tile grid
+            setTimeout(() => map.invalidateSize(), 100);
+
             setLoading(false);
         }
 
@@ -134,17 +137,16 @@ export function MapView() {
     }
 
     return (
-        <>
+        <div style={{ position: 'relative' }}>
             {loading && (
-                <div className="map-container__loading">
+                <div className="map-container__loading" style={{ position: 'absolute', inset: 0, zIndex: 1000 }}>
                     <p>Loading map…</p>
                 </div>
             )}
             <div
                 ref={containerRef}
                 className="map-container"
-                style={{ display: loading ? 'none' : 'block' }}
             />
-        </>
+        </div>
     );
 }
