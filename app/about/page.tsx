@@ -11,6 +11,8 @@ import { imageUrl, assetPlaceholder } from '@/lib/urls';
 import { immich } from '@/lib/immich';
 import './about.css';
 
+export const dynamic = 'force-dynamic';
+
 interface AboutFrontmatter {
   portrait?: string;
   name?: string;
