@@ -203,7 +203,11 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
       </div>
 
       {/* EXIF toggle */}
-      <button className={styles.infoToggle} onClick={handleExifToggle}>
+      <button
+        className={styles.infoToggle}
+        onClick={handleExifToggle}
+        aria-label="Toggle photo info"
+      >
         {showExif ? 'Hide Info' : 'Info'}
       </button>
 

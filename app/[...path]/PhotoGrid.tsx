@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { Lightbox } from '@/components/Lightbox';
 import { FadeIn } from '@/components/FadeIn';
@@ -50,19 +50,11 @@ function buildPhotoHash(index: number): string {
 }
 
 export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridProps) {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const isInitialized = useRef(false);
-
-  // ── On mount: check URL hash for a deep-link ──────────────────
-  useEffect(() => {
-    if (isInitialized.current) return;
-    isInitialized.current = true;
-
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
     const idx = parsePhotoHash(window.location.hash);
-    if (idx !== null && idx < assets.length) {
-      setLightboxIndex(idx);
-    }
-  }, [assets.length]);
+    return idx !== null && idx < assets.length ? idx : null;
+  });
 
   // ── Sync URL hash when lightbox state changes ─────────────────
   useEffect(() => {
@@ -90,14 +82,11 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [assets.length]);
 
-  const openLightbox = useCallback(
-    (index: number) => {
-      setLightboxIndex(index);
-      // Push state (not replace) so the user can press Back to close
-      window.history.pushState(null, '', buildPhotoHash(index));
-    },
-    [],
-  );
+  const openLightbox = useCallback((index: number) => {
+    setLightboxIndex(index);
+    // Push state (not replace) so the user can press Back to close
+    window.history.pushState(null, '', buildPhotoHash(index));
+  }, []);
 
   const closeLightbox = useCallback(() => {
     setLightboxIndex(null);
@@ -149,6 +138,15 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
             <div
               className="photo-grid__item"
               onClick={() => openLightbox(index)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openLightbox(index);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`View photo ${index + 1}`}
               style={{
                 ...(asset.dominantColor ? { backgroundColor: asset.dominantColor } : {}),
                 ...(layout === 'masonry' && asset.aspectRatio

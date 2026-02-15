@@ -1,7 +1,7 @@
 services:
   lightbox:
     build: .
-    container_name: immich-lightbox
+    container_name: immich-folio
     restart: unless-stopped
     ports:
       - '7211:7211'

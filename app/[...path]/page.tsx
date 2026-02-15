@@ -14,9 +14,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
-import { immich } from '@/lib/immich';
+import { immich, type ImmichAsset } from '@/lib/immich';
 import { notFound } from 'next/navigation';
-import { PhotoGrid } from './PhotoGrid';
+import { PhotoGrid, type PhotoItem } from './PhotoGrid';
 import {
   imageUrl,
   exifUrl,
@@ -27,6 +27,7 @@ import {
 import { getConfig, type GridConfig } from '@/lib/config';
 import { isProtected, isAuthenticated } from '@/lib/auth';
 import PasswordGate from '@/components/PasswordGate';
+import { BackLink } from '@/components/BackLink';
 
 // Render at request time — requires live Immich connection
 export const dynamic = 'force-dynamic';
@@ -83,6 +84,26 @@ export async function generateMetadata({ params }: PathPageProps): Promise<Metad
   };
 }
 
+/** Map Immich assets to PhotoItem props for the grid/lightbox. */
+function toPhotoItems(assets: ImmichAsset[], showExif: boolean): PhotoItem[] {
+  return assets
+    .filter((a) => a.type === 'IMAGE')
+    .map((a) => {
+      const ph = assetPlaceholder(a);
+      const exif = showExif ? assetExifSummary(a) : undefined;
+      return {
+        id: a.id,
+        thumbUrl: imageUrl(a.id, 'preview'),
+        previewUrl: imageUrl(a.id, 'preview'),
+        originalUrl: imageUrl(a.id, 'original'),
+        exifUrl: exifUrl(a.id),
+        ...(ph ? { blurDataURL: ph.blurDataURL, dominantColor: ph.dominantColor } : {}),
+        ...(exif ?? {}),
+        aspectRatio: assetAspectRatio(a),
+      };
+    });
+}
+
 export default async function PathPage({ params }: PathPageProps) {
   const { path } = await params;
   const config = getConfig();
@@ -129,24 +150,12 @@ export default async function PathPage({ params }: PathPageProps) {
     const spGrid = subpageData?.subpage.grid;
     const subpageName = subpageData?.subpage.name ?? subpageSlug;
 
-    const images = album.assets.filter((asset) => asset.type === 'IMAGE');
+    const images = toPhotoItems(album.assets, config.exifOnHover);
 
     return (
       <>
         <div className="album-header">
-          <Link href={`/${subpageSlug}`} className="album-header__back">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            Back to {subpageName}
-          </Link>
+          <BackLink href={`/${subpageSlug}`} label={`Back to ${subpageName}`} />
           <h1 className="album-header__title">{album.albumName}</h1>
           <p className="album-header__meta">
             {images.length} {images.length === 1 ? 'photo' : 'photos'}
@@ -154,20 +163,7 @@ export default async function PathPage({ params }: PathPageProps) {
           </p>
         </div>
         <PhotoGrid
-          assets={images.map((a) => {
-            const ph = assetPlaceholder(a);
-            const exif = config.exifOnHover ? assetExifSummary(a) : undefined;
-            return {
-              id: a.id,
-              thumbUrl: imageUrl(a.id, 'preview'),
-              previewUrl: imageUrl(a.id, 'preview'),
-              originalUrl: imageUrl(a.id, 'original'),
-              exifUrl: exifUrl(a.id),
-              ...(ph ? { blurDataURL: ph.blurDataURL, dominantColor: ph.dominantColor } : {}),
-              ...(exif ?? {}),
-              aspectRatio: assetAspectRatio(a),
-            };
-          })}
+          assets={images}
           albumId={album.id}
           layout={resolveLayout(spGrid)}
           gridStyle={buildGridStyle(spGrid)}
@@ -204,24 +200,12 @@ export default async function PathPage({ params }: PathPageProps) {
       const album = await immich.getAlbumBySlug(albums[0].slug, slug);
       if (!album) notFound();
 
-      const images = album.assets.filter((asset) => asset.type === 'IMAGE');
+      const images = toPhotoItems(album.assets, config.exifOnHover);
 
       return (
         <>
           <div className="album-header">
-            <Link href="/" className="album-header__back">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-              Back to Gallery
-            </Link>
+            <BackLink href="/" label="Back to Gallery" />
             <h1 className="album-header__title">{album.albumName}</h1>
             <p className="album-header__meta">
               {images.length} {images.length === 1 ? 'photo' : 'photos'}
@@ -229,20 +213,7 @@ export default async function PathPage({ params }: PathPageProps) {
             </p>
           </div>
           <PhotoGrid
-            assets={images.map((a) => {
-              const ph = assetPlaceholder(a);
-              const exif = config.exifOnHover ? assetExifSummary(a) : undefined;
-              return {
-                id: a.id,
-                thumbUrl: imageUrl(a.id, 'preview'),
-                previewUrl: imageUrl(a.id, 'preview'),
-                originalUrl: imageUrl(a.id, 'original'),
-                exifUrl: exifUrl(a.id),
-                ...(ph ? { blurDataURL: ph.blurDataURL, dominantColor: ph.dominantColor } : {}),
-                ...(exif ?? {}),
-                aspectRatio: assetAspectRatio(a),
-              };
-            })}
+            assets={images}
             albumId={album.id}
             layout={resolveLayout(result.subpage.grid)}
             gridStyle={buildGridStyle(result.subpage.grid)}
@@ -307,24 +278,12 @@ export default async function PathPage({ params }: PathPageProps) {
     notFound();
   }
 
-  const images = album.assets.filter((asset) => asset.type === 'IMAGE');
+  const images = toPhotoItems(album.assets, config.exifOnHover);
 
   return (
     <>
       <div className="album-header">
-        <Link href="/" className="album-header__back">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Back to Gallery
-        </Link>
+        <BackLink href="/" label="Back to Gallery" />
         <h1 className="album-header__title">{album.albumName}</h1>
         <p className="album-header__meta">
           {images.length} {images.length === 1 ? 'photo' : 'photos'}
@@ -332,20 +291,7 @@ export default async function PathPage({ params }: PathPageProps) {
         </p>
       </div>
       <PhotoGrid
-        assets={images.map((a) => {
-          const ph = assetPlaceholder(a);
-          const exif = config.exifOnHover ? assetExifSummary(a) : undefined;
-          return {
-            id: a.id,
-            thumbUrl: imageUrl(a.id, 'preview'),
-            previewUrl: imageUrl(a.id, 'preview'),
-            originalUrl: imageUrl(a.id, 'original'),
-            exifUrl: exifUrl(a.id),
-            ...(ph ? { blurDataURL: ph.blurDataURL, dominantColor: ph.dominantColor } : {}),
-            ...(exif ?? {}),
-            aspectRatio: assetAspectRatio(a),
-          };
-        })}
+        assets={images}
         albumId={album.id}
         layout={resolveLayout()}
         gridStyle={buildGridStyle()}

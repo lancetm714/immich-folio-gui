@@ -4,14 +4,11 @@
 
 - **Internationalization (i18n)** — Multi-language UI support (DE/EN). Extend YAML config with locale files
 - **ISR / Stale-While-Revalidate** — Replace `force-dynamic` with Incremental Static Regeneration + on-demand revalidation
-- **CI/CD pipeline** — GitHub Actions: lint → typecheck → unit tests → Playwright E2E → Docker build → push to GHCR _(Playwright tests exist, needs GH Actions workflow)_
-- **Privacy-friendly analytics** — Plausible or Umami (self-hosted) to track album/photo engagement
 
 ## 📸 Photographer
 
 - **Photo stories / Essays** — Vertical scroll format with images + text interspersed, like a photo essay. Portfolio differentiator
 - **Map view** — Minimal world map from EXIF city/country data, each dot links to an album. Mapbox GL or Leaflet
-- **Monochrome / Film simulation toggle** — CSS filters for grayscale, Tri-X, Portra 400 looks across the grid
 - **Collections by camera/lens** — Auto-generate virtual albums from EXIF data ("Shot on Leica Q3", "Summilux 35mm")
 
 ## 👤 User / Visitor

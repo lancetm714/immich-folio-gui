@@ -50,8 +50,9 @@ export function authenticate(slug: string, password: string): string | null {
 
   const token = authToken(slug, password);
   const maxAge = TOKEN_EXPIRY_HOURS * 60 * 60;
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 
-  return `${cookieName(slug)}=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict`;
+  return `${cookieName(slug)}=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict${secure}`;
 }
 
 /**

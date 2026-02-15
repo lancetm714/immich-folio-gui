@@ -5,8 +5,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, isProtected } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
+
+/** Tight limit for auth attempts — 10 per minute per IP. */
+const AUTH_RPM = 10;
 
 export async function POST(request: NextRequest) {
+  // ── Rate limiting (brute-force protection) ──────────
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+  const { success } = checkRateLimit(`auth:${ip}`, AUTH_RPM);
+
+  if (!success) {
+    return NextResponse.json({ error: 'Too many attempts, try again later' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { slug, password } = body;

@@ -279,10 +279,12 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 24px;
-  background: linear-gradient(to top,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.3) 40%,
-      transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.3) 40%,
+    transparent 100%
+  );
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
@@ -412,10 +414,12 @@
 
 /* ── Loading States ───────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg,
-      var(--bg-card) 0%,
-      var(--bg-card-hover) 50%,
-      var(--bg-card) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 0%,
+    var(--bg-card-hover) 50%,
+    var(--bg-card) 100%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite;
   border-radius: var(--radius-sm);
@@ -434,7 +438,9 @@
 /* ── Fade-In Animations ────────────────────────────── */
 .fade-in {
   opacity: 0;
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
 .fade-in--up {
@@ -724,7 +730,9 @@
   font-weight: 400;
   padding: 6px 0;
   border-bottom: 1px solid transparent;
-  transition: border-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .hero__nav-link:hover {
