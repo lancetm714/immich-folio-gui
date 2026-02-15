@@ -40,7 +40,7 @@ export interface ThemeConfig {
   photoFrame: 'none' | 'passepartout' | 'shadow';
   grain: boolean;
   headerDot: boolean;
-  heroStyle: 'split' | 'fullbleed' | 'minimal';
+  heroStyle: 'split' | 'fullbleed' | 'minimal' | 'stacked' | 'typographic' | 'mosaic';
 }
 
 // ── Theme Presets ──────────────────────────────────────────────
@@ -86,6 +86,36 @@ const THEME_PRESETS: Record<string, ThemeConfig> = {
     headerDot: true,
     heroStyle: 'minimal',
   },
+  noir: {
+    preset: 'noir',
+    accent: '#ff6b35',
+    fonts: { heading: 'Libre Baskerville', body: 'Source Sans 3', caption: 'Space Mono' },
+    radius: 0,
+    photoFrame: 'passepartout',
+    grain: true,
+    headerDot: false,
+    heroStyle: 'fullbleed',
+  },
+  monograph: {
+    preset: 'monograph',
+    accent: '#333333',
+    fonts: { heading: 'Instrument Serif', body: 'Inter', caption: 'IBM Plex Mono' },
+    radius: 0,
+    photoFrame: 'none',
+    grain: false,
+    headerDot: false,
+    heroStyle: 'typographic',
+  },
+  botanica: {
+    preset: 'botanica',
+    accent: '#4a7c59',
+    fonts: { heading: 'Cormorant Garamond', body: 'Nunito Sans', caption: 'Inconsolata' },
+    radius: 8,
+    photoFrame: 'none',
+    grain: false,
+    headerDot: true,
+    heroStyle: 'split',
+  },
 };
 
 /** Raw YAML structure (before validation). */
@@ -94,17 +124,17 @@ interface GalleryYaml {
   albums?: string[];
   exifOnHover?: boolean;
   theme?:
-    | string
-    | {
-        preset?: string;
-        accent?: string;
-        fonts?: { heading?: string; body?: string; caption?: string };
-        radius?: number;
-        photoFrame?: string;
-        grain?: boolean;
-        headerDot?: boolean;
-        heroStyle?: string;
-      };
+  | string
+  | {
+    preset?: string;
+    accent?: string;
+    fonts?: { heading?: string; body?: string; caption?: string };
+    radius?: number;
+    photoFrame?: string;
+    grain?: boolean;
+    headerDot?: boolean;
+    heroStyle?: string;
+  };
   grid?: {
     columns?: number;
     gap?: number;
@@ -138,7 +168,7 @@ function loadGalleryYaml(): GalleryYaml {
   if (!fs.existsSync(yamlPath)) {
     throw new Error(
       `Gallery config not found: ${yamlPath}\n` +
-        `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
+      `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
     );
   }
 
@@ -186,7 +216,7 @@ export interface GridConfig {
   columns: number;
   gap: number;
   aspectRatio: string;
-  layout: 'masonry' | 'uniform';
+  layout: 'masonry' | 'uniform' | 'showcase' | 'filmstrip' | 'editorial-flow';
 }
 
 export interface AppConfig {
@@ -213,7 +243,8 @@ export interface AppConfig {
 // ── Theme resolution ───────────────────────────────────────────
 
 const VALID_PHOTO_FRAMES = ['none', 'passepartout', 'shadow'];
-const VALID_HERO_STYLES = ['split', 'fullbleed', 'minimal'];
+const VALID_HERO_STYLES = ['split', 'fullbleed', 'minimal', 'stacked', 'typographic', 'mosaic'];
+const VALID_LAYOUTS = ['masonry', 'uniform', 'showcase', 'filmstrip', 'editorial-flow'];
 
 function resolveTheme(raw?: GalleryYaml['theme']): ThemeConfig {
   // No theme key → default preset
@@ -307,19 +338,19 @@ export function getConfig(): AppConfig {
       password: sp.password,
       ...(sp.grid
         ? {
-            grid: {
-              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-              ...(sp.grid.layout != null
-                ? {
-                    layout: (sp.grid.layout === 'uniform'
-                      ? 'uniform'
-                      : 'masonry') as GridConfig['layout'],
-                  }
-                : {}),
-            },
-          }
+          grid: {
+            ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+            ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+            ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+            ...(sp.grid.layout != null
+              ? {
+                layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                  ? sp.grid.layout
+                  : 'masonry') as GridConfig['layout'],
+              }
+              : {}),
+          },
+        }
         : {}),
     };
   });
@@ -340,24 +371,26 @@ export function getConfig(): AppConfig {
     siteSubtitle: env.SITE_SUBTITLE,
     heroImages: gallery.hero
       ? (Array.isArray(gallery.hero) ? gallery.hero : [gallery.hero]).map((id) =>
-          validateUuid(id, 'gallery.yaml hero'),
-        )
+        validateUuid(id, 'gallery.yaml hero'),
+      )
       : [],
     exifOnHover: gallery.exifOnHover !== false,
     grid: {
       columns: gallery.grid?.columns ?? 3,
       gap: gallery.grid?.gap ?? 12,
       aspectRatio: gallery.grid?.aspectRatio ?? '1',
-      layout: (gallery.grid?.layout === 'uniform' ? 'uniform' : 'masonry') as GridConfig['layout'],
+      layout: (VALID_LAYOUTS.includes(gallery.grid?.layout ?? '')
+        ? gallery.grid!.layout
+        : 'masonry') as GridConfig['layout'],
     },
     theme,
     footer: gallery.footer
       ? {
-          name: gallery.footer.name,
-          instagram: gallery.footer.instagram,
-          email: gallery.footer.email,
-          website: gallery.footer.website,
-        }
+        name: gallery.footer.name,
+        instagram: gallery.footer.instagram,
+        email: gallery.footer.email,
+        website: gallery.footer.website,
+      }
       : null,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,

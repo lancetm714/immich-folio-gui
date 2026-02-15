@@ -14,12 +14,15 @@ That's it. Your entire gallery switches to the minimal theme.
 
 ## Built-in Presets
 
-| Preset        | Style                          | Accent       | Fonts                      | Hero      | Frame        | Grain |
-| ------------- | ------------------------------ | ------------ | -------------------------- | --------- | ------------ | ----- |
-| **studio**    | Leica-inspired, editorial      | 🔴 `#e60012` | Playfair Display + DM Sans | Split     | Passepartout | ✓     |
-| **minimal**   | Swiss brutalist, high contrast | ⚫ `#000000` | Geist + IBM Plex Mono      | Fullbleed | None         | ✗     |
-| **editorial** | Cinematic magazine, warm tones | 🟤 `#8B2500` | Bodoni Moda + Newsreader   | Split     | Shadow       | ✗     |
-| **classic**   | Gilded gallery, warm luxury    | 🟡 `#c49a3c` | Cinzel + Crimson Pro       | Minimal   | Passepartout | ✗     |
+| Preset        | Style                          | Accent       | Fonts                              | Hero        | Frame        | Grain |
+| ------------- | ------------------------------ | ------------ | ---------------------------------- | ----------- | ------------ | ----- |
+| **studio**    | Leica-inspired, editorial      | 🔴 `#e60012` | Playfair Display + DM Sans         | Split       | Passepartout | ✓     |
+| **minimal**   | Swiss brutalist, high contrast | ⚫ `#000000` | Geist + IBM Plex Mono              | Fullbleed   | None         | ✗     |
+| **editorial** | Cinematic magazine, warm tones | 🟤 `#8B2500` | Bodoni Moda + Newsreader           | Split       | Shadow       | ✗     |
+| **classic**   | Gilded gallery, warm luxury    | 🟡 `#c49a3c` | Cinzel + Crimson Pro               | Minimal     | Passepartout | ✗     |
+| **noir**      | Darkroom analog, film noir     | 🟠 `#ff6b35` | Libre Baskerville + Source Sans 3  | Fullbleed   | Passepartout | ✓     |
+| **monograph** | Typographic, book-like         | ⬛ `#333333` | Instrument Serif + Inter           | Typographic | None         | ✗     |
+| **botanica**  | Organic, nature-inspired       | 🟢 `#4a7c59` | Cormorant Garamond + Nunito Sans   | Split       | None         | ✗     |
 
 Default is `studio` if no theme is specified.
 
@@ -32,6 +35,12 @@ Default is `studio` if no theme is specified.
 **Editorial** — Cinematic magazine feel inspired by Aperture and Magnum Photos. Oversized Bodoni Moda serif titles, warm charcoal backgrounds, generous grid spacing, slow cinematic transitions with desaturation-on-idle photos, and pull-quote section labels.
 
 **Classic** — Fine art gallery aesthetic with warm gold accents, Cinzel Roman capitals for headings, decorative ornamental dividers, warm passepartout frames, rounded corners, and an elegant gold header dot. Feels like a luxury exhibition catalog.
+
+**Noir** — Darkroom analog aesthetic with warm amber accents on a deep cool-black base. Sepia-tinted photos with vignette hover effects, film-edge EXIF labels in monospace, and a grain overlay. Inspired by wet-plate photography and film noir cinematography.
+
+**Monograph** — Type-first book design with no hero image. Features an 8rem serif title, numbered photo indices via CSS counters, slide-up EXIF captions, hairline dividers, and generous whitespace. Feels like an artist monograph.
+
+**Botanica** — Organic, nature-inspired with forest green accents and warm linen backgrounds. Rounded corners, botanical ornament dividers (❧), italic captions, and gentle hover animations. Feels like a botanical field guide.
 
 ## Custom Theme
 
@@ -49,7 +58,7 @@ theme:
   photoFrame: none # "none" | "passepartout" | "shadow"
   grain: false # film grain overlay on photos
   headerDot: false # accent-colored dot in the nav bar
-  heroStyle: split # "split" | "fullbleed" | "minimal"
+  heroStyle: split # "split" | "fullbleed" | "minimal" | "stacked" | "typographic" | "mosaic"
 ```
 
 All properties are optional — omitted values fall back to the preset defaults.
@@ -96,9 +105,22 @@ When `true`, shows a small accent-colored dot in the navigation bar (inspired by
 
 Controls the homepage hero layout:
 
-- **`split`** — title/nav on the left, hero image on the right (used by Studio and Editorial)
-- **`fullbleed`** — hero image fills the entire viewport, title overlaid in the corner (used by Minimal)
+- **`split`** — title/nav on the left, hero image on the right (used by Studio, Editorial, Botanica)
+- **`fullbleed`** — hero image fills the entire viewport, title overlaid in the corner (used by Minimal, Noir)
 - **`minimal`** — centered title card with decorative ornament, hero image as a banner below (used by Classic)
+- **`stacked`** — full-viewport hero image with title gradient-overlaid at the bottom, horizontal thumbnail navigation strip below
+- **`typographic`** — no hero image; massive centered title with numbered album navigation list (used by Monograph)
+- **`mosaic`** — asymmetric multi-image grid with frosted-glass title overlay centered on top
+
+### `grid.layout`
+
+Controls the photo grid layout on album pages:
+
+- **`masonry`** — Pinterest-style stacked columns, images shown at natural aspect ratios (default)
+- **`uniform`** — CSS Grid with fixed aspect ratio cells
+- **`showcase`** — first image displayed at full width (16:9), rest in standard grid
+- **`filmstrip`** — horizontal scroll of tall vertical image strips with scroll snapping
+- **`editorial-flow`** — alternating full-width (21:9) and side-by-side (4:3) image pairs
 
 ## Examples
 
@@ -144,4 +166,32 @@ theme:
   fonts:
     heading: 'Playfair Display'
     body: 'Lora'
+```
+
+### Dark analog portfolio
+
+```yaml
+theme:
+  preset: noir
+  heroStyle: stacked
+```
+
+### Type-forward monograph
+
+```yaml
+theme:
+  preset: monograph
+  accent: '#444'
+  fonts:
+    heading: 'DM Serif Text'
+```
+
+### Nature / travel journal
+
+```yaml
+theme:
+  preset: botanica
+  heroStyle: mosaic
+grid:
+  layout: editorial-flow
 ```

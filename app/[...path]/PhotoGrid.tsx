@@ -32,7 +32,7 @@ export interface PhotoItem {
 interface PhotoGridProps {
   assets: PhotoItem[];
   albumId: string;
-  layout?: 'masonry' | 'uniform';
+  layout?: 'masonry' | 'uniform' | 'showcase' | 'filmstrip' | 'editorial-flow';
   gridStyle?: React.CSSProperties;
 }
 
@@ -136,7 +136,8 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
         {assets.map((asset, index) => (
           <FadeIn key={asset.id} delay={index < 12 ? index * 50 : 0}>
             <div
-              className="photo-grid__item"
+              className={`photo-grid__item${layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
+                }`}
               onClick={() => openLightbox(index)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -149,7 +150,7 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
               aria-label={`View photo ${index + 1}`}
               style={{
                 ...(asset.dominantColor ? { backgroundColor: asset.dominantColor } : {}),
-                ...(layout === 'masonry' && asset.aspectRatio
+                ...((layout === 'masonry' || layout === 'showcase') && asset.aspectRatio
                   ? { aspectRatio: `${asset.aspectRatio}` }
                   : {}),
               }}

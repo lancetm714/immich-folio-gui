@@ -147,6 +147,99 @@
   --border-hover: #d0c8b5;
 }
 
+/* ── Noir: Darkroom Analog Palette ───────────────── */
+[data-preset='noir'] {
+  --bg-primary: #111014;
+  --bg-secondary: #0c0b0f;
+  --bg-card: #16141a;
+  --bg-card-hover: #1e1c22;
+  --bg-overlay: rgba(11, 10, 15, 0.98);
+
+  --text-primary: #f0ebe0;
+  --text-secondary: #998f80;
+  --text-muted: #665c50;
+
+  --border-subtle: #252228;
+  --border-hover: #3a3540;
+}
+
+[data-preset='noir'][data-theme='light'] {
+  --bg-primary: #faf5ef;
+  --bg-secondary: #f0ebe3;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f0e8;
+  --bg-overlay: rgba(250, 245, 239, 0.96);
+
+  --text-primary: #1a1610;
+  --text-secondary: #5a5548;
+  --text-muted: #8a8578;
+
+  --border-subtle: #e5dfd5;
+  --border-hover: #ccc5b8;
+}
+
+/* ── Monograph: Typographic / Book Palette ────────── */
+[data-preset='monograph'] {
+  --bg-primary: #151515;
+  --bg-secondary: #0f0f0f;
+  --bg-card: #1a1a1a;
+  --bg-card-hover: #222222;
+  --bg-overlay: rgba(15, 15, 15, 0.98);
+
+  --text-primary: #e8e8e8;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+
+  --border-subtle: #222222;
+  --border-hover: #3a3a3a;
+}
+
+[data-preset='monograph'][data-theme='light'] {
+  --bg-primary: #fafafa;
+  --bg-secondary: #f2f2f2;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f7f7;
+  --bg-overlay: rgba(250, 250, 250, 0.98);
+
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --text-muted: #999999;
+
+  --border-subtle: #e5e5e5;
+  --border-hover: #cccccc;
+}
+
+/* ── Botanica: Organic / Nature Palette ──────────── */
+[data-preset='botanica'] {
+  --bg-primary: #141a14;
+  --bg-secondary: #0f140f;
+  --bg-card: #182018;
+  --bg-card-hover: #1e261e;
+  --bg-overlay: rgba(15, 20, 15, 0.98);
+
+  --text-primary: #e8efe0;
+  --text-secondary: #8a9a78;
+  --text-muted: #5a6a4a;
+
+  --border-subtle: #253025;
+  --border-hover: #354535;
+}
+
+[data-preset='botanica'][data-theme='light'] {
+  --bg-primary: #faf7f0;
+  --bg-secondary: #f0ece2;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f2ea;
+  --bg-overlay: rgba(250, 247, 240, 0.96);
+
+  --text-primary: #1a2214;
+  --text-secondary: #4a5a3a;
+  --text-muted: #7a8a6a;
+
+  --border-subtle: #dde5d0;
+  --border-hover: #c5d0b5;
+}
+
 /* ── Reset ────────────────────────────────────────── */
 *,
 *::before,
