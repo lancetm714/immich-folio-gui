@@ -12,6 +12,13 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+
+# Dummy env vars for build — pages are force-dynamic so these are
+# never used at runtime, but Next.js page-data collection imports
+# env.ts which runs Zod validation on import.
+ENV IMMICH_API_URL="http://localhost:2283"
+ENV IMMICH_API_KEY="build-placeholder"
+
 RUN npm run build
 
 # ── Runtime ───────────────────────────────────────
