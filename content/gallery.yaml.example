@@ -52,10 +52,10 @@ subpages:
 
 # ── Theme ─────────────────────────────────────────────────────
 # Control the visual identity of your gallery. Use a preset name:
-#   theme: studio     # Leica-inspired, red accent, passepartout frames, film grain
-#   theme: minimal    # Clean, no distractions, grey accent
-#   theme: editorial  # Magazine feel, shadow frames
-#   theme: classic    # Warm, golden accent, rounded corners
+#   theme: studio     # Leica-inspired, red dot, passepartout frames, film grain
+#   theme: minimal    # Swiss brutalist, fullbleed hero, true B&W, zero-gap grid
+#   theme: editorial  # Cinematic magazine, warm charcoal, Bodoni serif, shadow frames
+#   theme: classic    # Gilded gallery, gold accents, Cinzel headings, passepartout
 #
 # Or customize individual properties (defaults from the preset):
 # theme:

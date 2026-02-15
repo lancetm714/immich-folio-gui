@@ -57,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       suppressHydrationWarning
       style={themeVars as React.CSSProperties}
+      data-preset={theme.preset}
       data-grain={theme.grain}
       data-header-dot={theme.headerDot}
       data-photo-frame={theme.photoFrame}

@@ -54,6 +54,99 @@
   --accent-dim: rgba(200, 0, 15, 0.08);
 }
 
+/* ── Minimal: Swiss Brutalist Palette ────────────── */
+[data-preset='minimal'] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-card: #111111;
+  --bg-card-hover: #1a1a1a;
+  --bg-overlay: rgba(0, 0, 0, 0.98);
+
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+
+  --border-subtle: #1a1a1a;
+  --border-hover: #333333;
+}
+
+[data-preset='minimal'][data-theme='light'] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f7;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fafafa;
+  --bg-overlay: rgba(255, 255, 255, 0.98);
+
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+
+  --border-subtle: #eeeeee;
+  --border-hover: #cccccc;
+}
+
+/* ── Editorial: Cinematic Magazine Palette ────────── */
+[data-preset='editorial'] {
+  --bg-primary: #1a1714;
+  --bg-secondary: #141210;
+  --bg-card: #1e1b17;
+  --bg-card-hover: #252119;
+  --bg-overlay: rgba(20, 18, 16, 0.98);
+
+  --text-primary: #ede8e0;
+  --text-secondary: #9a9086;
+  --text-muted: #6b6359;
+
+  --border-subtle: #2a2620;
+  --border-hover: #3a3530;
+}
+
+[data-preset='editorial'][data-theme='light'] {
+  --bg-primary: #faf8f4;
+  --bg-secondary: #f0ece4;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f2ec;
+  --bg-overlay: rgba(250, 248, 244, 0.96);
+
+  --text-primary: #1a1714;
+  --text-secondary: #5a5550;
+  --text-muted: #8a857f;
+
+  --border-subtle: #e5e0d8;
+  --border-hover: #ccc7c0;
+}
+
+/* ── Classic: Gilded Gallery Palette ─────────────── */
+[data-preset='classic'] {
+  --bg-primary: #121210;
+  --bg-secondary: #0e0e0c;
+  --bg-card: #181816;
+  --bg-card-hover: #1e1e1a;
+  --bg-overlay: rgba(14, 14, 12, 0.98);
+
+  --text-primary: #f0ece4;
+  --text-secondary: #a09888;
+  --text-muted: #706858;
+
+  --border-subtle: #2a2822;
+  --border-hover: #3a3830;
+}
+
+[data-preset='classic'][data-theme='light'] {
+  --bg-primary: #fdfbf5;
+  --bg-secondary: #f5f0e6;
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf6ee;
+  --bg-overlay: rgba(253, 251, 245, 0.96);
+
+  --text-primary: #1a1810;
+  --text-secondary: #5a5545;
+  --text-muted: #8a8575;
+
+  --border-subtle: #e5dfcf;
+  --border-hover: #d0c8b5;
+}
+
 /* ── Reset ────────────────────────────────────────── */
 *,
 *::before,

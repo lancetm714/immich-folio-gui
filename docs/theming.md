@@ -14,14 +14,24 @@ That's it. Your entire gallery switches to the minimal theme.
 
 ## Built-in Presets
 
-| Preset | Look | Accent | Fonts | Corners | Frame | Grain |
-|--------|------|--------|-------|---------|-------|-------|
-| **studio** | Leica-inspired, editorial | 🔴 `#e60012` | Playfair Display + DM Sans | Sharp | Passepartout | ✓ |
-| **minimal** | Clean, no distractions | ⚪ `#666666` | Inter | Sharp | None | ✗ |
-| **editorial** | Magazine feel | ⚫ `#1a1a1a` | Libre Baskerville + Source Sans | Slight | Shadow | ✗ |
-| **classic** | Warm, inviting | 🟡 `#8b6914` | Cormorant Garamond + Lato | Rounded | None | ✗ |
+| Preset        | Style                          | Accent       | Fonts                      | Hero      | Frame        | Grain |
+| ------------- | ------------------------------ | ------------ | -------------------------- | --------- | ------------ | ----- |
+| **studio**    | Leica-inspired, editorial      | 🔴 `#e60012` | Playfair Display + DM Sans | Split     | Passepartout | ✓     |
+| **minimal**   | Swiss brutalist, high contrast | ⚫ `#000000` | Geist + IBM Plex Mono      | Fullbleed | None         | ✗     |
+| **editorial** | Cinematic magazine, warm tones | 🟤 `#8B2500` | Bodoni Moda + Newsreader   | Split     | Shadow       | ✗     |
+| **classic**   | Gilded gallery, warm luxury    | 🟡 `#c49a3c` | Cinzel + Crimson Pro       | Minimal   | Passepartout | ✗     |
 
 Default is `studio` if no theme is specified.
+
+### What makes each theme unique
+
+**Studio** (default) — Leica-inspired with a red nav dot, passepartout photo frames, film grain, and a split hero layout. Clean editorial feel with Playfair Display headings.
+
+**Minimal** — Swiss Brutalist aesthetic inspired by Müller-Brockmann and Dieter Rams. Fullbleed hero image, true black/white palette, zero-gap photo grid with no hover effects, ultra-tiny navigation text. Every pixel earns its place.
+
+**Editorial** — Cinematic magazine feel inspired by Aperture and Magnum Photos. Oversized Bodoni Moda serif titles, warm charcoal backgrounds, generous grid spacing, slow cinematic transitions with desaturation-on-idle photos, and pull-quote section labels.
+
+**Classic** — Fine art gallery aesthetic with warm gold accents, Cinzel Roman capitals for headings, decorative ornamental dividers, warm passepartout frames, rounded corners, and an elegant gold header dot. Feels like a luxury exhibition catalog.
 
 ## Custom Theme
 
@@ -29,17 +39,17 @@ Start from any preset and override individual properties:
 
 ```yaml
 theme:
-  preset: studio              # base preset to extend (default: studio)
-  accent: "#2563eb"           # brand/accent color (any hex)
+  preset: studio # base preset to extend (default: studio)
+  accent: '#2563eb' # brand/accent color (any hex)
   fonts:
-    heading: "Inter"          # Google Fonts name for headings
-    body: "Inter"             # body text
-    caption: "JetBrains Mono" # EXIF captions
-  radius: 8                   # border-radius in px (0 = sharp corners)
-  photoFrame: none            # "none" | "passepartout" | "shadow"
-  grain: false                # film grain overlay on photos
-  headerDot: false            # accent-colored dot in the nav bar
-  heroStyle: split            # "split" | "fullbleed" | "minimal"
+    heading: 'Inter' # Google Fonts name for headings
+    body: 'Inter' # body text
+    caption: 'JetBrains Mono' # EXIF captions
+  radius: 8 # border-radius in px (0 = sharp corners)
+  photoFrame: none # "none" | "passepartout" | "shadow"
+  grain: false # film grain overlay on photos
+  headerDot: false # accent-colored dot in the nav bar
+  heroStyle: split # "split" | "fullbleed" | "minimal"
 ```
 
 All properties are optional — omitted values fall back to the preset defaults.
@@ -61,6 +71,7 @@ Google Fonts names. Fonts are loaded automatically — just use the name as it a
 ### `radius`
 
 Border radius in pixels applied to photo grid items and album cards:
+
 - `0` — sharp, editorial corners
 - `4-8` — subtle rounding
 - `12+` — soft, modern feel
@@ -84,38 +95,53 @@ When `true`, shows a small accent-colored dot in the navigation bar (inspired by
 ### `heroStyle`
 
 Controls the homepage hero layout:
-- **`split`** — title/nav on the left, hero image on the right (default)
-- **`fullbleed`** — hero image fills the entire viewport
-- **`minimal`** — text-only, no hero image
+
+- **`split`** — title/nav on the left, hero image on the right (used by Studio and Editorial)
+- **`fullbleed`** — hero image fills the entire viewport, title overlaid in the corner (used by Minimal)
+- **`minimal`** — centered title card with decorative ornament, hero image as a banner below (used by Classic)
 
 ## Examples
 
 ### Minimal portfolio
+
 ```yaml
 theme:
   preset: minimal
-  accent: "#0066cc"
+  accent: '#0066cc'
   fonts:
-    heading: "Outfit"
-    body: "Outfit"
+    heading: 'Outfit'
+    body: 'Outfit'
 ```
 
 ### Film photography blog
+
 ```yaml
 theme:
   preset: studio
-  accent: "#d4a017"
+  accent: '#d4a017'
   grain: true
   photoFrame: passepartout
 ```
 
 ### Modern magazine
+
 ```yaml
 theme:
   preset: editorial
   radius: 12
   fonts:
-    heading: "Fraunces"
-    body: "Inter"
-    caption: "IBM Plex Mono"
+    heading: 'Fraunces'
+    body: 'Inter'
+    caption: 'IBM Plex Mono'
+```
+
+### Luxury gallery
+
+```yaml
+theme:
+  preset: classic
+  accent: '#b8860b'
+  fonts:
+    heading: 'Playfair Display'
+    body: 'Lora'
 ```

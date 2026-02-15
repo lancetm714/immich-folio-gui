@@ -4,11 +4,16 @@ A self-hosted photography portfolio powered by [Immich](https://immich.app). Tur
 
 Immich Folio acts as a **secure reverse proxy** between your visitors and your private Immich instance. Your Immich server stays on your local network, completely invisible to the outside world.
 
+<p align="center">
+  <img src="docs/screenshots/theme-editorial-home.png" width="49%" alt="Homepage — Editorial theme" />
+  <img src="docs/screenshots/theme-editorial-grid.png" width="49%" alt="Photo grid — Editorial theme" />
+</p>
+
 ## Features
 
 ### Gallery & Layout
 
-- **Split hero homepage** — full-height hero with site title, subtitle, and navigation links on the left; hero image on the right
+- **Configurable hero layouts** — split (title + image side-by-side), fullbleed (edge-to-edge hero image), or minimal (centered title card)
 - **Hero image carousel** — single image or crossfade carousel of multiple Immich assets
 - **Masonry photo grid** — responsive layout with natural aspect ratios and configurable columns, gap, and aspect ratio
 - **Uniform grid mode** — switch to a fixed-aspect uniform grid per-subpage or globally
@@ -86,11 +91,30 @@ All gallery structure — hero images, albums, subpages, grid layout, footer —
 
 ### Theming
 
-Customize the visual identity of your gallery with built-in presets or fine-grained control over colors, fonts, corners, photo frames, and more.
+Four built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, and hero layout.
 
 ```yaml
-theme: minimal   # or: studio, editorial, classic
+theme: studio # or: minimal, editorial, classic
 ```
+
+<table>
+  <tr>
+    <td align="center"><strong>Studio</strong><br><em>Leica-inspired, red dot</em></td>
+    <td align="center"><strong>Minimal</strong><br><em>Swiss brutalist, fullbleed hero</em></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/theme-studio-home.png" width="400" alt="Studio theme" /></td>
+    <td><img src="docs/screenshots/theme-minimal-home.png" width="400" alt="Minimal theme" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Editorial</strong><br><em>Cinematic magazine, warm charcoal</em></td>
+    <td align="center"><strong>Classic</strong><br><em>Gilded gallery, gold accents</em></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/theme-editorial-home.png" width="400" alt="Editorial theme" /></td>
+    <td><img src="docs/screenshots/theme-classic-home.png" width="400" alt="Classic theme" /></td>
+  </tr>
+</table>
 
 → **[Theming Guide](docs/theming.md)**
 
