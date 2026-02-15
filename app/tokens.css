@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+/* Fonts are loaded dynamically via layout.tsx based on theme config */
 
-/* ── Design Tokens (Studio Dark — Default) ───────── */
+/* ── Design Tokens (Fallback Defaults) ───────────── */
+/* These are overridden at runtime by CSS vars injected from gallery.yaml theme config. */
 :root {
   --bg-primary: #1a1a1a;
   --bg-secondary: #141414;

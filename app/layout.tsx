@@ -1,6 +1,7 @@
 /**
  * Root layout — site header with portfolio-style navigation.
  * Shows all subpages + standalone albums as nav links.
+ * Injects theme CSS custom properties from gallery.yaml config.
  */
 
 import type { Metadata } from 'next';
@@ -10,6 +11,7 @@ import { SubpageNav } from '@/components/SubpageNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
+import { getConfig, getGoogleFontsUrl } from '@/lib/config';
 
 const siteTitle = process.env.SITE_TITLE || 'Gallery';
 const siteDescription = 'A curated photography portfolio';
@@ -35,8 +37,35 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const { theme } = getConfig();
+  const fontsUrl = getGoogleFontsUrl(theme);
+
+  // Inject theme values as CSS custom properties
+  const themeVars: Record<string, string> = {
+    '--accent': theme.accent,
+    '--accent-dim': `${theme.accent}1f`,
+    '--font-serif': `'${theme.fonts.heading}', Georgia, 'Times New Roman', serif`,
+    '--font-sans': `'${theme.fonts.body}', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`,
+    '--font-caption': `'${theme.fonts.caption}', Georgia, serif`,
+    '--radius-sm': `${theme.radius}px`,
+    '--radius-md': `${Math.round(theme.radius * 1.5)}px`,
+    '--radius-lg': `${theme.radius * 2}px`,
+  };
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      style={themeVars as React.CSSProperties}
+      data-grain={theme.grain}
+      data-header-dot={theme.headerDot}
+      data-photo-frame={theme.photoFrame}
+    >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={fontsUrl} />
+      </head>
       <body>
         <header className="header">
           <nav className="header__nav">

@@ -1,12 +1,14 @@
 /**
  * Dynamic OG image generator — renders social share previews.
  * Uses next/og (ImageResponse) to create 1200×630 cards.
+ * Reads accent color from theme config.
  *
  * GET /api/og?title=Album+Name&subtitle=12+photos
  */
 
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { getConfig } from '@/lib/config';
 
 export const runtime = 'edge';
 
@@ -14,6 +16,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const title = searchParams.get('title') || 'Gallery';
   const subtitle = searchParams.get('subtitle') || '';
+  const { theme } = getConfig();
 
   return new ImageResponse(
     <div
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
         style={{
           width: '60px',
           height: '2px',
-          backgroundColor: '#d4af37',
+          backgroundColor: theme.accent,
           marginBottom: '40px',
         }}
       />
@@ -75,7 +78,7 @@ export async function GET(request: NextRequest) {
         style={{
           width: '60px',
           height: '2px',
-          backgroundColor: '#d4af37',
+          backgroundColor: theme.accent,
           marginTop: '40px',
         }}
       />

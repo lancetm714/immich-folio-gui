@@ -279,12 +279,10 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 24px;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.3) 40%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      transparent 100%);
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
@@ -414,12 +412,10 @@
 
 /* ── Loading States ───────────────────────────────── */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-card) 0%,
-    var(--bg-card-hover) 50%,
-    var(--bg-card) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--bg-card) 0%,
+      var(--bg-card-hover) 50%,
+      var(--bg-card) 100%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite;
   border-radius: var(--radius-sm);
@@ -604,10 +600,11 @@
   font-weight: 300;
 }
 
-/* ── Studio-Inspired Defaults ────────────────────── */
+/* ── Theme Conditionals ──────────────────────────── */
+/* Features toggled via data attributes on <html>, set by theme config */
 
-/* Red dot in header */
-.header__nav::before {
+/* ─ Header dot (accent circle in nav) ─ */
+[data-header-dot='true'] .header__nav::before {
   content: '';
   display: block;
   width: 10px;
@@ -617,6 +614,78 @@
   margin-right: 8px;
   flex-shrink: 0;
 }
+
+/* ─ Passepartout photo frame ─ */
+[data-photo-frame='passepartout'] .photo-grid__item {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 8px 24px;
+  margin-bottom: var(--grid-gap, 24px);
+  background: #111;
+  overflow: hidden;
+}
+
+[data-photo-frame='passepartout'][data-theme='light'] .photo-grid__item {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+[data-photo-frame='passepartout'] .photo-grid__item-exif {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  background: none;
+  padding: 8px 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-caption);
+  font-style: italic;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  white-space: normal;
+  opacity: 1;
+  text-align: center;
+}
+
+[data-photo-frame='passepartout'] .photo-grid__item:hover .photo-grid__item-exif {
+  opacity: 1;
+}
+
+/* ─ Shadow photo frame ─ */
+[data-photo-frame='shadow'] .photo-grid__item {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+[data-photo-frame='shadow'][data-theme='light'] .photo-grid__item {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ─ Film grain overlay ─ */
+[data-grain='true'] .photo-grid__item::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+/* Grain without passepartout — fill the whole item */
+[data-grain='true'][data-photo-frame='none'] .photo-grid__item::after,
+[data-grain='true'][data-photo-frame='shadow'] .photo-grid__item::after {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ── Gallery Aesthetics (all themes) ─────────────── */
 
 /* Generous spacing — gallery exhibition feel */
 .main {
@@ -639,66 +708,9 @@
   letter-spacing: 0.2em;
 }
 
-/* Photo grid — passepartout white borders */
+/* Photo grid gap */
 .photo-grid {
   column-gap: var(--grid-gap, 24px);
-}
-
-.photo-grid__item {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 8px 24px;
-  margin-bottom: var(--grid-gap, 24px);
-  background: #111;
-  border-radius: 0;
-  cursor: pointer;
-  position: relative;
-  overflow: visible;
-}
-
-[data-theme='light'] .photo-grid__item {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: #fff;
-}
-
-.photo-grid__item img {
-  border-radius: 0;
-}
-
-/* Film grain overlay */
-.photo-grid__item::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  bottom: 24px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size: 128px 128px;
-  pointer-events: none;
-  z-index: 1;
-  mix-blend-mode: overlay;
-}
-
-/* Print-style captions (replaces EXIF overlay) */
-.photo-grid__item-exif {
-  position: relative;
-  bottom: auto;
-  left: auto;
-  right: auto;
-  background: none;
-  padding: 8px 0 0;
-  color: var(--text-muted);
-  font-family: var(--font-caption, 'EB Garamond', Georgia, serif);
-  font-style: italic;
-  font-size: 0.75rem;
-  letter-spacing: 0.02em;
-  white-space: normal;
-  opacity: 1;
-  text-align: center;
-}
-
-.photo-grid__item:hover .photo-grid__item-exif {
-  opacity: 1;
 }
 
 /* Shutter-click feedback */
@@ -740,9 +752,9 @@
   color: var(--accent);
 }
 
-/* Album cards — sharper, no rounded corners */
+/* Album cards */
 .album-card {
-  border-radius: 0;
+  border-radius: var(--radius-md);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -755,7 +767,7 @@
   transform: none;
 }
 
-/* Subpage grid — clean */
+/* Subpage grid */
 .subpage-grid__item {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -764,19 +776,17 @@
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-/* Nav link accent on hover */
+/* Accent hover effects (works with any accent color) */
 .header__nav-link:hover,
 .header__nav-link.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
 
-/* Footer — red accent on hover */
 .footer__link:hover {
   color: var(--accent);
 }
 
-/* Scroll-to-top — red accent on hover */
 .scroll-to-top:hover {
   border-color: var(--accent);
   color: var(--accent);
@@ -846,7 +856,7 @@
     opacity: 1;
   }
 
-  .photo-grid__item {
+  [data-photo-frame='passepartout'] .photo-grid__item {
     padding: 6px 6px 18px;
   }
 }

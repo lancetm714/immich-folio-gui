@@ -49,3 +49,24 @@ subpages:
 #   instagram: johndoe
 #   email: hello@example.com
 #   website: https://example.com
+
+# ── Theme ─────────────────────────────────────────────────────
+# Control the visual identity of your gallery. Use a preset name:
+#   theme: studio     # Leica-inspired, red accent, passepartout frames, film grain
+#   theme: minimal    # Clean, no distractions, grey accent
+#   theme: editorial  # Magazine feel, shadow frames
+#   theme: classic    # Warm, golden accent, rounded corners
+#
+# Or customize individual properties (defaults from the preset):
+# theme:
+#   preset: studio              # base preset to extend
+#   accent: "#2563eb"           # brand/accent color
+#   fonts:
+#     heading: "Inter"          # Google Fonts name for headings
+#     body: "Inter"             # body text
+#     caption: "JetBrains Mono" # EXIF captions
+#   radius: 8                   # border-radius in pixels (0 = sharp)
+#   photoFrame: none            # "none" | "passepartout" | "shadow"
+#   grain: false                # film grain overlay on photos
+#   headerDot: false            # accent dot in the nav bar
+#   heroStyle: split            # "split" | "fullbleed" | "minimal"

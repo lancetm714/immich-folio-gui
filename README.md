@@ -78,63 +78,21 @@ CACHE_TTL=300                          # seconds, default: 300
 RATE_LIMIT_RPM=120                     # requests/min/IP, default: 120
 ```
 
-### Gallery Config (`content/gallery.yaml`)
+### Gallery Config
+
+All gallery structure — hero images, albums, subpages, grid layout, footer — is defined in `content/gallery.yaml`.
+
+→ **[Gallery Configuration Guide](docs/gallery-config.md)**
+
+### Theming
+
+Customize the visual identity of your gallery with built-in presets or fine-grained control over colors, fonts, corners, photo frames, and more.
 
 ```yaml
-# Hero image(s) — single UUID or list for carousel
-hero: 00000000-0000-0000-0000-000000000000
-# hero:
-#   - uuid-1
-#   - uuid-2
-
-# Standalone albums on the homepage
-albums:
-  - 11111111-1111-1111-1111-111111111111
-  - 22222222-2222-2222-2222-222222222222
-
-# EXIF on hover (default: true)
-# exifOnHover: false
-
-# Global grid layout
-# grid:
-#   columns: 3
-#   gap: 12
-#   aspectRatio: "1"
-#   layout: masonry       # "masonry" or "uniform"
-
-# Subpages — group albums into collections
-subpages:
-  - name: Japan
-    grid:
-      columns: 4
-      layout: uniform
-      aspectRatio: '3/2'
-    albums:
-      - uuid-tokyo
-      - uuid-kyoto
-
-  - name: Wedding – Smith
-    password: clientpass123
-    albums:
-      - uuid-wedding
+theme: minimal   # or: studio, editorial, classic
 ```
 
-See `content/gallery.yaml.example` for the full reference.
-
-### About Page (`content/about.md`)
-
-```markdown
----
-portrait: asset-uuid
-name: Your Name
-location: City, Country
-gear:
-  - Camera Body
-  - Favorite Lens
----
-
-Your bio text here.
-```
+→ **[Theming Guide](docs/theming.md)**
 
 ## Docker
 

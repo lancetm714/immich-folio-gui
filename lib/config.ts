@@ -31,11 +31,80 @@ export interface FooterConfig {
   website?: string;
 }
 
+/** Theme configuration — controls the visual identity of the gallery. */
+export interface ThemeConfig {
+  preset: string;
+  accent: string;
+  fonts: { heading: string; body: string; caption: string };
+  radius: number;
+  photoFrame: 'none' | 'passepartout' | 'shadow';
+  grain: boolean;
+  headerDot: boolean;
+  heroStyle: 'split' | 'fullbleed' | 'minimal';
+}
+
+// ── Theme Presets ──────────────────────────────────────────────
+
+const THEME_PRESETS: Record<string, ThemeConfig> = {
+  studio: {
+    preset: 'studio',
+    accent: '#e60012',
+    fonts: { heading: 'Playfair Display', body: 'DM Sans', caption: 'EB Garamond' },
+    radius: 0,
+    photoFrame: 'passepartout',
+    grain: true,
+    headerDot: true,
+    heroStyle: 'split',
+  },
+  minimal: {
+    preset: 'minimal',
+    accent: '#666666',
+    fonts: { heading: 'Inter', body: 'Inter', caption: 'JetBrains Mono' },
+    radius: 0,
+    photoFrame: 'none',
+    grain: false,
+    headerDot: false,
+    heroStyle: 'split',
+  },
+  editorial: {
+    preset: 'editorial',
+    accent: '#1a1a1a',
+    fonts: { heading: 'Libre Baskerville', body: 'Source Sans 3', caption: 'Source Sans 3' },
+    radius: 4,
+    photoFrame: 'shadow',
+    grain: false,
+    headerDot: false,
+    heroStyle: 'split',
+  },
+  classic: {
+    preset: 'classic',
+    accent: '#8b6914',
+    fonts: { heading: 'Cormorant Garamond', body: 'Lato', caption: 'Lato' },
+    radius: 8,
+    photoFrame: 'none',
+    grain: false,
+    headerDot: false,
+    heroStyle: 'split',
+  },
+};
+
 /** Raw YAML structure (before validation). */
 interface GalleryYaml {
   hero?: string | string[];
   albums?: string[];
   exifOnHover?: boolean;
+  theme?:
+    | string
+    | {
+        preset?: string;
+        accent?: string;
+        fonts?: { heading?: string; body?: string; caption?: string };
+        radius?: number;
+        photoFrame?: string;
+        grain?: boolean;
+        headerDot?: boolean;
+        heroStyle?: string;
+      };
   grid?: {
     columns?: number;
     gap?: number;
@@ -133,10 +202,72 @@ export interface AppConfig {
   exifOnHover: boolean;
   /** Photo grid layout configuration. */
   grid: GridConfig;
+  /** Theme configuration. */
+  theme: ThemeConfig;
   /** Footer social links config. */
   footer: FooterConfig | null;
   cacheTtl: number;
   rateLimitRpm: number;
+}
+
+// ── Theme resolution ───────────────────────────────────────────
+
+const VALID_PHOTO_FRAMES = ['none', 'passepartout', 'shadow'];
+const VALID_HERO_STYLES = ['split', 'fullbleed', 'minimal'];
+
+function resolveTheme(raw?: GalleryYaml['theme']): ThemeConfig {
+  // No theme key → default preset
+  if (!raw) return { ...THEME_PRESETS.studio };
+
+  // String shorthand: `theme: minimal`
+  if (typeof raw === 'string') {
+    const preset = THEME_PRESETS[raw];
+    if (!preset) {
+      throw new Error(
+        `Unknown theme preset "${raw}". Valid presets: ${Object.keys(THEME_PRESETS).join(', ')}`,
+      );
+    }
+    return { ...preset };
+  }
+
+  // Object: merge with base preset
+  const baseName = raw.preset ?? 'studio';
+  const base = THEME_PRESETS[baseName];
+  if (!base) {
+    throw new Error(
+      `Unknown theme preset "${baseName}". Valid presets: ${Object.keys(THEME_PRESETS).join(', ')}`,
+    );
+  }
+
+  return {
+    preset: baseName,
+    accent: raw.accent ?? base.accent,
+    fonts: {
+      heading: raw.fonts?.heading ?? base.fonts.heading,
+      body: raw.fonts?.body ?? base.fonts.body,
+      caption: raw.fonts?.caption ?? base.fonts.caption,
+    },
+    radius: raw.radius ?? base.radius,
+    photoFrame: VALID_PHOTO_FRAMES.includes(raw.photoFrame ?? '')
+      ? (raw.photoFrame as ThemeConfig['photoFrame'])
+      : base.photoFrame,
+    grain: raw.grain ?? base.grain,
+    headerDot: raw.headerDot ?? base.headerDot,
+    heroStyle: VALID_HERO_STYLES.includes(raw.heroStyle ?? '')
+      ? (raw.heroStyle as ThemeConfig['heroStyle'])
+      : base.heroStyle,
+  };
+}
+
+/**
+ * Build a Google Fonts URL for the theme's fonts.
+ * Deduplicates fonts and includes key weights.
+ */
+export function getGoogleFontsUrl(theme: ThemeConfig): string {
+  const weights = '300;400;500;600';
+  const families = [...new Set([theme.fonts.heading, theme.fonts.body, theme.fonts.caption])];
+  const params = families.map((f) => `family=${f.replace(/ /g, '+')}:wght@${weights}`).join('&');
+  return `https://fonts.googleapis.com/css2?${params}&display=swap`;
 }
 
 // ── Config builder ─────────────────────────────────────────────
@@ -149,6 +280,9 @@ export function getConfig(): AppConfig {
   const apiUrl = env.IMMICH_API_URL;
   const apiKey = env.IMMICH_API_KEY;
   const gallery = loadGalleryYaml();
+
+  // Resolve theme: string shorthand → preset, object → merged with preset base
+  const theme = resolveTheme(gallery.theme);
 
   // Parse standalone albums
   const standaloneAlbumIds = (gallery.albums ?? []).map((id) =>
@@ -216,6 +350,7 @@ export function getConfig(): AppConfig {
       aspectRatio: gallery.grid?.aspectRatio ?? '1',
       layout: (gallery.grid?.layout === 'uniform' ? 'uniform' : 'masonry') as GridConfig['layout'],
     },
+    theme,
     footer: gallery.footer
       ? {
           name: gallery.footer.name,
