@@ -10,6 +10,17 @@
 - **Photo stories / Essays** — Vertical scroll format with images + text interspersed, like a photo essay. Portfolio differentiator
 - **Map view** — Minimal world map from EXIF city/country data, each dot links to an album. Mapbox GL or Leaflet
 - **Collections by camera/lens** — Auto-generate virtual albums from EXIF data ("Shot on Leica Q3", "Summilux 35mm")
+- **Client proofing** — Let clients favorite/select photos in password-protected galleries. Extends existing password gate
+- **Download originals** — Button in lightbox to download full-res, proxied through server (keeps Immich hidden). Unlocks client delivery
+- **Before/After slider** — Drag-to-reveal comparison component for retouching/editing showcases
+- **Print shop integration** — "Buy Print" button linking to external print-on-demand service or contact form with photo reference
+- **Watermarking** — Server-side watermark overlay on proxied images (corner logo, center text, or diagonal). Configurable in YAML
+- **Curated homepage feed** — Hand-picked "best of" sequence across all albums, like an Instagram highlights page
+- **Photo of the Day** — Auto-rotate hero image daily from a designated favorites album. Gives visitors a reason to return
+- **EXIF analytics page** — Visual breakdown of shooting patterns: most-used focal lengths, aperture distribution, camera body stats
+- **Color palette extraction** — Show dominant colors per photo/album as subtle accents. Art direction + bespoke feel
+- **Timeline / Year view** — Chronological scroll of all work by year/month, showing progression over time
+- **Search by EXIF** — Filter entire portfolio by camera settings ("everything at f/1.4", "all black & white")
 
 ## 👤 User / Visitor
 
@@ -27,9 +38,14 @@
 | Slideshow mode | Low | High — exhibition ready |
 | Fullscreen API in lightbox | Low | Medium — immersive |
 | Monochrome toggle | Low | Medium — Leica vibes |
+| Download originals | Low | High — client delivery |
 | ISR caching | Medium | High — performance |
+| Photo of the Day | Low | Medium — return visits |
+| Before/After slider | Medium | Medium — editing showcase |
 | Photo stories/essays | High | Very high — differentiator |
 | Map view | Medium | High — wow factor |
+| Client proofing | High | Very high — business tool |
+| EXIF analytics | Medium | Medium — gear-nerd appeal |
 
 ## ✅ Already Implemented
 

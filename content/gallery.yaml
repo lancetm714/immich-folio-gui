@@ -33,3 +33,6 @@ footer:
   instagram: quasiralf
 #  email: hello@example.com
 #  website: https://example.com
+
+# Enable the /map page
+map: true

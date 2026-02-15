@@ -38,7 +38,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { theme } = getConfig();
+  const config = getConfig();
+  const { theme } = config;
   const fontsUrl = getGoogleFontsUrl(theme);
 
   // Inject theme values as CSS custom properties
@@ -78,6 +79,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/about" className="header__nav-link">
               About
             </Link>
+            {config.map && (
+              <Link href="/map" className="header__nav-link">
+                Map
+              </Link>
+            )}
             <ThemeToggle />
           </nav>
         </header>

@@ -20,6 +20,9 @@ albums:
 # Show camera/lens EXIF on photo hover (default: true)
 # exifOnHover: false
 
+# Enable the /map page — plots photos on a world map by city/country (default: false)
+# map: true
+
 # Photo grid layout — customize columns, gap, aspect ratio, and mode.
 # grid:
 #   columns: 3        # default: 3

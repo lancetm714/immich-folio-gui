@@ -123,6 +123,7 @@ interface GalleryYaml {
   hero?: string | string[];
   albums?: string[];
   exifOnHover?: boolean;
+  map?: boolean;
   theme?:
   | string
   | {
@@ -236,6 +237,8 @@ export interface AppConfig {
   theme: ThemeConfig;
   /** Footer social links config. */
   footer: FooterConfig | null;
+  /** Show the /map page. Default: false. */
+  map: boolean;
   cacheTtl: number;
   rateLimitRpm: number;
 }
@@ -392,6 +395,7 @@ export function getConfig(): AppConfig {
         website: gallery.footer.website,
       }
       : null,
+    map: gallery.map === true,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
   };
