@@ -13,10 +13,11 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 
 ### Gallery & Layout
 
-- **Configurable hero layouts** — split (title + image side-by-side), fullbleed (edge-to-edge hero image), or minimal (centered title card)
+- **Configurable hero layouts** — split, fullbleed, minimal, stacked (image + thumbnail strip), typographic (text-only), or mosaic (multi-image grid)
 - **Hero image carousel** — single image or crossfade carousel of multiple Immich assets
 - **Masonry photo grid** — responsive layout with natural aspect ratios and configurable columns, gap, and aspect ratio
 - **Uniform grid mode** — switch to a fixed-aspect uniform grid per-subpage or globally
+- **Showcase / filmstrip / editorial-flow layouts** — featured hero + grid, horizontal scroll strips, or alternating full-width and paired images
 - **Per-subpage grid overrides** — each subpage can define its own columns, gap, aspect ratio, and layout mode
 - **Fullscreen lightbox** — keyboard and swipe navigation, EXIF panel, adjacent image preloading
 - **EXIF metadata on hover** — camera body, lens, focal length, aperture, shutter speed, ISO shown directly on the grid
@@ -91,10 +92,10 @@ All gallery structure — hero images, albums, subpages, grid layout, footer —
 
 ### Theming
 
-Four built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, and hero layout.
+Seven built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, hero layout, and grid style.
 
 ```yaml
-theme: studio # or: minimal, editorial, classic
+theme: studio # or: minimal, editorial, classic, noir, monograph, botanica
 ```
 
 <table>

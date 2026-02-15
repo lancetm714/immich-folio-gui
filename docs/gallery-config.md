@@ -58,7 +58,7 @@ grid:
   columns: 3            # number of columns (default: 3)
   gap: 12               # gap in pixels (default: 12)
   aspectRatio: "1"       # "1", "3/2", "auto", etc. (default: "1")
-  layout: masonry        # "masonry" or "uniform" (default: "masonry")
+  layout: masonry        # "masonry" | "uniform" | "showcase" | "filmstrip" | "editorial-flow"
 
 subpages:
   - name: Japan
