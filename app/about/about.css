@@ -109,7 +109,7 @@
   }
 
   .about__portrait-col {
-    max-height: 50vh;
+    aspect-ratio: 3 / 2;
   }
 
   .about__text-col {
