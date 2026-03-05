@@ -166,10 +166,14 @@ class ImmichClient {
     const allowedIds = new Set(this.config.albums);
     const filtered = all
       .filter((album) => allowedIds.has(album.id))
-      .map((album) => ({
-        ...album,
-        slug: slugify(album.albumName),
-      }));
+      .map((album) => {
+        const name = this.config.albumOverrides[album.id] ?? album.albumName;
+        return {
+          ...album,
+          albumName: name,
+          slug: slugify(name),
+        };
+      });
 
     // Log album summary on first load so admins can see what's published
     if (!this.hasLoggedAlbums) {
@@ -277,7 +281,10 @@ class ImmichClient {
 
     // Filter out trashed assets
     album.assets = (album.assets || []).filter((a) => !a.isTrashed);
-    album.slug = slugify(album.albumName);
+
+    const name = this.config.albumOverrides[album.id] ?? album.albumName;
+    album.albumName = name;
+    album.slug = slugify(name);
 
     cache.set(cacheKey, album, this.config.cacheTtl);
     return album;

@@ -9,23 +9,20 @@ hero:
 
 # Standalone albums shown directly on the homepage
 albums:
-  - a89c6085-a105-46c2-baa4-338bc69cab93
-  - 9aee9367-a239-4651-980d-3368bc70b7b6
+  - a89c6085-a105-46c2-baa4-338bc69cab93: "Wüstenzauber"
+  - 9aee9367-a239-4651-980d-3368bc70b7b6: "Heimatliebe"
 
 # Subpages group multiple albums under one URL path
 subpages:
-  - name: Deutschland
-    albums:
-      - 9aee9367-a239-4651-980d-3368bc70b7b6
-
-  - name: Dubai
-    albums:
-      - a89c6085-a105-46c2-baa4-338bc69cab93
-
-  - name: Polen
+  Deutschland:
+    - 9aee9367-a239-4651-980d-3368bc70b7b6
+  Dubai:
+    - a89c6085-a105-46c2-baa4-338bc69cab93: "Burj Khalifa & Co"
+  # Support for subpages with passwords or custom grids in the map format
+  Polen:
     password: clientpass123
     albums:
-      - 4ad0ed89-55de-4e69-937f-2d9988f63ad1
+      - 4ad0ed89-55de-4e69-937f-2d9988f63ad1: "Krakau & mehr"
       
 # Footer — optional minimal footer with social links
 footer:

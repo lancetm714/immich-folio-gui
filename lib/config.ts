@@ -148,9 +148,11 @@ interface GalleryYaml {
     email?: string;
     website?: string;
   };
-  subpages?: Array<{
+  subpages?:
+  | Record<string, string[] | Array<string | Record<string, string>>>
+  | Array<{
     name: string;
-    albums: string[];
+    albums: Array<string | Record<string, string>>;
     password?: string;
     grid?: {
       columns?: number;
@@ -239,6 +241,8 @@ export interface AppConfig {
   footer: FooterConfig | null;
   /** Show the /map page. Default: false. */
   map: boolean;
+  /** Explicit album name overrides from gallery.yaml. */
+  albumOverrides: Record<string, string>;
   cacheTtl: number;
   rateLimitRpm: number;
 }
@@ -318,45 +322,101 @@ export function getConfig(): AppConfig {
   // Resolve theme: string shorthand → preset, object → merged with preset base
   const theme = resolveTheme(gallery.theme);
 
+  const albumOverrides: Record<string, string> = {};
+
+  function processAlbumEntry(entry: string | Record<string, string>, context: string): string {
+    if (typeof entry === 'string') {
+      return validateUuid(entry, context);
+    }
+    // Map format: { "uuid": "Custom Name" }
+    const [uuid, name] = Object.entries(entry)[0];
+    const validatedUuid = validateUuid(uuid, context);
+    albumOverrides[validatedUuid] = name;
+    return validatedUuid;
+  }
+
   // Parse standalone albums
-  const standaloneAlbumIds = (gallery.albums ?? []).map((id) =>
-    validateUuid(id, 'gallery.yaml albums'),
+  const standaloneAlbumIds = (gallery.albums ?? []).map((entry) =>
+    processAlbumEntry(entry, 'gallery.yaml albums'),
   );
 
-  if (standaloneAlbumIds.length === 0 && (!gallery.subpages || gallery.subpages.length === 0)) {
+  if (standaloneAlbumIds.length === 0 && (!gallery.subpages || (Array.isArray(gallery.subpages) ? gallery.subpages.length === 0 : Object.keys(gallery.subpages).length === 0))) {
     throw new Error('gallery.yaml must define at least one album or subpage');
   }
 
   // Parse subpages
-  const subpages: SubpageConfig[] = (gallery.subpages ?? []).map((sp) => {
-    if (!sp.name || !sp.albums || sp.albums.length === 0) {
-      throw new Error(
-        `Subpage "${sp.name || '(unnamed)'}" must have a name and at least one album`,
-      );
-    }
-    return {
-      name: sp.name,
-      slug: slugify(sp.name),
-      albumIds: sp.albums.map((id) => validateUuid(id, `subpage "${sp.name}"`)),
-      password: sp.password,
-      ...(sp.grid
-        ? {
-          grid: {
-            ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-            ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-            ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-            ...(sp.grid.layout != null
-              ? {
-                layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                  ? sp.grid.layout
-                  : 'masonry') as GridConfig['layout'],
-              }
-              : {}),
-          },
-        }
-        : {}),
-    };
-  });
+  let subpages: SubpageConfig[] = [];
+
+  if (Array.isArray(gallery.subpages)) {
+    // Original list format
+    subpages = gallery.subpages.map((sp) => {
+      if (!sp.name || !sp.albums || sp.albums.length === 0) {
+        throw new Error(
+          `Subpage "${sp.name || '(unnamed)'}" must have a name and at least one album`,
+        );
+      }
+      return {
+        name: sp.name,
+        slug: slugify(sp.name),
+        albumIds: sp.albums.map((entry) => processAlbumEntry(entry, `subpage "${sp.name}"`)),
+        password: sp.password,
+        ...(sp.grid
+          ? {
+            grid: {
+              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+              ...(sp.grid.layout != null
+                ? {
+                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                    ? sp.grid.layout
+                    : 'masonry') as GridConfig['layout'],
+                }
+                : {}),
+            },
+          }
+          : {}),
+      };
+    });
+  } else if (gallery.subpages) {
+    // New map format: { "Subpage Name": ["uuid1", { "uuid2": "Name" }] } OR { "Subpage Name": { password: "...", albums: [...] } }
+    subpages = Object.entries(gallery.subpages).map(([name, value]) => {
+      // If it's an array, it's just albums
+      if (Array.isArray(value)) {
+        return {
+          name,
+          slug: slugify(name),
+          albumIds: value.map((entry) => processAlbumEntry(entry, `subpage "${name}"`)),
+        };
+      }
+
+      // If it's an object, it might have password, grid, albums
+      const sp = value as any;
+      const albumEntries = sp.albums || [];
+      return {
+        name,
+        slug: slugify(name),
+        albumIds: albumEntries.map((entry: any) => processAlbumEntry(entry, `subpage "${name}"`)),
+        password: sp.password,
+        ...(sp.grid
+          ? {
+            grid: {
+              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+              ...(sp.grid.layout != null
+                ? {
+                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                    ? sp.grid.layout
+                    : 'masonry') as GridConfig['layout'],
+                }
+                : {}),
+            },
+          }
+          : {}),
+      };
+    });
+  }
 
   // Collect ALL album IDs (standalone + subpage) — deduplicated
   const subpageAlbumIds = new Set(subpages.flatMap((sp) => sp.albumIds));
@@ -396,6 +456,7 @@ export function getConfig(): AppConfig {
       }
       : null,
     map: gallery.map === true,
+    albumOverrides,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
   };
