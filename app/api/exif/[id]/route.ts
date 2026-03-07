@@ -8,8 +8,16 @@
 import { NextResponse } from 'next/server';
 import { immich } from '@/lib/immich';
 import { decodeAssetId } from '@/lib/tokens';
+import { getConfig } from '@/lib/config';
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const config = getConfig();
+
+  // Security: If EXIF is globally disabled, do not serve it via API either
+  if (!config.exifOnHover) {
+    return NextResponse.json({ error: 'EXIF metadata is disabled' }, { status: 403 });
+  }
+
   const { id: token } = await params;
 
   // Decode the opaque token back to an Immich asset ID
