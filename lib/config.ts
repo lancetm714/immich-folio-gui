@@ -1,14 +1,13 @@
 /**
  * Typed configuration loader.
  * Secrets come from env vars; gallery structure comes from content/gallery.yaml.
+ * Global settings come from content/settings.yaml.
  */
 
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import { env } from './env';
-
-// ── Env helpers (now handled by lib/env.ts via Zod) ───────────
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -29,6 +28,20 @@ export interface FooterConfig {
   instagram?: string;
   email?: string;
   website?: string;
+}
+
+/** Legal / Impressum configuration. */
+export interface LegalConfig {
+  enabled: boolean;
+  name: string;
+  address: string;
+  zipCity: string;
+  country: string;
+  email?: string;
+  phone?: string;
+  taxId?: string;
+  vatId?: string;
+  extraInfo?: string;
 }
 
 /** Theme configuration — controls the visual identity of the gallery. */
@@ -118,10 +131,29 @@ const THEME_PRESETS: Record<string, ThemeConfig> = {
   },
 };
 
-/** Raw YAML structure (before validation). */
+/** Raw YAML structure for gallery structure. */
 interface GalleryYaml {
   hero?: string | string[];
   albums?: string[];
+  subpages?:
+    | Record<string, string[] | Array<string | Record<string, string>>>
+    | Array<{
+        name: string;
+        albums: Array<string | Record<string, string>>;
+        password?: string;
+        grid?: {
+          columns?: number;
+          gap?: number;
+          aspectRatio?: string;
+          layout?: string;
+        };
+      }>;
+}
+
+/** Raw YAML structure for global settings. */
+interface SettingsYaml {
+  title?: string;
+  subtitle?: string;
   exifOnHover?: boolean;
   map?: boolean;
   transitions?: boolean;
@@ -143,47 +175,28 @@ interface GalleryYaml {
     aspectRatio?: string;
     layout?: string;
   };
-  footer?: {
-    name?: string;
-    instagram?: string;
-    email?: string;
-    website?: string;
-  };
-  subpages?:
-    | Record<string, string[] | Array<string | Record<string, string>>>
-    | Array<{
-        name: string;
-        albums: Array<string | Record<string, string>>;
-        password?: string;
-        grid?: {
-          columns?: number;
-          gap?: number;
-          aspectRatio?: string;
-          layout?: string;
-        };
-      }>;
+  footer?: FooterConfig;
+  legal?: Partial<LegalConfig>;
 }
 
 // ── YAML loading ───────────────────────────────────────────────
 
-function loadGalleryYaml(): GalleryYaml {
-  const yamlPath = path.join(process.cwd(), 'content', 'gallery.yaml');
+function loadYaml<T>(filename: string): T {
+  const yamlPath = path.join(process.cwd(), 'content', filename);
 
   if (!fs.existsSync(yamlPath)) {
-    throw new Error(
-      `Gallery config not found: ${yamlPath}\n` +
-        `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
-    );
+    // gallery.yaml is required, settings.yaml can fallback to defaults
+    if (filename === 'gallery.yaml') {
+      throw new Error(
+        `Required config not found: ${yamlPath}\n` +
+          `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
+      );
+    }
+    return {} as T;
   }
 
   const raw = fs.readFileSync(yamlPath, 'utf8');
-  const data = yaml.load(raw) as GalleryYaml;
-
-  if (!data || typeof data !== 'object') {
-    throw new Error('gallery.yaml is empty or invalid');
-  }
-
-  return data;
+  return (yaml.load(raw) || {}) as T;
 }
 
 // ── UUID validation ────────────────────────────────────────────
@@ -242,6 +255,8 @@ export interface AppConfig {
   theme: ThemeConfig;
   /** Footer social links config. */
   footer: FooterConfig | null;
+  /** Legal / Impressum configuration. */
+  legal: LegalConfig;
   /** Show the /map page. Default: false. */
   map: boolean;
   /** Enable page transitions between routes. Default: true. */
@@ -258,7 +273,7 @@ const VALID_PHOTO_FRAMES = ['none', 'passepartout', 'shadow'];
 const VALID_HERO_STYLES = ['split', 'fullbleed', 'minimal', 'stacked', 'typographic', 'mosaic'];
 const VALID_LAYOUTS = ['masonry', 'uniform', 'showcase', 'filmstrip', 'editorial-flow'];
 
-function resolveTheme(raw?: GalleryYaml['theme']): ThemeConfig {
+function resolveTheme(raw?: SettingsYaml['theme']): ThemeConfig {
   // No theme key → default preset
   if (!raw) return { ...THEME_PRESETS.studio };
 
@@ -331,10 +346,11 @@ export function getConfig(): AppConfig {
     );
   }
 
-  const gallery = loadGalleryYaml();
+  const gallery = loadYaml<GalleryYaml>('gallery.yaml');
+  const settings = loadYaml<SettingsYaml>('settings.yaml');
 
   // Resolve theme: string shorthand → preset, object → merged with preset base
-  const theme = resolveTheme(gallery.theme);
+  const theme = resolveTheme(settings.theme);
 
   const albumOverrides: Record<string, string> = {};
 
@@ -451,33 +467,45 @@ export function getConfig(): AppConfig {
     albums: allAlbumIds,
     standaloneAlbums: standaloneAlbumIds.filter((id) => !subpageAlbumIds.has(id)),
     subpages,
-    siteTitle: env.SITE_TITLE,
-    siteSubtitle: env.SITE_SUBTITLE,
+    siteTitle: settings.title ?? env.SITE_TITLE,
+    siteSubtitle: settings.subtitle ?? env.SITE_SUBTITLE,
     heroImages: gallery.hero
       ? (Array.isArray(gallery.hero) ? gallery.hero : [gallery.hero]).map((id) =>
           validateUuid(id, 'gallery.yaml hero'),
         )
       : [],
-    exifOnHover: gallery.exifOnHover !== false,
+    exifOnHover: settings.exifOnHover !== false,
     grid: {
-      columns: gallery.grid?.columns ?? 3,
-      gap: gallery.grid?.gap ?? 12,
-      aspectRatio: gallery.grid?.aspectRatio ?? '1',
-      layout: (VALID_LAYOUTS.includes(gallery.grid?.layout ?? '')
-        ? gallery.grid!.layout
+      columns: settings.grid?.columns ?? 3,
+      gap: settings.grid?.gap ?? 12,
+      aspectRatio: settings.grid?.aspectRatio ?? '1',
+      layout: (VALID_LAYOUTS.includes(settings.grid?.layout ?? '')
+        ? settings.grid!.layout
         : 'masonry') as GridConfig['layout'],
     },
     theme,
-    footer: gallery.footer
+    footer: settings.footer
       ? {
-          name: gallery.footer.name,
-          instagram: gallery.footer.instagram,
-          email: gallery.footer.email,
-          website: gallery.footer.website,
+          name: settings.footer.name,
+          instagram: settings.footer.instagram,
+          email: settings.footer.email,
+          website: settings.footer.website,
         }
       : null,
-    map: gallery.map === true,
-    transitions: gallery.transitions !== false,
+    legal: {
+      enabled: settings.legal?.enabled === true,
+      name: settings.legal?.name || '',
+      address: settings.legal?.address || '',
+      zipCity: settings.legal?.zipCity || '',
+      country: settings.legal?.country || '',
+      email: settings.legal?.email,
+      phone: settings.legal?.phone,
+      taxId: settings.legal?.taxId,
+      vatId: settings.legal?.vatId,
+      extraInfo: settings.legal?.extraInfo,
+    },
+    map: settings.map === true,
+    transitions: settings.transitions !== false,
     albumOverrides,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,

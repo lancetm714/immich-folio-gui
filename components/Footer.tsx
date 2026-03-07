@@ -3,21 +3,32 @@
  * Reads configuration from gallery.yaml via getConfig().
  */
 
+import Link from 'next/link';
 import { getConfig } from '@/lib/config';
 
 export function Footer() {
   const config = getConfig();
-  const { footer } = config;
+  const { footer, legal } = config;
 
-  // Don't render if no footer config
-  if (!footer || (!footer.name && !footer.instagram && !footer.email && !footer.website)) {
+  // Don't render if no footer config AND no legal config
+  if (
+    !legal.enabled &&
+    (!footer || (!footer.name && !footer.instagram && !footer.email && !footer.website))
+  ) {
     return null;
   }
 
   return (
     <footer className="footer">
       <div className="footer__inner">
-        {footer.name && <span className="footer__name">{footer.name}</span>}
+        <div className="footer__left">
+          {footer?.name && <span className="footer__name">{footer.name}</span>}
+          {legal.enabled && (
+            <Link href="/impressum" className="footer__legal-link">
+              Impressum
+            </Link>
+          )}
+        </div>
 
         <div className="footer__links">
           {footer.instagram && (

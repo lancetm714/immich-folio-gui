@@ -1,0 +1,52 @@
+# ── Global Site Settings ──────────────────────────────────────────
+# This file controls the visual identity, global behavior, and legal info.
+# Structure is separated from gallery.yaml (album IDs) for clarity.
+
+# Public site title and subtitle (overrides .env if set)
+title: "My Portfolio"
+subtitle: "A visual journal"
+
+# Show EXIF metadata (camera, lens, ISO) on photo grid hover
+exifOnHover: true
+
+# Enable the interactive world map view (/map)
+map: true
+
+# Enable smooth page transitions between routes
+transitions: true
+
+# ── Theme configuration ──────────────────────────────────────────
+# Presets: studio, minimal, editorial, classic, noir, monograph, botanica
+theme:
+  preset: "studio"
+  # accent: "#e60012"
+  # photoFrame: "passepartout" # none, passepartout, shadow
+  # grain: true
+
+# ── Grid configuration ───────────────────────────────────────────
+grid:
+  columns: 3
+  gap: 12
+  aspectRatio: "1" # "1" (square), "3/2", "2/3", "16/9", "auto"
+  layout: "masonry" # masonry, uniform, showcase, filmstrip, editorial-flow
+
+# ── Footer & Social ──────────────────────────────────────────────
+footer:
+  name: "My Photography"
+  instagram: "https://instagram.com/your-handle"
+  email: "hello@example.com"
+  website: "https://example.com"
+
+# ── Legal / Impressum (German Law compliance) ────────────────────
+# If enabled: true, a link to /impressum will appear in the footer.
+legal:
+  enabled: false
+  name: "Your Full Name"
+  address: "Street and House Number"
+  zipCity: "ZIP Code and City"
+  country: "Germany"
+  email: "legal@example.com"
+  phone: "+49 123 456789"
+  # taxId: "DE123456789"
+  # vatId: "12/345/67890"
+  extraInfo: "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: Max Mustermann"
