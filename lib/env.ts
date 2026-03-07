@@ -29,25 +29,10 @@ const envSchema = z.object({
 
   /**
    * Secret used for signing auth cookies and encrypting asset tokens.
+   * If not provided, IMMICH_API_KEY will be used as a fallback (configured in config.ts).
    */
   AUTH_SECRET: z.string().min(16, 'AUTH_SECRET should be at least 16 characters').optional(),
-}).refine(
-  (data) => {
-    // Only require AUTH_SECRET in production at runtime, not during build
-    if (
-      process.env.NODE_ENV === 'production' &&
-      !process.env.NEXT_PHASE?.includes('build') &&
-      !data.AUTH_SECRET
-    ) {
-      return false;
-    }
-    return true;
-  },
-  {
-    message: 'AUTH_SECRET is required in production',
-    path: ['AUTH_SECRET'],
-  },
-);
+});
 
 export type Env = z.infer<typeof envSchema>;
 
