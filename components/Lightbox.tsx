@@ -175,8 +175,8 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
           src={current.previewUrl}
           alt=""
           draggable={false}
-          crossOrigin="anonymous"
           onLoad={() => setImageLoaded(true)}
+          onError={() => console.error(`[Lightbox] Failed to load image: ${current.previewUrl}`)}
         />
       </div>
 

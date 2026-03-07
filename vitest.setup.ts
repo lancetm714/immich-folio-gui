@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 // Set mandatory environment variables for all tests
 process.env.IMMICH_API_URL = 'http://immich.test';
 process.env.IMMICH_API_KEY = 'test-key';
