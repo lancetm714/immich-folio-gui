@@ -63,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       data-grain={theme.grain}
       data-header-dot={theme.headerDot}
       data-photo-frame={theme.photoFrame}
+      data-transitions={config.transitions}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

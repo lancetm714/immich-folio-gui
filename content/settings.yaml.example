@@ -12,6 +12,9 @@ exifOnHover: true
 # Enable the interactive world map view (/map)
 map: true
 
+# Enable smooth page transitions between routes
+transitions: true
+
 # ── Theme configuration ──────────────────────────────────────────
 # Presets: studio, minimal, editorial, classic, noir, monograph, botanica
 theme:

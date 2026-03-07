@@ -60,6 +60,22 @@
   padding: 104px 24px 96px; /* 56px header + 48px original padding */
 }
 
+/* Simple CSS Page Fade-In (Replaces Framer Motion) */
+[data-transitions='true'] .main {
+  animation: page-fade-in 0.5s ease-out forwards;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Homepage hero + About page use full bleed — override main padding */
 .main:has(.hero),
 .main:has(.about) {
