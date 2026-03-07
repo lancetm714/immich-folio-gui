@@ -31,16 +31,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   if (!success) {
     const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': String(retryAfter),
-          'X-RateLimit-Remaining': '0',
-        },
-      },
-    );
+    console.warn(`[Image API] ⚠️ Rate limit exceeded for IP: ${ip}. Retry after ${retryAfter}s`);
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   const { id: token } = await params;
@@ -48,6 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   // Decode the opaque token back to an Immich asset ID
   const assetId = decodeAssetId(token);
   if (!assetId) {
+    console.error(`[Image API] ❌ Invalid token: ${token.substring(0, 10)}...`);
     return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
   }
 
@@ -67,8 +60,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   const result = await immich.streamAsset(assetId, size);
   if (!result) {
+    console.error(`[Image API] ❌ Asset not found in Immich: ${assetId} (Size: ${size})`);
     return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
   }
+
+  console.log(`[Image API] ✅ Serving ${assetId} (${size}) - Type: ${result.contentType}`);
 
   const headers: Record<string, string> = {
     'Content-Type': result.contentType,

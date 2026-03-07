@@ -25,7 +25,7 @@ const envSchema = z.object({
   CACHE_TTL: z.coerce.number().int().min(0).default(300),
 
   /** Rate limit: max requests per minute per IP */
-  RATE_LIMIT_RPM: z.coerce.number().int().min(1).default(120),
+  RATE_LIMIT_RPM: z.coerce.number().int().min(1).default(600),
 
   /**
    * Secret used for signing auth cookies and encrypting asset tokens.
