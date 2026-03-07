@@ -31,7 +31,7 @@ const envSchema = z.object({
    * Secret used for signing auth cookies and encrypting asset tokens.
    * If not provided, IMMICH_API_KEY will be used as a fallback (configured in config.ts).
    */
-  AUTH_SECRET: z.string().min(16, 'AUTH_SECRET should be at least 16 characters').optional(),
+  AUTH_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
