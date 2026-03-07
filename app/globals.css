@@ -2,8 +2,10 @@
 
 /* ── Header / Navigation ──────────────────────────── */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 100;
   background: rgba(26, 26, 26, 0.9);
   backdrop-filter: blur(20px);
@@ -55,14 +57,17 @@
 .main {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 48px 24px 96px;
+  padding: 104px 24px 96px; /* 56px header + 48px original padding */
 }
 
 /* Homepage hero + About page use full bleed — override main padding */
 .main:has(.hero),
 .main:has(.about) {
   max-width: none;
-  padding: 0;
+  padding-top: 56px; /* Still need space for header */
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
 }
 
 /* ── Hero Split Layout (Homepage) ────────────────── */
