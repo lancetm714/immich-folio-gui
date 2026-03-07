@@ -13,8 +13,8 @@ let _key: Buffer | null = null;
 
 function getKey(): Buffer {
   if (!_key) {
-    const apiKey = getConfig().immich.apiKey;
-    _key = crypto.createHash('sha256').update(apiKey).digest();
+    const authSecret = getConfig().authSecret;
+    _key = crypto.createHash('sha256').update(authSecret).digest();
   }
   return _key;
 }

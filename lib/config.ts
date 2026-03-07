@@ -125,17 +125,17 @@ interface GalleryYaml {
   exifOnHover?: boolean;
   map?: boolean;
   theme?:
-  | string
-  | {
-    preset?: string;
-    accent?: string;
-    fonts?: { heading?: string; body?: string; caption?: string };
-    radius?: number;
-    photoFrame?: string;
-    grain?: boolean;
-    headerDot?: boolean;
-    heroStyle?: string;
-  };
+    | string
+    | {
+        preset?: string;
+        accent?: string;
+        fonts?: { heading?: string; body?: string; caption?: string };
+        radius?: number;
+        photoFrame?: string;
+        grain?: boolean;
+        headerDot?: boolean;
+        heroStyle?: string;
+      };
   grid?: {
     columns?: number;
     gap?: number;
@@ -149,18 +149,18 @@ interface GalleryYaml {
     website?: string;
   };
   subpages?:
-  | Record<string, string[] | Array<string | Record<string, string>>>
-  | Array<{
-    name: string;
-    albums: Array<string | Record<string, string>>;
-    password?: string;
-    grid?: {
-      columns?: number;
-      gap?: number;
-      aspectRatio?: string;
-      layout?: string;
-    };
-  }>;
+    | Record<string, string[] | Array<string | Record<string, string>>>
+    | Array<{
+        name: string;
+        albums: Array<string | Record<string, string>>;
+        password?: string;
+        grid?: {
+          columns?: number;
+          gap?: number;
+          aspectRatio?: string;
+          layout?: string;
+        };
+      }>;
 }
 
 // ── YAML loading ───────────────────────────────────────────────
@@ -171,7 +171,7 @@ function loadGalleryYaml(): GalleryYaml {
   if (!fs.existsSync(yamlPath)) {
     throw new Error(
       `Gallery config not found: ${yamlPath}\n` +
-      `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
+        `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
     );
   }
 
@@ -224,6 +224,8 @@ export interface GridConfig {
 
 export interface AppConfig {
   immich: { apiUrl: string; apiKey: string };
+  /** Secret used for signing auth cookies and encrypting asset tokens. */
+  authSecret: string;
   albums: string[];
   standaloneAlbums: string[];
   subpages: SubpageConfig[];
@@ -317,6 +319,15 @@ export function getConfig(): AppConfig {
 
   const apiUrl = env.IMMICH_API_URL;
   const apiKey = env.IMMICH_API_KEY;
+  const authSecret = env.AUTH_SECRET || apiKey;
+
+  if (!env.AUTH_SECRET && process.env.NODE_ENV === 'production') {
+    console.warn(
+      '\n⚠️  SECURITY WARNING: AUTH_SECRET is not set. Falling back to IMMICH_API_KEY.\n' +
+        '   Please set a long random string as AUTH_SECRET in your .env for better security.\n',
+    );
+  }
+
   const gallery = loadGalleryYaml();
 
   // Resolve theme: string shorthand → preset, object → merged with preset base
@@ -340,7 +351,13 @@ export function getConfig(): AppConfig {
     processAlbumEntry(entry, 'gallery.yaml albums'),
   );
 
-  if (standaloneAlbumIds.length === 0 && (!gallery.subpages || (Array.isArray(gallery.subpages) ? gallery.subpages.length === 0 : Object.keys(gallery.subpages).length === 0))) {
+  if (
+    standaloneAlbumIds.length === 0 &&
+    (!gallery.subpages ||
+      (Array.isArray(gallery.subpages)
+        ? gallery.subpages.length === 0
+        : Object.keys(gallery.subpages).length === 0))
+  ) {
     throw new Error('gallery.yaml must define at least one album or subpage');
   }
 
@@ -362,19 +379,19 @@ export function getConfig(): AppConfig {
         password: sp.password,
         ...(sp.grid
           ? {
-            grid: {
-              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-              ...(sp.grid.layout != null
-                ? {
-                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                    ? sp.grid.layout
-                    : 'masonry') as GridConfig['layout'],
-                }
-                : {}),
-            },
-          }
+              grid: {
+                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+                ...(sp.grid.layout != null
+                  ? {
+                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                        ? sp.grid.layout
+                        : 'masonry') as GridConfig['layout'],
+                    }
+                  : {}),
+              },
+            }
           : {}),
       };
     });
@@ -400,19 +417,19 @@ export function getConfig(): AppConfig {
         password: sp.password,
         ...(sp.grid
           ? {
-            grid: {
-              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-              ...(sp.grid.layout != null
-                ? {
-                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                    ? sp.grid.layout
-                    : 'masonry') as GridConfig['layout'],
-                }
-                : {}),
-            },
-          }
+              grid: {
+                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+                ...(sp.grid.layout != null
+                  ? {
+                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                        ? sp.grid.layout
+                        : 'masonry') as GridConfig['layout'],
+                    }
+                  : {}),
+              },
+            }
           : {}),
       };
     });
@@ -427,6 +444,7 @@ export function getConfig(): AppConfig {
       apiUrl: `${apiUrl}/api`,
       apiKey,
     },
+    authSecret,
     albums: allAlbumIds,
     standaloneAlbums: standaloneAlbumIds.filter((id) => !subpageAlbumIds.has(id)),
     subpages,
@@ -434,8 +452,8 @@ export function getConfig(): AppConfig {
     siteSubtitle: env.SITE_SUBTITLE,
     heroImages: gallery.hero
       ? (Array.isArray(gallery.hero) ? gallery.hero : [gallery.hero]).map((id) =>
-        validateUuid(id, 'gallery.yaml hero'),
-      )
+          validateUuid(id, 'gallery.yaml hero'),
+        )
       : [],
     exifOnHover: gallery.exifOnHover !== false,
     grid: {
@@ -449,11 +467,11 @@ export function getConfig(): AppConfig {
     theme,
     footer: gallery.footer
       ? {
-        name: gallery.footer.name,
-        instagram: gallery.footer.instagram,
-        email: gallery.footer.email,
-        website: gallery.footer.website,
-      }
+          name: gallery.footer.name,
+          instagram: gallery.footer.instagram,
+          email: gallery.footer.email,
+          website: gallery.footer.website,
+        }
       : null,
     map: gallery.map === true,
     albumOverrides,

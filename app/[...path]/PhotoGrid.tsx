@@ -136,8 +136,9 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
         {assets.map((asset, index) => (
           <FadeIn key={asset.id} delay={index < 12 ? index * 50 : 0}>
             <div
-              className={`photo-grid__item${layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
-                }`}
+              className={`photo-grid__item${
+                layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
+              }`}
               onClick={() => openLightbox(index)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

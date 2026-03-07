@@ -80,9 +80,7 @@ export default async function HomePage() {
             <nav className="hero__nav hero__nav--indexed">
               {subpages.map((sp, i) => (
                 <Link key={sp.slug} href={`/${sp.slug}`} className="hero__nav-link">
-                  <span className="hero__nav-index">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+                  <span className="hero__nav-index">{String(i + 1).padStart(2, '0')}</span>
                   {sp.name}
                 </Link>
               ))}
@@ -127,11 +125,7 @@ export default async function HomePage() {
         <FadeIn delay={200}>
           <nav className="hero__thumbnail-strip">
             {allEntries.map((entry) => (
-              <Link
-                key={entry.slug}
-                href={`/${entry.slug}`}
-                className="hero__thumbnail-item"
-              >
+              <Link key={entry.slug} href={`/${entry.slug}`} className="hero__thumbnail-item">
                 <span className="hero__thumbnail-label">{entry.name}</span>
               </Link>
             ))}

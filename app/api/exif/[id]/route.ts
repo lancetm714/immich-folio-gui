@@ -24,15 +24,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const exif = asset.exifInfo;
-  return NextResponse.json({
-    make: exif.make,
-    model: exif.model,
-    lensModel: exif.lensModel,
-    focalLength: exif.focalLength,
-    fNumber: exif.fNumber,
-    exposureTime: exif.exposureTime,
-    iso: exif.iso,
-    city: exif.city,
-    country: exif.country,
-  });
+  return NextResponse.json(
+    {
+      make: exif.make,
+      model: exif.model,
+      lensModel: exif.lensModel,
+      focalLength: exif.focalLength,
+      fNumber: exif.fNumber,
+      exposureTime: exif.exposureTime,
+      iso: exif.iso,
+      city: exif.city,
+      country: exif.country,
+    },
+    {
+      headers: {
+        'Cache-Control': 'private, max-age=86400, stale-while-revalidate=3600',
+      },
+    },
+  );
 }

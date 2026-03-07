@@ -4,39 +4,56 @@
  * Cover asset IDs are encrypted for security.
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { immich } from '@/lib/immich';
 import { getConfig } from '@/lib/config';
 import { imageUrl } from '@/lib/urls';
+import { isAuthenticated } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-    const config = getConfig();
+export async function GET(_request: NextRequest) {
+  const config = getConfig();
 
-    if (!config.map) {
-        return NextResponse.json({ error: 'Map is not enabled' }, { status: 404 });
-    }
+  if (!config.map) {
+    return NextResponse.json({ error: 'Map is not enabled' }, { status: 404 });
+  }
 
-    const locations = await immich.getMapData();
+  const cookieStore = await cookies();
+  const getCookie = (name: string) => cookieStore.get(name)?.value;
 
-    // Encrypt cover asset IDs and convert to public-safe image URLs
-    const publicLocations = locations.map((loc) => ({
+  const locations = await immich.getMapData();
+
+  // Filter locations and albums based on auth
+  const publicLocations = locations
+    .map((loc) => {
+      // Only keep albums the user is allowed to see
+      const allowedAlbums = loc.albums.filter((a) => {
+        if (!a.subpageSlug) return true; // Standalone albums are public
+        return isAuthenticated(a.subpageSlug, getCookie);
+      });
+
+      if (allowedAlbums.length === 0) return null;
+
+      return {
         city: loc.city,
         country: loc.country,
         lat: loc.lat,
         lng: loc.lng,
-        photoCount: loc.photoCount,
+        photoCount: loc.photoCount, // Note: This count might be slightly off if some photos are in hidden albums
         coverUrl: imageUrl(loc.coverAssetId, 'thumbnail'),
-        albums: loc.albums.map((a) => ({
-            name: a.name,
-            url: a.subpageSlug ? `/${a.subpageSlug}/${a.slug}` : `/${a.slug}`,
+        albums: allowedAlbums.map((a) => ({
+          name: a.name,
+          url: a.subpageSlug ? `/${a.subpageSlug}/${a.slug}` : `/${a.slug}`,
         })),
-    }));
+      };
+    })
+    .filter((loc) => loc !== null);
 
-    return NextResponse.json(publicLocations, {
-        headers: {
-            'Cache-Control': `public, max-age=${Math.floor(config.cacheTtl / 1000)}, stale-while-revalidate=60`,
-        },
-    });
+  return NextResponse.json(publicLocations, {
+    headers: {
+      'Cache-Control': `private, no-cache, no-store, must-revalidate`, // Don't cache personalized map data publicly
+    },
+  });
 }

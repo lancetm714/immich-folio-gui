@@ -12,7 +12,7 @@ import { getConfig, SubpageConfig } from './config';
 const TOKEN_EXPIRY_HOURS = 24;
 
 function hmac(data: string): string {
-  return crypto.createHmac('sha256', getConfig().immich.apiKey).update(data).digest('hex');
+  return crypto.createHmac('sha256', getConfig().authSecret).update(data).digest('hex');
 }
 
 function authToken(slug: string, password: string): string {

@@ -26,6 +26,12 @@ const envSchema = z.object({
 
   /** Rate limit: max requests per minute per IP */
   RATE_LIMIT_RPM: z.coerce.number().int().min(1).default(120),
+
+  /**
+   * Secret used for signing auth cookies and encrypting asset tokens.
+   * If not provided, IMMICH_API_KEY will be used as a fallback (not recommended for production).
+   */
+  AUTH_SECRET: z.string().min(16, 'AUTH_SECRET should be at least 16 characters').optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
