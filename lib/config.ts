@@ -124,6 +124,7 @@ interface GalleryYaml {
   albums?: string[];
   exifOnHover?: boolean;
   map?: boolean;
+  transitions?: boolean;
   theme?:
     | string
     | {
@@ -243,6 +244,8 @@ export interface AppConfig {
   footer: FooterConfig | null;
   /** Show the /map page. Default: false. */
   map: boolean;
+  /** Enable page transitions between routes. Default: true. */
+  transitions: boolean;
   /** Explicit album name overrides from gallery.yaml. */
   albumOverrides: Record<string, string>;
   cacheTtl: number;
@@ -474,6 +477,7 @@ export function getConfig(): AppConfig {
         }
       : null,
     map: gallery.map === true,
+    transitions: gallery.transitions !== false,
     albumOverrides,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
