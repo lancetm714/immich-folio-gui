@@ -31,7 +31,7 @@ export function Footer() {
         </div>
 
         <div className="footer__links">
-          {footer.instagram && (
+          {footer?.instagram && (
             <a
               href={`https://instagram.com/${footer.instagram.replace('@', '')}`}
               target="_blank"
@@ -55,7 +55,7 @@ export function Footer() {
               </svg>
             </a>
           )}
-          {footer.email && (
+          {footer?.email && (
             <a href={`mailto:${footer.email}`} className="footer__link" aria-label="Email">
               <svg
                 width="16"
@@ -72,7 +72,7 @@ export function Footer() {
               </svg>
             </a>
           )}
-          {footer.website && (
+          {footer?.website && (
             <a
               href={footer.website}
               target="_blank"

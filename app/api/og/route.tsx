@@ -10,8 +10,6 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { getConfig } from '@/lib/config';
 
-export const runtime = 'edge';
-
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const title = searchParams.get('title') || 'Gallery';

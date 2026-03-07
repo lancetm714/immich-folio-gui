@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { getConfig } from '@/lib/config';
 import { BackLink } from '@/components/BackLink';
 import { FadeIn } from '@/components/FadeIn';
+import './impressum.css';
 
 export const metadata: Metadata = {
   title: 'Impressum',
@@ -92,30 +93,6 @@ export default function ImpressumPage() {
           </section>
         </FadeIn>
       </main>
-
-      <style jsx>{`
-        .subpage-container {
-          padding: 4rem 2rem;
-          min-height: 80vh;
-        }
-        .subpage-header {
-          margin-bottom: 4rem;
-          text-align: center;
-        }
-        .subpage-title {
-          font-family: var(--font-serif);
-          font-size: clamp(2.5rem, 8vw, 4rem);
-          font-weight: 400;
-          margin-bottom: 1rem;
-        }
-        .subpage-subtitle {
-          font-family: var(--font-caption);
-          font-size: 1rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          opacity: 0.6;
-        }
-      `}</style>
     </div>
   );
 }
