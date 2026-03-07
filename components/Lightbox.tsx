@@ -175,6 +175,7 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
           src={current.previewUrl}
           alt=""
           draggable={false}
+          crossOrigin="anonymous"
           onLoad={() => setImageLoaded(true)}
         />
       </div>
