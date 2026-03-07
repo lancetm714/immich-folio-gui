@@ -1,35 +1,30 @@
-# ── Gallery Configuration ──────────────────────────────────────
-# Album and subpage definitions for your public gallery.
-# Secrets (API key, server URL) stay in .env.local.
+# ── Gallery Structure ──────────────────────────────────────────────
+# This file defines WHICH albums and subpages are shown.
+# Global settings (theme, map, legal, title) now live in content/settings.yaml.
 
+# Hero images for the homepage carousel (Immich asset UUIDs)
 hero:
   - 03c0df0e-01d7-4cc7-8352-cf30d2289ad6
   - a492300b-14ca-4167-a2c9-815c820a8802
   - 7fdc0891-8e9d-48f1-9f1b-a8697c6dbea1
+  - c023e78a-1718-4c1a-aaa1-c22368d0be6c
+  - 1d518119-d333-40db-a81f-e7ca80c1a66e
 
-# Standalone albums shown directly on the homepage
-albums:
-  - a89c6085-a105-46c2-baa4-338bc69cab93: "Wüstenzauber"
-  - 9aee9367-a239-4651-980d-3368bc70b7b6: "Heimatliebe"
+# Standalone albums (shown on the home page)
+#albums:
+#  - "your-album-uuid-1"
+#  - "your-album-uuid-2"
 
-# Subpages group multiple albums under one URL path
+# Subpages: group albums under custom URL paths
 subpages:
   Deutschland:
-    - 9aee9367-a239-4651-980d-3368bc70b7b6
+    - 9aee9367-a239-4651-980d-3368bc70b7b6: "Kloster Chorin"
+    - 371336b4-eb59-409c-b24e-a613f81ede5a: "2025 Oktober - Sanssouci im Herbst"
+    - b55b4a94-b1b6-4eb8-8ce0-32238a78150f: "An der Ostsee"
   Dubai:
-    - a89c6085-a105-46c2-baa4-338bc69cab93: "Burj Khalifa & Co"
+    - a89c6085-a105-46c2-baa4-338bc69cab93: "Dubai 2024"
   # Support for subpages with passwords or custom grids in the map format
   Polen:
     password: clientpass123
     albums:
       - 4ad0ed89-55de-4e69-937f-2d9988f63ad1: "Krakau & mehr"
-      
-# Footer — optional minimal footer with social links
-footer:
-  name: Ralf Ohlenbostel
-  instagram: quasiralf
-#  email: hello@example.com
-#  website: https://example.com
-
-# Enable the /map page
-map: true

@@ -4,11 +4,11 @@ import type { NextConfig } from 'next';
 // Locks down the public-facing site to only trusted sources.
 const cspDirectives = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Added unsafe-eval for some client-side libs if needed
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://unpkg.com",
-  "connect-src 'self'",
+  "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com", // Added blob: and osm
+  "connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com", // Added fonts for connectivity checks
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

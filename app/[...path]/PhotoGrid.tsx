@@ -31,7 +31,6 @@ export interface PhotoItem {
 
 interface PhotoGridProps {
   assets: PhotoItem[];
-  albumId: string;
   layout?: 'masonry' | 'uniform' | 'showcase' | 'filmstrip' | 'editorial-flow';
   gridStyle?: React.CSSProperties;
 }
@@ -50,11 +49,15 @@ function buildPhotoHash(index: number): string {
 }
 
 export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridProps) {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // ── Initial hash check (Client-only to avoid hydration mismatch) ──
+  useEffect(() => {
     const idx = parsePhotoHash(window.location.hash);
-    return idx !== null && idx < assets.length ? idx : null;
-  });
+    if (idx !== null && idx < assets.length) {
+      setLightboxIndex(idx);
+    }
+  }, [assets.length]);
 
   // ── Sync URL hash when lightbox state changes ─────────────────
   useEffect(() => {
@@ -136,9 +139,8 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
         {assets.map((asset, index) => (
           <FadeIn key={asset.id} delay={index < 12 ? index * 50 : 0}>
             <div
-              className={`photo-grid__item${
-                layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
-              }`}
+              className={`photo-grid__item${layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
+                }`}
               onClick={() => openLightbox(index)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

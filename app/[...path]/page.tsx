@@ -164,7 +164,6 @@ export default async function PathPage({ params }: PathPageProps) {
         </div>
         <PhotoGrid
           assets={images}
-          albumId={album.id}
           layout={resolveLayout(spGrid)}
           gridStyle={buildGridStyle(spGrid)}
         />
@@ -214,7 +213,6 @@ export default async function PathPage({ params }: PathPageProps) {
           </div>
           <PhotoGrid
             assets={images}
-            albumId={album.id}
             layout={resolveLayout(result.subpage.grid)}
             gridStyle={buildGridStyle(result.subpage.grid)}
           />
@@ -292,7 +290,6 @@ export default async function PathPage({ params }: PathPageProps) {
       </div>
       <PhotoGrid
         assets={images}
-        albumId={album.id}
         layout={resolveLayout()}
         gridStyle={buildGridStyle()}
       />
