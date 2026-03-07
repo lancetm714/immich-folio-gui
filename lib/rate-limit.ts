@@ -2,6 +2,11 @@
  * In-memory sliding-window rate limiter.
  * Tracks request counts per IP per minute bucket.
  * Auto-evicts expired entries to prevent memory leaks.
+ *
+ * ⚠️ NOTE: This is an in-memory store. In a multi-node or serverless
+ * environment (Vercel, AWS Lambda, Docker Swarm), each instance will
+ * have its own independent rate limit. For a global limit across
+ * multiple nodes, a persistent store like Redis would be required.
  */
 
 interface RateLimitEntry {

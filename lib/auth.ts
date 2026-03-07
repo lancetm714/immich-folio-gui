@@ -2,21 +2,30 @@
  * Album authentication helpers.
  * Uses HMAC tokens stored in HttpOnly cookies — no database needed.
  *
- * Token = HMAC-SHA256(slug + password, apiKey)
+ * Token = HMAC-SHA256(slug + passwordSecret, authSecret)
  * Cookie = lb_auth_<slug> = <token>
  */
 
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { getConfig, SubpageConfig } from './config';
 
 const TOKEN_EXPIRY_HOURS = 24;
+
+/**
+ * Check if a string looks like a bcrypt hash.
+ */
+function isHash(str: string): boolean {
+  return str.startsWith('$2a$') || str.startsWith('$2b$') || str.startsWith('$2y$');
+}
 
 function hmac(data: string): string {
   return crypto.createHmac('sha256', getConfig().authSecret).update(data).digest('hex');
 }
 
-function authToken(slug: string, password: string): string {
-  return hmac(`${slug}:${password}`);
+function authToken(slug: string, passwordSecret: string): string {
+  // Use the hash/password as part of the HMAC for a secure, unique session token
+  return hmac(`${slug}:${passwordSecret}`);
 }
 
 function cookieName(slug: string): string {
@@ -46,9 +55,23 @@ export function authenticate(slug: string, password: string): string | null {
   const sp = findSubpageBySlug(slug);
   if (!sp?.password) return null;
 
-  if (password !== sp.password) return null;
+  let isValid = false;
+  if (isHash(sp.password)) {
+    isValid = bcrypt.compareSync(password, sp.password);
+  } else {
+    // Plaintext fallback (deprecated)
+    isValid = password === sp.password;
+    if (isValid) {
+      console.warn(
+        `\n⚠️  SECURITY WARNING: Subpage "${slug}" is using a plaintext password in gallery.yaml.\n` +
+          `   Please hash it for better security. You can use: npx bcryptjs ${sp.password}\n`,
+      );
+    }
+  }
 
-  const token = authToken(slug, password);
+  if (!isValid) return null;
+
+  const token = authToken(slug, sp.password);
   const maxAge = TOKEN_EXPIRY_HOURS * 60 * 60;
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 

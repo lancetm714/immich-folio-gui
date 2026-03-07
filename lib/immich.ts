@@ -77,6 +77,8 @@ export interface SubpageSummary {
   coverAssetId: string | null;
 }
 
+export type ImmichResult<T> = { data: T | null; error: string | null };
+
 // ── API Client ─────────────────────────────────────────────────
 
 class ImmichClient {
@@ -89,7 +91,7 @@ class ImmichClient {
   /**
    * Make an authenticated request to the Immich API.
    */
-  private async request<T>(endpoint: string): Promise<T | null> {
+  private async request<T>(endpoint: string): Promise<ImmichResult<T>> {
     const url = `${this.config.immich.apiUrl}${endpoint}`;
     try {
       const res = await fetch(url, {
@@ -100,18 +102,20 @@ class ImmichClient {
       });
 
       if (!res.ok) {
-        console.error(`[Immich] ${res.status} ${res.statusText} for ${endpoint}`);
-        return null;
+        const error = `[Immich] ${res.status} ${res.statusText} for ${endpoint}`;
+        console.error(error);
+        return { data: null, error };
       }
 
       const contentType = res.headers.get('Content-Type') || '';
       if (contentType.includes('application/json')) {
-        return (await res.json()) as T;
+        return { data: (await res.json()) as T, error: null };
       }
-      return null;
-    } catch (error) {
-      console.error(`[Immich] Failed to reach ${url}:`, error);
-      return null;
+      return { data: null, error: 'Invalid response format (expected JSON)' };
+    } catch (err) {
+      const error = `[Immich] Failed to reach ${url}: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error(error);
+      return { data: null, error };
     }
   }
 
@@ -160,8 +164,8 @@ class ImmichClient {
     const cached = cache.get<ImmichAlbum[]>(cacheKey);
     if (cached) return cached;
 
-    const all = await this.request<ImmichAlbum[]>('/albums?shared=true');
-    if (!all) return [];
+    const { data: all, error } = await this.request<ImmichAlbum[]>('/albums?shared=true');
+    if (error || !all) return [];
 
     const allowedIds = new Set(this.config.albums);
     const filtered = all
@@ -276,8 +280,8 @@ class ImmichClient {
     const cached = cache.get<ImmichAlbum>(cacheKey);
     if (cached) return cached;
 
-    const album = await this.request<ImmichAlbum>(`/albums/${encodeURIComponent(albumId)}`);
-    if (!album) return null;
+    const { data: album, error } = await this.request<ImmichAlbum>(`/albums/${encodeURIComponent(albumId)}`);
+    if (error || !album) return null;
 
     // Filter out trashed assets
     album.assets = (album.assets || []).filter((a) => !a.isTrashed);
@@ -325,8 +329,8 @@ class ImmichClient {
     const cached = cache.get<ImmichAsset>(cacheKey);
     if (cached) return cached;
 
-    const asset = await this.request<ImmichAsset>(`/assets/${encodeURIComponent(assetId)}`);
-    if (!asset) return null;
+    const { data: asset, error } = await this.request<ImmichAsset>(`/assets/${encodeURIComponent(assetId)}`);
+    if (error || !asset) return null;
 
     cache.set(cacheKey, asset, this.config.cacheTtl);
     return asset;
@@ -406,8 +410,8 @@ class ImmichClient {
    * Check if the Immich server is reachable.
    */
   async ping(): Promise<boolean> {
-    const res = await this.request<{ res: string }>('/server/ping');
-    return !!res;
+    const { data } = await this.request<{ res: string }>('/server/ping');
+    return !!data;
   }
 }
 

@@ -29,10 +29,10 @@ export default function ImpressumPage() {
         <p className="subpage-subtitle">Angaben gemäß § 5 TMG</p>
       </header>
 
-      <main className="subpage-content" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', opacity: 0.8 }}>Anschrift</h2>
-          <p style={{ lineHeight: 1.6 }}>
+      <main className="subpage-content">
+        <section className="legal-section">
+          <h2 className="legal-section__title">Anschrift</h2>
+          <p className="legal-section__text">
             {legal.name}
             <br />
             {legal.address}
@@ -44,9 +44,9 @@ export default function ImpressumPage() {
         </section>
 
         {(legal.email || legal.phone) && (
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', opacity: 0.8 }}>Kontakt</h2>
-            <p style={{ lineHeight: 1.6 }}>
+          <section className="legal-section">
+            <h2 className="legal-section__title">Kontakt</h2>
+            <p className="legal-section__text">
               {legal.email && (
                 <>
                   E-Mail: {legal.email}
@@ -59,11 +59,9 @@ export default function ImpressumPage() {
         )}
 
         {(legal.taxId || legal.vatId) && (
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', opacity: 0.8 }}>
-              Steuernummer
-            </h2>
-            <p style={{ lineHeight: 1.6 }}>
+          <section className="legal-section">
+            <h2 className="legal-section__title">Steuernummer</h2>
+            <p className="legal-section__text">
               {legal.taxId && (
                 <>
                   Steuernummer: {legal.taxId}
@@ -76,15 +74,13 @@ export default function ImpressumPage() {
         )}
 
         {legal.extraInfo && (
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', opacity: 0.8 }}>
-              Weitere Informationen
-            </h2>
-            <p style={{ lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{legal.extraInfo}</p>
+          <section className="legal-section">
+            <h2 className="legal-section__title">Weitere Informationen</h2>
+            <p className="legal-section__text legal-section__text--pre">{legal.extraInfo}</p>
           </section>
         )}
 
-        <section style={{ marginTop: '4rem', fontSize: '0.85rem', opacity: 0.6 }}>
+        <section className="legal-source">
           <p>Quelle: Erstellt mit dem Impressum-Generator von eRecht24.</p>
         </section>
       </main>

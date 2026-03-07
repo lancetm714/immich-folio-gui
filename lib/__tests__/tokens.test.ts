@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/config', () => ({
   getConfig: () => ({
     immich: { apiKey: 'test-api-key-for-vitest-unit-tests' },
+    authSecret: 'test-auth-secret-32-chars-long-min',
   }),
 }));
 
