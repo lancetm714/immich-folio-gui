@@ -60,10 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       style={themeVars as React.CSSProperties}
       data-preset={theme.preset}
-      data-grain={theme.grain}
-      data-header-dot={theme.headerDot}
+      data-grain={String(theme.grain)}
+      data-header-dot={String(theme.headerDot)}
       data-photo-frame={theme.photoFrame}
-      data-transitions={config.transitions}
+      data-transitions={String(config.transitions)}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
