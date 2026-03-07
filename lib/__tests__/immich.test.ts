@@ -39,11 +39,10 @@ describe('ImmichClient', () => {
 
       // Access private method via any casting for testing
       const result = await (immich as any).request('/test');
-      expect(result.data).toEqual({ foo: 'bar' });
-      expect(result.error).toBeNull();
+      expect(result).toEqual({ foo: 'bar' });
     });
 
-    it('returns error on non-ok response', async () => {
+    it('returns null on non-ok response', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -51,8 +50,7 @@ describe('ImmichClient', () => {
       });
 
       const result = await (immich as any).request('/test');
-      expect(result.data).toBeNull();
-      expect(result.error).toContain('404 Not Found');
+      expect(result).toBeNull();
     });
   });
 
