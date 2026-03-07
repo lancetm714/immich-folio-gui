@@ -12,7 +12,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
 import { DevToolbar } from '@/components/DevToolbar';
-import { PageTransition } from '@/components/PageTransition';
 import { getConfig, getGoogleFontsUrl } from '@/lib/config';
 
 const siteTitle = process.env.SITE_TITLE || 'Gallery';
@@ -88,9 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ThemeToggle />
           </nav>
         </header>
-        <PageTransition enabled={config.transitions}>
-          <main className="main">{children}</main>
-        </PageTransition>
+        <main className="main">{children}</main>
         <Footer />
         <ScrollToTop />
         {process.env.NODE_ENV === 'development' && <DevToolbar />}
