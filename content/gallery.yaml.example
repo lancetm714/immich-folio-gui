@@ -18,6 +18,8 @@ subpages:
     - "album-uuid-3"
     - "album-uuid-4"
   "Projects":
+    title: "My Creative Projects" # Optional: Header title, defaults to Navigation key ("Projects")
+    subtitle: "A collection of 2026 highlights in 35mm film." # Optional: Sub-text for headers
     password: "your-password" # Optional protection
     albums:
       - "album-uuid-5"

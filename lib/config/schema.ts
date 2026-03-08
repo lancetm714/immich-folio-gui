@@ -1,6 +1,8 @@
 export interface SubpageConfig {
     name: string;
     slug: string;
+    title?: string;
+    subtitle?: string;
     albumIds: string[];
     password?: string;
     grid?: Partial<GridConfig>;
@@ -79,6 +81,8 @@ export interface GalleryYaml {
     | Record<string, string[] | Array<string | Record<string, string>>>
     | Array<{
         name: string;
+        title?: string;
+        subtitle?: string;
         albums: Array<string | Record<string, string>>;
         password?: string;
         grid?: {

@@ -78,6 +78,8 @@ export function getConfig(): AppConfig {
             return {
                 name: sp.name,
                 slug: slugify(sp.name),
+                title: sp.title,
+                subtitle: sp.subtitle,
                 albumIds: sp.albums.map((entry) => processAlbumEntry(entry, `subpage "${sp.name}"`)),
                 password: sp.password,
                 ...(sp.grid ? {
@@ -95,12 +97,14 @@ export function getConfig(): AppConfig {
             if (Array.isArray(value)) {
                 return { name, slug: slugify(name), albumIds: value.map((entry) => processAlbumEntry(entry, `subpage "${name}"`)) };
             }
-            interface SubpageObjectValue { albums?: Array<string | Record<string, string>>; password?: string; grid?: { columns?: number; gap?: number; aspectRatio?: string; layout?: string; }; }
+            interface SubpageObjectValue { title?: string; subtitle?: string; albums?: Array<string | Record<string, string>>; password?: string; grid?: { columns?: number; gap?: number; aspectRatio?: string; layout?: string; }; }
             const sp = value as SubpageObjectValue;
             const albumEntries = sp.albums || [];
             return {
                 name,
                 slug: slugify(name),
+                title: sp.title,
+                subtitle: sp.subtitle,
                 albumIds: albumEntries.map((entry) => processAlbumEntry(entry, `subpage "${name}"`)),
                 password: sp.password,
                 ...(sp.grid ? {

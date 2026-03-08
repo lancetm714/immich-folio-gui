@@ -222,6 +222,8 @@ export default async function PathPage({ params }: PathPageProps) {
     return (
       <SubpageGridView
         slug={slug}
+        title={result.subpage.title || result.subpage.name}
+        subtitle={result.subpage.subtitle}
         albums={albums}
         coverPlaceholders={coverPlaceholders}
       />
