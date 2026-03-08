@@ -20,7 +20,35 @@ export function getConfig(): AppConfig {
     }
 
     const gallery = loadYaml<GalleryYaml>('gallery.yaml');
-    const settings = loadYaml<SettingsYaml>('settings.yaml');
+    const settings = loadYaml<SettingsYaml>('settings.yaml') || {};
+
+    if (!gallery) {
+        // Return dummy config if gallery.yaml is missing
+        _config = {
+            immich: { apiUrl: `${apiUrl}/api`, apiKey },
+            authSecret,
+            albums: [],
+            standaloneAlbums: [],
+            subpages: [],
+            siteTitle: env.SITE_TITLE || 'Immich Folio',
+            siteSubtitle: env.SITE_SUBTITLE || 'Setup Required',
+            seo: { title: 'Setup Required', description: 'Please configure Immich Folio', noIndex: true, noFollow: true },
+            heroImages: [],
+            exifOnHover: true,
+            grid: { columns: 3, gap: 12, aspectRatio: '1', layout: 'masonry' },
+            theme: resolveTheme('studio'),
+            footer: null,
+            legal: { enabled: false, name: '', address: '', zipCity: '', country: '' },
+            map: false,
+            transitions: false,
+            albumOverrides: {},
+            cacheTtl: env.CACHE_TTL * 1000,
+            rateLimitRpm: env.RATE_LIMIT_RPM,
+            needsSetup: true
+        };
+        return _config;
+    }
+
     const theme = resolveTheme(settings.theme);
 
     const albumOverrides: Record<string, string> = {};
@@ -131,6 +159,7 @@ export function getConfig(): AppConfig {
         albumOverrides,
         cacheTtl: env.CACHE_TTL * 1000,
         rateLimitRpm: env.RATE_LIMIT_RPM,
+        needsSetup: false
     };
     return _config;
 }

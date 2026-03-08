@@ -12,7 +12,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
 import { DevToolbar } from '@/components/DevToolbar';
-import { getConfig, getGoogleFontsUrl } from '@/lib/config';
+import { getConfig, getGoogleFontsUrl, AppConfig } from '@/lib/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = getConfig();
@@ -50,7 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const { theme } = config;
   const fontsUrl = getGoogleFontsUrl(theme);
 
-  // Inject theme values as CSS custom properties
   const themeVars: Record<string, string> = {
     '--accent': theme.accent,
     '--accent-dim': `${theme.accent}1f`,
@@ -61,6 +60,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '--radius-md': `${Math.round(theme.radius * 1.5)}px`,
     '--radius-lg': `${theme.radius * 2}px`,
   };
+
+  if ((config as AppConfig & { needsSetup?: boolean }).needsSetup) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            minHeight: '100dvh', padding: '2rem', backgroundColor: '#ffffff',
+            color: '#111111', fontFamily: 'system-ui, sans-serif'
+          }}>
+            <div style={{ maxWidth: '600px', width: '100%' }}>
+              <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 500, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+                Setup Required
+              </h1>
+              <p style={{ fontSize: '1.125rem', opacity: 0.7, marginBottom: '2rem', lineHeight: 1.5 }}>
+                Immich Folio is running, but it looks like your configuration files are missing.
+              </p>
+              <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)', padding: '1.5rem', borderRadius: '8px', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                <p style={{ marginBottom: '1rem' }}>To get started, follow these steps in your repository or mounted <code>content/</code> volume:</p>
+                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                  <li style={{ marginBottom: '0.5rem' }}>Copy <code>settings.yaml.example</code> to <code>settings.yaml</code></li>
+                  <li style={{ marginBottom: '0.5rem' }}>Copy <code>gallery.yaml.example</code> to <code>gallery.yaml</code></li>
+                  <li style={{ marginBottom: '0.5rem' }}>Copy <code>about.md.example</code> to <code>about.md</code> (optional)</li>
+                </ol>
+                <p style={{ marginTop: '1.5rem', marginBottom: 0 }}>
+                  Open <code>gallery.yaml</code> and add the album IDs you want to display, then <strong>restart your server</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html

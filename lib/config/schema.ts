@@ -69,6 +69,7 @@ export interface AppConfig {
     albumOverrides: Record<string, string>;
     cacheTtl: number;
     rateLimitRpm: number;
+    needsSetup?: boolean;
 }
 
 export interface GalleryYaml {

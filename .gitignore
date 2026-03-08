@@ -49,3 +49,10 @@ docs/dev/
 # Build cache
 tsconfig.tsbuildinfo
 content/about.md
+
+#content
+content/settings.yaml
+content/gallery.yaml
+
+#git-filter-repo    
+git-filter-repo
