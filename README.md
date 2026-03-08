@@ -33,6 +33,11 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 
 ### Security
 
+<details>
+<summary><strong>View security architecture & protections</strong></summary>
+
+<br>
+
 | Concern                 | Protection                                                                                              |
 | ----------------------- | ------------------------------------------------------------------------------------------------------- |
 | **Server exposure**     | Immich URL and port are never sent to the browser — all requests are proxied server-side                |
@@ -44,6 +49,8 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 | **No direct access**    | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
 
 **Production Ready:** The codebase has been fully audited for production. It uses strict Content Security Policy (No `unsafe-eval`), strong cryptographic patterns (SHA-256 for IV generation instead of MD5), lengths-capped inputs for OG dynamic generation to prevent DoS, and is completely free of N+1 database queries since the API isolates Immich.
+
+</details>
 
 ### Infrastructure
 
@@ -128,6 +135,9 @@ docker compose up -d
 
 The gallery will be available at `http://localhost:7211`.
 
+<details>
+<summary><strong>Advanced Docker (Standalone, Health Check, Proxy)</strong></summary>
+
 ### Standalone Docker
 
 ```bash
@@ -163,6 +173,8 @@ photos.example.com {
     reverse_proxy localhost:7211
 }
 ```
+
+</details>
 
 ## Tech Stack
 
