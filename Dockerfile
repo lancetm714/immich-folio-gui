@@ -18,6 +18,7 @@ COPY . .
 # env.ts which runs Zod validation on import.
 ENV IMMICH_API_URL="http://localhost:2283"
 ENV IMMICH_API_KEY="build-placeholder"
+ENV AUTH_SECRET="build-placeholder"
 
 RUN npm run build
 
