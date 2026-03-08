@@ -547,6 +547,30 @@
   margin-top: 0;
 }
 
+/* ── Subpage Header ──────────────────────────────── */
+.subpage-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.subpage-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.subpage-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 /* ── Subpage Album Grid (2-column, edge-to-edge) ─── */
 .subpage-grid {
   display: grid;
