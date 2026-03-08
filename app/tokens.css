@@ -44,8 +44,8 @@
   --bg-overlay: rgba(245, 245, 240, 0.96);
 
   --text-primary: #1a1a18;
-  --text-secondary: #5a5a55;
-  --text-muted: #8a8a85;
+  --text-secondary: #4a4a45;
+  --text-muted: #6a6a65;
 
   --border-subtle: #ddddd8;
   --border-hover: #c5c5c0;
@@ -78,8 +78,8 @@
   --bg-overlay: rgba(255, 255, 255, 0.98);
 
   --text-primary: #000000;
-  --text-secondary: #666666;
-  --text-muted: #999999;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
 
   --border-subtle: #eeeeee;
   --border-hover: #cccccc;
@@ -109,8 +109,8 @@
   --bg-overlay: rgba(250, 248, 244, 0.96);
 
   --text-primary: #1a1714;
-  --text-secondary: #5a5550;
-  --text-muted: #8a857f;
+  --text-secondary: #4a4540;
+  --text-muted: #6a655f;
 
   --border-subtle: #e5e0d8;
   --border-hover: #ccc7c0;
@@ -140,8 +140,8 @@
   --bg-overlay: rgba(253, 251, 245, 0.96);
 
   --text-primary: #1a1810;
-  --text-secondary: #5a5545;
-  --text-muted: #8a8575;
+  --text-secondary: #4a4535;
+  --text-muted: #6a6555;
 
   --border-subtle: #e5dfcf;
   --border-hover: #d0c8b5;
@@ -171,8 +171,8 @@
   --bg-overlay: rgba(250, 245, 239, 0.96);
 
   --text-primary: #1a1610;
-  --text-secondary: #5a5548;
-  --text-muted: #8a8578;
+  --text-secondary: #4a4538;
+  --text-muted: #6a6558;
 
   --border-subtle: #e5dfd5;
   --border-hover: #ccc5b8;
@@ -202,8 +202,8 @@
   --bg-overlay: rgba(250, 250, 250, 0.98);
 
   --text-primary: #111111;
-  --text-secondary: #555555;
-  --text-muted: #999999;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
 
   --border-subtle: #e5e5e5;
   --border-hover: #cccccc;
@@ -236,7 +236,19 @@ a {
   text-decoration: none;
 }
 
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
 img {
   display: block;
   max-width: 100%;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
 }

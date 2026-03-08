@@ -196,14 +196,14 @@ exifOnHover: ${exifOnHover}`;
 
   return (
     <>
-      {/* ── Floating Toggle Button — bottom-right ── */}
+      {/* ── Floating Toggle Button — bottom-left ── */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Dev Toolbar"
         style={{
           position: 'fixed',
           bottom: 20,
-          right: 20,
+          left: 20,
           zIndex: 99999,
           width: 44,
           height: 44,
@@ -224,13 +224,13 @@ exifOnHover: ${exifOnHover}`;
         {open ? '✕' : '🎨'}
       </button>
 
-      {/* ── Panel — anchored bottom-right ────────── */}
+      {/* ── Panel — anchored bottom-left ────────── */}
       {open && (
         <div
           style={{
             position: 'fixed',
             bottom: 76,
-            right: 20,
+            left: 20,
             zIndex: 99998,
             width: 300,
             background: 'rgba(18,18,22,0.97)',
