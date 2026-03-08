@@ -45,3 +45,6 @@ next-env.d.ts
 
 # internal dev docs
 dev-docs/
+
+# Build cache
+tsconfig.tsbuildinfo
