@@ -7,16 +7,41 @@
  */
 
 import crypto from 'crypto';
-import bcrypt from 'bcryptjs';
 import { getConfig, SubpageConfig } from './config';
 
 const TOKEN_EXPIRY_HOURS = 24;
 
 /**
- * Check if a string looks like a bcrypt hash.
+ * Check if a string looks like a legacy bcrypt hash.
  */
-function isHash(str: string): boolean {
+function isBcryptHash(str: string): boolean {
   return str.startsWith('$2a$') || str.startsWith('$2b$') || str.startsWith('$2y$');
+}
+
+/**
+ * Native SCrypt verify (format: 'scrypt:salt:hash_hex')
+ */
+function verifyScrypt(password: string, stored: string): boolean {
+  if (!stored.startsWith('scrypt:')) return false;
+
+  try {
+    const [, salt, hashHex] = stored.split(':');
+    const key = crypto.scryptSync(password, salt, 64);
+    const expectedKey = Buffer.from(hashHex, 'hex');
+    if (key.length !== expectedKey.length) return false;
+    return crypto.timingSafeEqual(key, expectedKey);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Helper to generate an scrypt string to print in logs.
+ */
+function generateScryptHash(password: string): string {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `scrypt:${salt}:${hash}`;
 }
 
 function hmac(data: string): string {
@@ -56,15 +81,27 @@ export function authenticate(slug: string, password: string): string | null {
   if (!sp?.password) return null;
 
   let isValid = false;
-  if (isHash(sp.password)) {
-    isValid = bcrypt.compareSync(password, sp.password);
+
+  if (isBcryptHash(sp.password)) {
+    console.error(
+      `\n❌ SECURITY ERROR: Subpage "${slug}" is using an outdated bcrypt password hash.\n` +
+      `   Bcrypt dependency has been removed to reduce bundle size.\n` +
+      `   Please switch temporarily to plaintext in your gallery.yaml, log in again\n` +
+      `   to see your new secure "scrypt:..." hash in the logs, and update your file.\n`,
+    );
+    return null;
+  }
+
+  if (sp.password.startsWith('scrypt:')) {
+    isValid = verifyScrypt(password, sp.password);
   } else {
     // Plaintext fallback (deprecated)
     isValid = password === sp.password;
     if (isValid) {
+      const recommendedHash = generateScryptHash(sp.password);
       console.warn(
         `\n⚠️  SECURITY WARNING: Subpage "${slug}" is using a plaintext password in gallery.yaml.\n` +
-          `   Please hash it for better security. You can use: npx bcryptjs ${sp.password}\n`,
+        `   Please replace it with this native secure hash:\n\n   ${recommendedHash}\n`,
       );
     }
   }

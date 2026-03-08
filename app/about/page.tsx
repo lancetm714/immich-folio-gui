@@ -5,7 +5,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import matter from 'gray-matter';
+import yaml from 'js-yaml';
 import Image from 'next/image';
 import { imageUrl, assetPlaceholder } from '@/lib/urls';
 import { immich } from '@/lib/immich';
@@ -26,8 +26,21 @@ function getAboutContent() {
     return { meta: {} as AboutFrontmatter, body: '' };
   }
   const raw = readFileSync(filePath, 'utf-8');
-  const { data, content } = matter(raw);
-  return { meta: data as AboutFrontmatter, body: content.trim() };
+
+  let meta = {} as AboutFrontmatter;
+  let body = raw;
+
+  const match = raw.match(/^(?:---\r?\n)([\s\S]*?)(?:\r?\n---\r?\n)([\s\S]*)$/);
+  if (match) {
+    try {
+      meta = (yaml.load(match[1]) || {}) as AboutFrontmatter;
+    } catch (e) {
+      console.error('Failed to parse about.md frontmatter', e);
+    }
+    body = match[2];
+  }
+
+  return { meta, body: body.trim() };
 }
 
 export default async function AboutPage() {

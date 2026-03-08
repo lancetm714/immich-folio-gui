@@ -1,50 +1,58 @@
 /**
- * Zod-validated environment variables.
+ * Environment variables parser.
  * Parsed once at startup — all env access should go through this module.
  */
 
-import { z } from 'zod';
-
-const envSchema = z.object({
-  /** Base URL of your Immich instance, e.g. https://immich.example.com */
-  IMMICH_API_URL: z
-    .string()
-    .url('IMMICH_API_URL must be a valid URL')
-    .transform((url) => url.replace(/\/+$/, '')),
-
-  /** Immich API key (from Admin → API Keys) */
-  IMMICH_API_KEY: z.string().min(1, 'IMMICH_API_KEY is required'),
-
-  /** Public site title shown in the header */
-  SITE_TITLE: z.string().default('Gallery'),
-
-  /** Subtitle displayed below the title */
-  SITE_SUBTITLE: z.string().default(''),
-
-  /** Cache TTL in seconds */
-  CACHE_TTL: z.coerce.number().int().min(0).default(300),
-
-  /** Rate limit: max requests per minute per IP */
-  RATE_LIMIT_RPM: z.coerce.number().int().min(1).default(600),
-
-  /**
-   * Secret used for signing auth cookies and encrypting asset tokens.
-   * If not provided, IMMICH_API_KEY will be used as a fallback (configured in config.ts).
-   */
-  AUTH_SECRET: z.string().optional(),
-});
-
-export type Env = z.infer<typeof envSchema>;
+export interface Env {
+  IMMICH_API_URL: string;
+  IMMICH_API_KEY: string;
+  SITE_TITLE: string;
+  SITE_SUBTITLE: string;
+  CACHE_TTL: number;
+  RATE_LIMIT_RPM: number;
+  AUTH_SECRET?: string;
+}
 
 function parseEnv(): Env {
-  const result = envSchema.safeParse(process.env);
-  if (!result.success) {
-    const formatted = result.error.issues
-      .map((issue) => `  ✗ ${issue.path.join('.')}: ${issue.message}`)
-      .join('\n');
+  const errors: string[] = [];
+
+  const urlRaw = process.env.IMMICH_API_URL;
+  let apiUrl = '';
+  if (!urlRaw) {
+    errors.push('IMMICH_API_URL is required');
+  } else {
+    try {
+      apiUrl = new URL(urlRaw).toString().replace(/\/+$/, '');
+    } catch {
+      errors.push('IMMICH_API_URL must be a valid URL');
+    }
+  }
+
+  const apiKey = process.env.IMMICH_API_KEY;
+  if (!apiKey) {
+    errors.push('IMMICH_API_KEY is required');
+  }
+
+  if (errors.length > 0) {
+    const formatted = errors.map((err) => `  ✗ ${err}`).join('\n');
     throw new Error(`\n❌ Environment validation failed:\n${formatted}\n`);
   }
-  return result.data;
+
+  const cacheTtlStr = process.env.CACHE_TTL;
+  const cacheTtl = cacheTtlStr && !isNaN(parseInt(cacheTtlStr, 10)) ? parseInt(cacheTtlStr, 10) : 300;
+
+  const rateLimitStr = process.env.RATE_LIMIT_RPM;
+  const rateLimit = rateLimitStr && !isNaN(parseInt(rateLimitStr, 10)) ? parseInt(rateLimitStr, 10) : 600;
+
+  return {
+    IMMICH_API_URL: apiUrl,
+    IMMICH_API_KEY: apiKey as string,
+    SITE_TITLE: process.env.SITE_TITLE || 'Gallery',
+    SITE_SUBTITLE: process.env.SITE_SUBTITLE || '',
+    CACHE_TTL: Math.max(0, cacheTtl),
+    RATE_LIMIT_RPM: Math.max(1, rateLimit),
+    AUTH_SECRET: process.env.AUTH_SECRET,
+  };
 }
 
 /** Validated, typed environment variables. */
