@@ -75,11 +75,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Setup Required
               </h1>
               <p style={{ fontSize: '1.125rem', opacity: 0.7, marginBottom: '2rem', lineHeight: 1.5 }}>
-                Immich Folio is running, but it looks like your configuration files are missing.
+                Immich Folio is running, but it looks like your configuration files or environment variables are missing.
               </p>
               <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)', padding: '1.5rem', borderRadius: '8px', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 <p style={{ marginBottom: '1rem' }}>To get started, follow these steps in your repository or mounted <code>content/</code> volume:</p>
                 <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                  <li style={{ marginBottom: '0.5rem' }}>Copy <code>.env.example</code> to <code>.env.local</code> and fill in your Immich API URL and Key</li>
                   <li style={{ marginBottom: '0.5rem' }}>Copy <code>settings.yaml.example</code> to <code>settings.yaml</code></li>
                   <li style={{ marginBottom: '0.5rem' }}>Copy <code>gallery.yaml.example</code> to <code>gallery.yaml</code></li>
                   <li style={{ marginBottom: '0.5rem' }}>Copy <code>about.md.example</code> to <code>about.md</code> (optional)</li>
