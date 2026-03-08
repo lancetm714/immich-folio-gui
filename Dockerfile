@@ -4,14 +4,14 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm config set dns-result-order ipv4first && npm config set fetch-retry-maxtimeout 120000 && npm config set fetch-retry-mintimeout 20000
+RUN npm config set fetch-retry-maxtimeout 120000 && npm config set fetch-retry-mintimeout 20000
 RUN npm ci --omit=dev
 
 # ── Build ─────────────────────────────────────────
 FROM base AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm config set dns-result-order ipv4first && npm config set fetch-retry-maxtimeout 120000 && npm config set fetch-retry-mintimeout 20000
+RUN npm config set fetch-retry-maxtimeout 120000 && npm config set fetch-retry-mintimeout 20000
 RUN npm ci --verbose
 COPY . .
 
