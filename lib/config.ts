@@ -154,6 +154,12 @@ interface GalleryYaml {
 interface SettingsYaml {
   title?: string;
   subtitle?: string;
+  seo?: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+  };
   exifOnHover?: boolean;
   map?: boolean;
   transitions?: boolean;
@@ -245,6 +251,12 @@ export interface AppConfig {
   subpages: SubpageConfig[];
   siteTitle: string;
   siteSubtitle: string;
+  seo: {
+    title: string;
+    description: string;
+    noIndex: boolean;
+    noFollow: boolean;
+  };
   /** One or more hero image asset IDs for the homepage carousel. */
   heroImages: string[];
   /** Show EXIF (camera/lens) on photo grid hover. Default: true. */
@@ -472,6 +484,12 @@ export function getConfig(): AppConfig {
     subpages,
     siteTitle: settings.title ?? env.SITE_TITLE,
     siteSubtitle: settings.subtitle ?? env.SITE_SUBTITLE,
+    seo: {
+      title: settings.seo?.title || settings.title || env.SITE_TITLE || 'Gallery',
+      description: settings.seo?.description || settings.subtitle || env.SITE_SUBTITLE || 'A curated photography portfolio',
+      noIndex: settings.seo?.noIndex === true,
+      noFollow: settings.seo?.noFollow === true,
+    },
     heroImages: gallery.hero
       ? (Array.isArray(gallery.hero) ? gallery.hero : [gallery.hero]).map((id) =>
         validateUuid(id, 'gallery.yaml hero'),

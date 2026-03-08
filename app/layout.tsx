@@ -14,28 +14,36 @@ import { Footer } from '@/components/Footer';
 import { DevToolbar } from '@/components/DevToolbar';
 import { getConfig, getGoogleFontsUrl } from '@/lib/config';
 
-const siteTitle = process.env.SITE_TITLE || 'Gallery';
-const siteDescription = 'A curated photography portfolio';
+export async function generateMetadata(): Promise<Metadata> {
+  const config = getConfig();
+  const siteTitle = config.seo.title;
+  const siteDescription = config.seo.description;
+  const robots = {
+    index: !config.seo.noIndex,
+    follow: !config.seo.noFollow,
+  };
 
-export const metadata: Metadata = {
-  title: siteTitle,
-  description: siteDescription,
-  icons: {
-    apple: '/apple-touch-icon.png',
-  },
-  openGraph: {
+  return {
     title: siteTitle,
     description: siteDescription,
-    type: 'website',
-    images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteTitle,
-    description: siteDescription,
-    images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
-  },
-};
+    robots,
+    icons: {
+      apple: '/apple-touch-icon.png',
+    },
+    openGraph: {
+      title: siteTitle,
+      description: siteDescription,
+      type: 'website',
+      images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteTitle,
+      description: siteDescription,
+      images: [`/api/og?title=${encodeURIComponent(siteTitle)}`],
+    },
+  };
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const config = getConfig();
