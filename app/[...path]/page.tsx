@@ -28,6 +28,8 @@ import { getConfig, type GridConfig } from '@/lib/config';
 import { isProtected, isAuthenticated } from '@/lib/auth';
 import PasswordGate from '@/components/PasswordGate';
 import { BackLink } from '@/components/BackLink';
+import { AlbumDetailView } from './AlbumDetailView';
+import { SubpageGridView } from './SubpageGridView';
 
 // Render at request time — requires live Immich connection
 export const dynamic = 'force-dynamic';
@@ -153,21 +155,14 @@ export default async function PathPage({ params }: PathPageProps) {
     const images = toPhotoItems(album.assets, config.exifOnHover);
 
     return (
-      <>
-        <div className="album-header">
-          <BackLink href={`/${subpageSlug}`} label={`Back to ${subpageName}`} />
-          <h1 className="album-header__title">{album.albumName}</h1>
-          <p className="album-header__meta">
-            {images.length} {images.length === 1 ? 'photo' : 'photos'}
-            {album.description && ` · ${album.description}`}
-          </p>
-        </div>
-        <PhotoGrid
-          assets={images}
-          layout={resolveLayout(spGrid)}
-          gridStyle={buildGridStyle(spGrid)}
-        />
-      </>
+      <AlbumDetailView
+        album={album}
+        images={images}
+        layout={resolveLayout(spGrid)}
+        gridStyle={buildGridStyle(spGrid)}
+        backLinkHref={`/${subpageSlug}`}
+        backLinkLabel={`Back to ${subpageName}`}
+      />
     );
   }
 
@@ -202,21 +197,14 @@ export default async function PathPage({ params }: PathPageProps) {
       const images = toPhotoItems(album.assets, config.exifOnHover);
 
       return (
-        <>
-          <div className="album-header">
-            <BackLink href="/" label="Back to Gallery" />
-            <h1 className="album-header__title">{album.albumName}</h1>
-            <p className="album-header__meta">
-              {images.length} {images.length === 1 ? 'photo' : 'photos'}
-              {album.description && ` · ${album.description}`}
-            </p>
-          </div>
-          <PhotoGrid
-            assets={images}
-            layout={resolveLayout(result.subpage.grid)}
-            gridStyle={buildGridStyle(result.subpage.grid)}
-          />
-        </>
+        <AlbumDetailView
+          album={album}
+          images={images}
+          layout={resolveLayout(result.subpage.grid)}
+          gridStyle={buildGridStyle(result.subpage.grid)}
+          backLinkHref="/"
+          backLinkLabel="Back to Gallery"
+        />
       );
     }
 
@@ -232,41 +220,11 @@ export default async function PathPage({ params }: PathPageProps) {
     );
 
     return (
-      <div className="subpage-grid">
-        {albums.map((album, i) => {
-          const ph = coverPlaceholders[i];
-          return (
-            <Link
-              key={album.id}
-              href={`/${slug}/${album.slug}`}
-              className="subpage-grid__item"
-              style={ph?.dominantColor ? { backgroundColor: ph.dominantColor } : undefined}
-            >
-              {album.albumThumbnailAssetId ? (
-                <Image
-                  src={imageUrl(album.albumThumbnailAssetId, 'preview')}
-                  alt={album.albumName}
-                  fill
-                  sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"
-                  loading="lazy"
-                  {...(ph ? { placeholder: 'blur' as const, blurDataURL: ph.blurDataURL } : {})}
-                />
-              ) : (
-                <div className="skeleton" style={{ width: '100%', height: '100%' }} />
-              )}
-              <span className="subpage-grid__item-badge">
-                {album.assetCount} {album.assetCount === 1 ? 'photo' : 'photos'}
-              </span>
-              <div className="subpage-grid__item-overlay">
-                <span className="subpage-grid__item-title">{album.albumName}</span>
-                <span className="subpage-grid__item-count">
-                  {album.assetCount} {album.assetCount === 1 ? 'photo' : 'photos'}
-                </span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      <SubpageGridView
+        slug={slug}
+        albums={albums}
+        coverPlaceholders={coverPlaceholders}
+      />
     );
   }
 
@@ -279,16 +237,13 @@ export default async function PathPage({ params }: PathPageProps) {
   const images = toPhotoItems(album.assets, config.exifOnHover);
 
   return (
-    <>
-      <div className="album-header">
-        <BackLink href="/" label="Back to Gallery" />
-        <h1 className="album-header__title">{album.albumName}</h1>
-        <p className="album-header__meta">
-          {images.length} {images.length === 1 ? 'photo' : 'photos'}
-          {album.description && ` · ${album.description}`}
-        </p>
-      </div>
-      <PhotoGrid assets={images} layout={resolveLayout()} gridStyle={buildGridStyle()} />
-    </>
+    <AlbumDetailView
+      album={album}
+      images={images}
+      layout={resolveLayout()}
+      gridStyle={buildGridStyle()}
+      backLinkHref="/"
+      backLinkLabel="Back to Gallery"
+    />
   );
 }

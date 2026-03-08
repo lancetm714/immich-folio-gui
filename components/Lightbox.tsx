@@ -14,19 +14,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { PhotoItem } from '@/app/[...path]/PhotoGrid';
+import { useExif } from '@/hooks/useExif';
+import { useSwipe } from '@/hooks/useSwipe';
 import styles from './Lightbox.module.css';
-
-interface ExifData {
-  make?: string | null;
-  model?: string | null;
-  lensModel?: string | null;
-  focalLength?: number | null;
-  fNumber?: number | null;
-  exposureTime?: string | null;
-  iso?: number | null;
-  city?: string | null;
-  country?: string | null;
-}
 
 interface LightboxProps {
   assets: PhotoItem[];
@@ -38,12 +28,9 @@ interface LightboxProps {
 
 export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: LightboxProps) {
   const [showExif, setShowExif] = useState(false);
-  const [exifData, setExifData] = useState<ExifData | null>(null);
-  const [exifLoading, setExifLoading] = useState(false);
+  const { exifData, exifLoading, fetchExif, clearExif } = useExif();
   const [imageLoaded, setImageLoaded] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef<number>(0);
-  const touchStartY = useRef<number>(0);
 
   const current = assets[currentIndex];
   const [mounted, setMounted] = useState(false);
@@ -53,20 +40,9 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
     setMounted(true);
   }, []);
 
-  // Fetch EXIF data on demand
-  const fetchExif = useCallback((url: string) => {
-    setExifLoading(true);
-    setExifData(null);
-    fetch(url)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setExifData(data))
-      .catch(() => setExifData(null))
-      .finally(() => setExifLoading(false));
-  }, []);
-
   // Reset EXIF data when switching images; refetch if panel is open
   useEffect(() => {
-    setExifData(null);
+    clearExif();
     setImageLoaded(false);
     if (showExif && current) {
       fetchExif(current.exifUrl);
@@ -95,25 +71,10 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
     preload(currentIndex - 1);
   }, [currentIndex, assets]);
 
-  // Touch/swipe support
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      const dx = e.changedTouches[0].clientX - touchStartX.current;
-      const dy = e.changedTouches[0].clientY - touchStartY.current;
-
-      // Only register horizontal swipes (not vertical scrolling)
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 0) onPrev();
-        else onNext();
-      }
-    },
-    [onNext, onPrev],
-  );
+  const { handleTouchStart, handleTouchEnd } = useSwipe({
+    onSwipeLeft: onNext,
+    onSwipeRight: onPrev,
+  });
 
   // Click on overlay background → close
   const handleOverlayClick = useCallback(

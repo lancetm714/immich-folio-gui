@@ -6,10 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { immich } from '@/lib/immich';
 import { getConfig } from '@/lib/config';
 import { imageUrl } from '@/lib/urls';
 import { isAuthenticated } from '@/lib/auth';
+import { getMapData } from '@/lib/mapService';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest) {
   const cookieStore = await cookies();
   const getCookie = (name: string) => cookieStore.get(name)?.value;
 
-  const locations = await immich.getMapData();
+  const locations = await getMapData();
 
   // Filter locations and albums based on auth
   const publicLocations = locations

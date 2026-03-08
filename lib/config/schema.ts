@@ -1,0 +1,133 @@
+export interface SubpageConfig {
+    name: string;
+    slug: string;
+    albumIds: string[];
+    password?: string;
+    grid?: Partial<GridConfig>;
+}
+
+export interface FooterConfig {
+    name?: string;
+    instagram?: string;
+    email?: string;
+    website?: string;
+}
+
+export interface LegalConfig {
+    enabled: boolean;
+    name: string;
+    address: string;
+    zipCity: string;
+    country: string;
+    email?: string;
+    phone?: string;
+    taxId?: string;
+    vatId?: string;
+    extraInfo?: string;
+}
+
+export interface ThemeConfig {
+    preset: string;
+    accent: string;
+    fonts: { heading: string; body: string; caption: string };
+    radius: number;
+    photoFrame: 'none' | 'passepartout' | 'shadow';
+    grain: boolean;
+    headerDot: boolean;
+    heroStyle: 'split' | 'fullbleed' | 'minimal' | 'stacked' | 'typographic' | 'mosaic';
+}
+
+export interface GridConfig {
+    columns: number;
+    gap: number;
+    aspectRatio: string;
+    layout: 'masonry' | 'uniform' | 'showcase' | 'filmstrip' | 'editorial-flow';
+}
+
+export interface AppConfig {
+    immich: { apiUrl: string; apiKey: string };
+    authSecret: string;
+    albums: string[];
+    standaloneAlbums: string[];
+    subpages: SubpageConfig[];
+    siteTitle: string;
+    siteSubtitle: string;
+    seo: {
+        title: string;
+        description: string;
+        noIndex: boolean;
+        noFollow: boolean;
+    };
+    heroImages: string[];
+    exifOnHover: boolean;
+    grid: GridConfig;
+    theme: ThemeConfig;
+    footer: FooterConfig | null;
+    legal: LegalConfig;
+    map: boolean;
+    transitions: boolean;
+    albumOverrides: Record<string, string>;
+    cacheTtl: number;
+    rateLimitRpm: number;
+}
+
+export interface GalleryYaml {
+    hero?: string | string[];
+    albums?: string[];
+    subpages?:
+    | Record<string, string[] | Array<string | Record<string, string>>>
+    | Array<{
+        name: string;
+        albums: Array<string | Record<string, string>>;
+        password?: string;
+        grid?: {
+            columns?: number;
+            gap?: number;
+            aspectRatio?: string;
+            layout?: string;
+        };
+    }>;
+}
+
+export interface SettingsYaml {
+    title?: string;
+    subtitle?: string;
+    seo?: {
+        title?: string;
+        description?: string;
+        noIndex?: boolean;
+        noFollow?: boolean;
+    };
+    exifOnHover?: boolean;
+    map?: boolean;
+    transitions?: boolean;
+    theme?:
+    | string
+    | {
+        preset?: string;
+        accent?: string;
+        fonts?: { heading?: string; body?: string; caption?: string };
+        radius?: number;
+        photoFrame?: string;
+        grain?: boolean;
+        headerDot?: boolean;
+        heroStyle?: string;
+    };
+    grid?: {
+        columns?: number;
+        gap?: number;
+        aspectRatio?: string;
+        layout?: string;
+    };
+    footer?: FooterConfig;
+    legal?: Partial<LegalConfig>;
+}
+
+export function slugify(name: string): string {
+    return name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
