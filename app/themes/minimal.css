@@ -1,0 +1,194 @@
+/* ══════════════════════════════════════════════════════
+   THEME: Minimal — Swiss Brutalist
+   ══════════════════════════════════════════════════════ */
+
+/* Header: ultra-stripped, no border, just floating text */
+[data-preset='minimal'] .header {
+  border-bottom: none;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-preset='minimal'] .header__nav-link {
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  border-bottom: none;
+}
+
+[data-preset='minimal'] .header__nav-link:hover,
+[data-preset='minimal'] .header__nav-link.active {
+  color: var(--text-primary);
+  border-bottom-color: transparent;
+}
+
+/* Hero: fullbleed image, title overlaid bottom-left */
+[data-preset='minimal'] .hero {
+  grid-template-columns: 1fr;
+  position: relative;
+}
+
+[data-preset='minimal'] .hero__left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  padding: 32px 40px;
+  background: none;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+[data-preset='minimal'] .hero__content {
+  text-align: left;
+}
+
+[data-preset='minimal'] .hero__title {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+[data-preset='minimal'] .hero__subtitle {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+[data-preset='minimal'] .hero__nav {
+  flex-direction: row;
+  gap: 16px;
+}
+
+[data-preset='minimal'] .hero__nav-link {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: none;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}
+
+[data-preset='minimal'] .hero__nav-link:hover {
+  opacity: 1;
+  border-bottom-color: transparent;
+  color: var(--text-primary);
+}
+
+[data-preset='minimal'] .hero__right {
+  grid-column: 1;
+  grid-row: 1;
+  height: 100vh;
+  height: 100svh;
+}
+
+/* Photo grid: zero hover effects, clinical stillness */
+[data-preset='minimal'] .photo-grid {
+  column-gap: 2px;
+}
+
+[data-preset='minimal'] .photo-grid__item {
+  margin-bottom: 2px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+[data-preset='minimal'] .photo-grid__item:hover img {
+  filter: none;
+  transform: none;
+}
+
+[data-preset='minimal'] .photo-grid__item:active img {
+  filter: brightness(0.8);
+  transform: none;
+}
+
+/* Album cards: no overlay, text below */
+[data-preset='minimal'] .album-card {
+  border: none;
+  border-radius: 0;
+}
+
+[data-preset='minimal'] .album-card:hover {
+  border-color: transparent;
+  transform: none;
+}
+
+[data-preset='minimal'] .album-card:hover .album-card__image {
+  transform: none;
+  filter: none;
+}
+
+[data-preset='minimal'] .album-card__overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 30%);
+  opacity: 1;
+}
+
+[data-preset='minimal'] .album-card__title {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+[data-preset='minimal'] .album-card__count {
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+/* Section labels: numbered indices */
+[data-preset='minimal'] .section-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+/* Footer: single line, ultra-minimal */
+[data-preset='minimal'] .footer {
+  border-top: none;
+}
+
+[data-preset='minimal'] .footer__name {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+}
+
+/* Album & Subpage header */
+[data-preset='minimal'] .album-header__title,
+[data-preset='minimal'] .subpage-title {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='minimal'] .album-header__meta,
+[data-preset='minimal'] .subpage-subtitle {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+/* Subpage grid */
+[data-preset='minimal'] .subpage-grid {
+  gap: 2px;
+}
+
+[data-preset='minimal'] .subpage-grid__item {
+  border: none;
+}
+
+[data-preset='minimal'] .subpage-grid__item-title {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
