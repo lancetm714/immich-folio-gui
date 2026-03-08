@@ -208,4 +208,4 @@ photos.example.com {
 
 ## License
 
-Private — all rights reserved.
+MIT License — free to use and modify for the Immich community.
