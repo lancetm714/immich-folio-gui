@@ -48,14 +48,27 @@ Group multiple albums into named collections. URLs are auto-generated from the n
 ```yaml
 subpages:
   - name: Japan                    # → /japan
+    title: "Trip to Japan"         # Optional: overrides the page heading
+    subtitle: "2024 adventures"    # Optional: adds a subline under the heading
     albums:
       - 33333333-3333-3333-3333-333333333333  # Tokyo
       - 44444444-4444-4444-4444-444444444444  # Kyoto
 
   - name: Wedding – Smith         # → /wedding-smith
-    password: clientpass123        # password-protected
+    password: clientpass123        # Optional: password-protected
     albums:
       - 55555555-5555-5555-5555-555555555555
+```
+
+Alternatively, you can use the object notation (recommended):
+
+```yaml
+subpages:
+  "Japan":
+    title: "Trip to Japan"
+    subtitle: "2024 adventures"
+    albums:
+      - 33333333-3333-3333-3333-333333333333
 ```
 
 ## Grid Layout
