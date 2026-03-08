@@ -22,7 +22,6 @@ That's it. Your entire gallery switches to the minimal theme.
 | **classic**   | Gilded gallery, warm luxury    | 🟡 `#c49a3c` | Cinzel + Crimson Pro               | Minimal     | Passepartout | ✗     |
 | **noir**      | Darkroom analog, film noir     | 🟠 `#ff6b35` | Libre Baskerville + Source Sans 3  | Fullbleed   | Passepartout | ✓     |
 | **monograph** | Typographic, book-like         | ⬛ `#333333` | Instrument Serif + Inter           | Typographic | None         | ✗     |
-| **botanica**  | Organic, nature-inspired       | 🟢 `#4a7c59` | Cormorant Garamond + Nunito Sans   | Split       | None         | ✗     |
 
 Default is `studio` if no theme is specified.
 
@@ -50,14 +49,6 @@ Default is `studio` if no theme is specified.
   <tr>
     <td><img src="screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
     <td><img src="screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Botanica</strong><br><em>Organic, nature-inspired</em></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-botanica-home.png" width="400" alt="Botanica theme" /></td>
-    <td></td>
   </tr>
 </table>
 
@@ -88,14 +79,6 @@ Default is `studio` if no theme is specified.
     <td><img src="screenshots/theme-noir-grid.png" width="400" alt="Noir grid" /></td>
     <td><img src="screenshots/theme-monograph-grid.png" width="400" alt="Monograph grid" /></td>
   </tr>
-  <tr>
-    <td align="center"><strong>Botanica</strong></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-botanica-grid.png" width="400" alt="Botanica grid" /></td>
-    <td></td>
-  </tr>
 </table>
 
 ### What makes each theme unique
@@ -111,8 +94,6 @@ Default is `studio` if no theme is specified.
 **Noir** — Darkroom analog aesthetic with warm amber accents on a deep cool-black base. Sepia-tinted photos with vignette hover effects, film-edge EXIF labels in monospace, and a grain overlay. Inspired by wet-plate photography and film noir cinematography.
 
 **Monograph** — Type-first book design with no hero image. Features an 8rem serif title, numbered photo indices via CSS counters, slide-up EXIF captions, hairline dividers, and generous whitespace. Feels like an artist monograph.
-
-**Botanica** — Organic, nature-inspired with forest green accents and warm linen backgrounds. Rounded corners, botanical ornament dividers (❧), italic captions, and gentle hover animations. Feels like a botanical field guide.
 
 ## Custom Theme
 
@@ -177,7 +158,7 @@ When `true`, shows a small accent-colored dot in the navigation bar (inspired by
 
 Controls the homepage hero layout:
 
-- **`split`** — title/nav on the left, hero image on the right (used by Studio, Editorial, Botanica)
+- **`split`** — title/nav on the left, hero image on the right (used by Studio, Editorial)
 - **`fullbleed`** — hero image fills the entire viewport, title overlaid in the corner (used by Minimal, Noir)
 - **`minimal`** — centered title card with decorative ornament, hero image as a banner below (used by Classic)
 - **`stacked`** — full-viewport hero image with title gradient-overlaid at the bottom, horizontal thumbnail navigation strip below

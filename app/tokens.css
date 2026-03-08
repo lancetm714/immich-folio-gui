@@ -209,37 +209,6 @@
   --border-hover: #cccccc;
 }
 
-/* ── Botanica: Organic / Nature Palette ──────────── */
-[data-preset='botanica'] {
-  --bg-primary: #141a14;
-  --bg-secondary: #0f140f;
-  --bg-card: #182018;
-  --bg-card-hover: #1e261e;
-  --bg-overlay: rgba(15, 20, 15, 0.98);
-
-  --text-primary: #e8efe0;
-  --text-secondary: #8a9a78;
-  --text-muted: #5a6a4a;
-
-  --border-subtle: #253025;
-  --border-hover: #354535;
-}
-
-[data-preset='botanica'][data-theme='light'] {
-  --bg-primary: #faf7f0;
-  --bg-secondary: #f0ece2;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f5f2ea;
-  --bg-overlay: rgba(250, 247, 240, 0.96);
-
-  --text-primary: #1a2214;
-  --text-secondary: #4a5a3a;
-  --text-muted: #7a8a6a;
-
-  --border-subtle: #dde5d0;
-  --border-hover: #c5d0b5;
-}
-
 /* ── Reset ────────────────────────────────────────── */
 *,
 *::before,

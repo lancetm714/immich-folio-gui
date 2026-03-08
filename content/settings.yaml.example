@@ -24,7 +24,7 @@ map: true
 transitions: true
 
 # ── Theme configuration ──────────────────────────────────────────
-# Presets: studio, minimal, editorial, classic, noir, monograph, botanica
+# Presets: studio, minimal, editorial, classic, noir, monograph
 theme:
   preset: "studio"
   # accent: "#e60012"

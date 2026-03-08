@@ -97,7 +97,7 @@ All gallery structure — hero images, albums, subpages, grid layout, footer —
 Seven built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, hero layout, and grid style.
 
 ```yaml
-theme: studio # or: minimal, editorial, classic, noir, monograph, botanica
+theme: studio # or: minimal, editorial, classic, noir, monograph
 ```
 
 <table>
@@ -124,14 +124,6 @@ theme: studio # or: minimal, editorial, classic, noir, monograph, botanica
   <tr>
     <td><img src="docs/screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
     <td><img src="docs/screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Botanica</strong><br><em>Organic, nature-inspired</em></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/theme-botanica-home.png" width="400" alt="Botanica theme" /></td>
-    <td></td>
   </tr>
 </table>
 

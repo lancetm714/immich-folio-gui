@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 
-const PRESETS = ['studio', 'minimal', 'editorial', 'classic', 'noir', 'monograph', 'botanica'];
+const PRESETS = ['studio', 'minimal', 'editorial', 'classic', 'noir', 'monograph'];
 const FRAMES = ['none', 'passepartout', 'shadow'];
 const HERO_STYLES = ['split', 'fullbleed', 'minimal', 'stacked', 'typographic', 'mosaic'];
 const GRID_LAYOUTS = ['masonry', 'uniform', 'showcase', 'filmstrip', 'editorial-flow'];
@@ -32,7 +32,6 @@ const PRESET_FONTS: Record<string, { heading: string; body: string; caption: str
   classic: { heading: 'Cinzel', body: 'Crimson Pro', caption: 'Crimson Pro' },
   noir: { heading: 'Libre Baskerville', body: 'Source Sans 3', caption: 'Space Mono' },
   monograph: { heading: 'Instrument Serif', body: 'Inter', caption: 'IBM Plex Mono' },
-  botanica: { heading: 'Cormorant Garamond', body: 'Nunito Sans', caption: 'Inconsolata' },
 };
 
 const PRESET_ACCENTS: Record<string, string> = {
@@ -42,7 +41,6 @@ const PRESET_ACCENTS: Record<string, string> = {
   classic: '#c49a3c',
   noir: '#ff6b35',
   monograph: '#333333',
-  botanica: '#4a7c59',
 };
 
 function getAttr(attr: string): string {
