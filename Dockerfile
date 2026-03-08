@@ -12,7 +12,7 @@ FROM base AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm config set fetch-retry-maxtimeout 120000 && npm config set fetch-retry-mintimeout 20000
-RUN npm ci
+RUN npm ci --verbose
 COPY . .
 
 # Dummy env vars for build — pages are force-dynamic so these are
