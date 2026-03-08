@@ -192,3 +192,54 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+
+/* Subpage TOC: ultra-minimal, uppercase, no separators */
+[data-preset='minimal'] .subpage-toc {
+  margin-bottom: 48px;
+}
+
+[data-preset='minimal'] .subpage-toc__entry+.subpage-toc__entry::before {
+  content: '—';
+  padding: 0 10px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+[data-preset='minimal'] .subpage-toc__num {
+  display: none;
+}
+
+[data-preset='minimal'] .subpage-toc__label {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='minimal'] .subpage-toc__link {
+  color: var(--text-muted);
+}
+
+[data-preset='minimal'] .subpage-toc__link:hover {
+  color: var(--text-primary);
+}
+
+/* Section: hard-edged rule, sans title */
+[data-preset='minimal'] .subpage-section__title {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='minimal'] .subpage-section__desc {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+[data-preset='minimal'] .subpage-section__rule {
+  background: var(--text-primary);
+  height: 2px;
+}

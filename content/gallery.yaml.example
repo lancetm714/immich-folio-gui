@@ -24,3 +24,31 @@ subpages:
     albums:
       - "album-uuid-5"
       - "album-uuid-6"
+
+# ── Subpage with Sections ──────────────────────────────────────────
+# Use sections to group albums by location, theme, or any other logic.
+# A typographic table of contents is rendered above the albums.
+# Sections are optional: leave them out and you get a flat album grid (as above).
+subpages:
+  - name: Japan
+    title: Japan
+    subtitle: "Reisen durch ein Land voller Kontraste."
+
+    sections:
+      - title: Tokyo
+        description: "Megacity, Neonlichter, Stille im Lärm."
+        albums:
+          - "album-uuid-tokyo-1"               # Uses Immich album name
+          - "album-uuid-tokyo-2": Shinjuku bei Nacht  # Custom title override
+          - "album-uuid-tokyo-3"
+
+      - title: Kyoto
+        description: "Tempel, Bambuswälder, goldener Herbst."
+        albums:
+          - "album-uuid-kyoto-1": Fushimi Inari
+          - "album-uuid-kyoto-2"
+
+      - title: Osaka
+        albums:                                # description is optional
+          - "album-uuid-osaka-1"
+          - "album-uuid-osaka-2"

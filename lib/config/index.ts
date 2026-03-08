@@ -1,7 +1,7 @@
 import { env } from '../env';
 import { loadYaml, validateUuid } from './parser';
 import { resolveTheme, VALID_LAYOUTS } from './theme';
-import { slugify, AppConfig, SubpageConfig, GalleryYaml, SettingsYaml, GridConfig } from './schema';
+import { slugify, AppConfig, SubpageConfig, SubpageSectionConfig, GalleryYaml, SettingsYaml, GridConfig } from './schema';
 
 export * from './schema';
 export * from './theme';
@@ -72,15 +72,41 @@ export function getConfig(): AppConfig {
 
     if (Array.isArray(gallery.subpages)) {
         subpages = gallery.subpages.map((sp) => {
-            if (!sp.name || !sp.albums || sp.albums.length === 0) {
-                throw new Error(`Subpage "${sp.name || '(unnamed)'}" must have a name and at least one album`);
+            if (!sp.name) {
+                throw new Error(`Subpage "(unnamed)" must have a name`);
             }
+
+            // Parse sections if present
+            let sections: SubpageSectionConfig[] | undefined;
+            let albumIds: string[];
+
+            if (sp.sections && sp.sections.length > 0) {
+                sections = sp.sections.map((sec) => ({
+                    title: sec.title,
+                    slug: slugify(sec.title),
+                    description: sec.description,
+                    albumIds: sec.albums.map((entry) => processAlbumEntry(entry, `subpage "${sp.name}" section "${sec.title}"`)),
+                }));
+                // flat union of all section albums
+                albumIds = sections.flatMap((s) => s.albumIds);
+                // Also include any top-level albums (outside sections)
+                const topLevel = (sp.albums ?? []).map((entry) => processAlbumEntry(entry, `subpage "${sp.name}"`));
+                albumIds = [...topLevel, ...albumIds];
+            } else {
+                const albums = sp.albums ?? [];
+                if (albums.length === 0) {
+                    throw new Error(`Subpage "${sp.name}" must have albums or sections`);
+                }
+                albumIds = albums.map((entry) => processAlbumEntry(entry, `subpage "${sp.name}"`));
+            }
+
             return {
                 name: sp.name,
                 slug: slugify(sp.name),
                 title: sp.title,
                 subtitle: sp.subtitle,
-                albumIds: sp.albums.map((entry) => processAlbumEntry(entry, `subpage "${sp.name}"`)),
+                albumIds,
+                sections,
                 password: sp.password,
                 ...(sp.grid ? {
                     grid: {

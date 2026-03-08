@@ -105,3 +105,60 @@
   font-weight: 400;
   letter-spacing: 0.05em;
 }
+
+/* Subpage TOC: monospace film-edge style, amber accent */
+[data-preset='noir'] .subpage-toc {
+  margin-bottom: 56px;
+}
+
+[data-preset='noir'] .subpage-toc__entry+.subpage-toc__entry::before {
+  content: '|';
+  padding: 0 12px;
+  font-family: var(--font-caption);
+  font-size: 0.65rem;
+  color: rgba(255, 107, 53, 0.3);
+}
+
+[data-preset='noir'] .subpage-toc__num {
+  font-family: var(--font-caption);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+[data-preset='noir'] .subpage-toc__label {
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='noir'] .subpage-toc__link {
+  color: var(--text-secondary);
+}
+
+[data-preset='noir'] .subpage-toc__link:hover {
+  color: var(--accent);
+}
+
+/* Section: amber hairline rule */
+[data-preset='noir'] .subpage-section__title {
+  font-weight: 300;
+  letter-spacing: 0.06em;
+}
+
+[data-preset='noir'] .subpage-section__desc {
+  font-family: var(--font-caption);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 200, 150, 0.5);
+}
+
+[data-preset='noir'] .subpage-section__rule {
+  background: linear-gradient(to right, var(--accent), transparent);
+  opacity: 0.35;
+  height: 1px;
+}

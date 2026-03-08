@@ -74,6 +74,55 @@ subpages:
       - 33333333-3333-3333-3333-333333333333
 ```
 
+### Sections
+
+When a subpage contains many albums you can split them into **named sections**. A typographic table of contents with anchor links is automatically rendered above the albums. Sections are fully optional — omit them and you get the standard flat grid.
+
+Each section can have:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `title` | string | ✅ | Section heading + anchor name |
+| `description` | string | ➖ | Optional subline under the heading |
+| `albums` | list | ✅ | Album UUIDs (same format as regular albums) |
+
+Within the `albums` list you can use a plain UUID or override the display title:
+
+```yaml
+albums:
+  - "album-uuid"             # → uses the Immich album name
+  - "album-uuid": My Title   # → displays "My Title" instead
+```
+
+**Full example:**
+
+```yaml
+subpages:
+  - name: Japan
+    title: Japan
+    subtitle: "Reisen durch ein Land voller Kontraste."
+    sections:
+      - title: Tokyo
+        description: "Megacity, Neonlichter, Stille im Lärm."
+        albums:
+          - "33333333-3333-3333-3333-333333333333"
+          - "44444444-4444-4444-4444-444444444444": Shinjuku bei Nacht
+
+      - title: Kyoto
+        description: "Tempel und Bambuswälder."
+        albums:
+          - "55555555-5555-5555-5555-555555555555": Fushimi Inari
+          - "66666666-6666-6666-6666-666666666666"
+
+      - title: Osaka
+        albums:          # description is optional
+          - "77777777-7777-7777-7777-777777777777"
+```
+
+> [!NOTE]
+> Each section title is automatically converted to a URL-safe anchor (`#tokyo`, `#kyoto`, …). The TOC appearance (separator character, numbering style, section rule) is fully controlled by the active theme.
+
+
 ## Grid Layout
 
 Configure the photo grid globally or per-subpage:

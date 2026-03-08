@@ -1,9 +1,17 @@
+export interface SubpageSectionConfig {
+    title: string;
+    slug: string;        // auto-derived from title, used as anchor
+    description?: string;
+    albumIds: string[];
+}
+
 export interface SubpageConfig {
     name: string;
     slug: string;
     title?: string;
     subtitle?: string;
-    albumIds: string[];
+    albumIds: string[];  // flat list (all albums, incl. from sections)
+    sections?: SubpageSectionConfig[];
     password?: string;
     grid?: Partial<GridConfig>;
 }
@@ -83,7 +91,12 @@ export interface GalleryYaml {
         name: string;
         title?: string;
         subtitle?: string;
-        albums: Array<string | Record<string, string>>;
+        albums?: Array<string | Record<string, string>>;
+        sections?: Array<{
+            title: string;
+            description?: string;
+            albums: Array<string | Record<string, string>>;
+        }>;
         password?: string;
         grid?: {
             columns?: number;

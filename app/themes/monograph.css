@@ -184,6 +184,74 @@
   text-transform: uppercase;
 }
 
+/* Subpage TOC: book-indexed, hairline */
+[data-preset='monograph'] .subpage-toc {
+  margin-bottom: 64px;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 0;
+}
+
+[data-preset='monograph'] .subpage-toc__entry {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+[data-preset='monograph'] .subpage-toc__entry:last-child {
+  border-bottom: none;
+}
+
+[data-preset='monograph'] .subpage-toc__entry+.subpage-toc__entry::before {
+  display: none;
+}
+
+[data-preset='monograph'] .subpage-toc__link {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  color: var(--text-secondary);
+}
+
+[data-preset='monograph'] .subpage-toc__link:hover {
+  color: var(--text-primary);
+}
+
+[data-preset='monograph'] .subpage-toc__num {
+  font-family: var(--font-caption);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  min-width: 24px;
+}
+
+[data-preset='monograph'] .subpage-toc__label {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Section: hairline rule, generous serif title */
+[data-preset='monograph'] .subpage-section__title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-preset='monograph'] .subpage-section__desc {
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+[data-preset='monograph'] .subpage-section__rule {
+  background: var(--border-subtle);
+  height: 1px;
+}
+
 @media (max-width: 1024px) {
   .photo-grid {
     --grid-columns: 2;

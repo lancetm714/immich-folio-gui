@@ -575,7 +575,90 @@
   letter-spacing: 0.02em;
 }
 
-/* ── Subpage Album Grid (2-column, edge-to-edge) ─── */
+/* ── Subpage TOC (Typographic Navigation) ────────── */
+.subpage-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 56px;
+  margin-top: 8px;
+}
+
+.subpage-toc__entry {
+  display: flex;
+  align-items: center;
+}
+
+.subpage-toc__entry+.subpage-toc__entry::before {
+  content: '·';
+  padding: 0 12px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.subpage-toc__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.subpage-toc__link:hover {
+  color: var(--text-primary);
+}
+
+.subpage-toc__num {
+  font-family: var(--font-caption, monospace);
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.subpage-toc__label {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+/* ── Subpage Section ─────────────────────────────── */
+.subpage-section {
+  scroll-margin-top: 80px;
+  margin-bottom: 72px;
+}
+
+.subpage-section__header {
+  margin-bottom: 28px;
+}
+
+.subpage-section__title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.subpage-section__desc {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.subpage-section__rule {
+  height: 1px;
+  background: var(--border-subtle);
+  width: 100%;
+}
+
+
 .subpage-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

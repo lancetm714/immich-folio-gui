@@ -227,6 +227,7 @@ export default async function PathPage({ params }: PathPageProps) {
         subtitle={result.subpage.subtitle}
         albums={albums}
         coverPlaceholders={coverPlaceholders}
+        sections={result.subpage.sections}
       />
     );
   }
