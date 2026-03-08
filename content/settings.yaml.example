@@ -22,6 +22,8 @@ theme:
   # accent: "#e60012"
   # photoFrame: "passepartout" # none, passepartout, shadow
   # grain: true
+  # heroStyle: "split" # split, fullbleed, minimal, stacked, typographic, mosaic
+  #   Note: "mosaic" needs at least 3 hero images in gallery.yaml (optimal: 6)
 
 # ── Grid configuration ───────────────────────────────────────────
 grid:

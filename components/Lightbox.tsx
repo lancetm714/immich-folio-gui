@@ -12,6 +12,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { PhotoItem } from '@/app/[...path]/PhotoGrid';
 import styles from './Lightbox.module.css';
 
@@ -45,6 +46,12 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
   const touchStartY = useRef<number>(0);
 
   const current = assets[currentIndex];
+  const [mounted, setMounted] = useState(false);
+
+  // Mount guard — createPortal needs document.body (client-only)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch EXIF data on demand
   const fetchExif = useCallback((url: string) => {
@@ -118,7 +125,7 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
     [onClose],
   );
 
-  return (
+  const lightboxJsx = (
     <div
       className={styles.overlay}
       ref={overlayRef}
@@ -277,4 +284,7 @@ export function Lightbox({ assets, currentIndex, onClose, onNext, onPrev }: Ligh
       )}
     </div>
   );
+
+  if (!mounted) return null;
+  return createPortal(lightboxJsx, document.body);
 }

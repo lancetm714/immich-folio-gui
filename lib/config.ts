@@ -136,18 +136,18 @@ interface GalleryYaml {
   hero?: string | string[];
   albums?: string[];
   subpages?:
-    | Record<string, string[] | Array<string | Record<string, string>>>
-    | Array<{
-        name: string;
-        albums: Array<string | Record<string, string>>;
-        password?: string;
-        grid?: {
-          columns?: number;
-          gap?: number;
-          aspectRatio?: string;
-          layout?: string;
-        };
-      }>;
+  | Record<string, string[] | Array<string | Record<string, string>>>
+  | Array<{
+    name: string;
+    albums: Array<string | Record<string, string>>;
+    password?: string;
+    grid?: {
+      columns?: number;
+      gap?: number;
+      aspectRatio?: string;
+      layout?: string;
+    };
+  }>;
 }
 
 /** Raw YAML structure for global settings. */
@@ -158,17 +158,17 @@ interface SettingsYaml {
   map?: boolean;
   transitions?: boolean;
   theme?:
-    | string
-    | {
-        preset?: string;
-        accent?: string;
-        fonts?: { heading?: string; body?: string; caption?: string };
-        radius?: number;
-        photoFrame?: string;
-        grain?: boolean;
-        headerDot?: boolean;
-        heroStyle?: string;
-      };
+  | string
+  | {
+    preset?: string;
+    accent?: string;
+    fonts?: { heading?: string; body?: string; caption?: string };
+    radius?: number;
+    photoFrame?: string;
+    grain?: boolean;
+    headerDot?: boolean;
+    heroStyle?: string;
+  };
   grid?: {
     columns?: number;
     gap?: number;
@@ -189,7 +189,7 @@ function loadYaml<T>(filename: string): T {
     if (filename === 'gallery.yaml') {
       throw new Error(
         `Required config not found: ${yamlPath}\n` +
-          `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
+        `Copy content/gallery.yaml.example to content/gallery.yaml and add your album IDs.`,
       );
     }
     return {} as T;
@@ -333,7 +333,10 @@ export function getGoogleFontsUrl(theme: ThemeConfig): string {
 let _config: AppConfig | null = null;
 
 export function getConfig(): AppConfig {
-  if (_config) return _config;
+  // In development, skip the cache so YAML changes are picked up on the next
+  // request without a full server restart.
+  const isDev = process.env.NODE_ENV !== 'production';
+  if (_config && !isDev) return _config;
 
   const apiUrl = env.IMMICH_API_URL;
   const apiKey = env.IMMICH_API_KEY;
@@ -342,7 +345,7 @@ export function getConfig(): AppConfig {
   if (!env.AUTH_SECRET && process.env.NODE_ENV === 'production') {
     console.warn(
       '\n⚠️  SECURITY WARNING: AUTH_SECRET is not set. Falling back to IMMICH_API_KEY.\n' +
-        '   Please set a long random string as AUTH_SECRET in your .env for better security.\n',
+      '   Please set a long random string as AUTH_SECRET in your .env for better security.\n',
     );
   }
 
@@ -398,19 +401,19 @@ export function getConfig(): AppConfig {
         password: sp.password,
         ...(sp.grid
           ? {
-              grid: {
-                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-                ...(sp.grid.layout != null
-                  ? {
-                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                        ? sp.grid.layout
-                        : 'masonry') as GridConfig['layout'],
-                    }
-                  : {}),
-              },
-            }
+            grid: {
+              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+              ...(sp.grid.layout != null
+                ? {
+                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                    ? sp.grid.layout
+                    : 'masonry') as GridConfig['layout'],
+                }
+                : {}),
+            },
+          }
           : {}),
       };
     });
@@ -436,19 +439,19 @@ export function getConfig(): AppConfig {
         password: sp.password,
         ...(sp.grid
           ? {
-              grid: {
-                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-                ...(sp.grid.layout != null
-                  ? {
-                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                        ? sp.grid.layout
-                        : 'masonry') as GridConfig['layout'],
-                    }
-                  : {}),
-              },
-            }
+            grid: {
+              ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
+              ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
+              ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
+              ...(sp.grid.layout != null
+                ? {
+                  layout: (VALID_LAYOUTS.includes(sp.grid.layout)
+                    ? sp.grid.layout
+                    : 'masonry') as GridConfig['layout'],
+                }
+                : {}),
+            },
+          }
           : {}),
       };
     });
@@ -471,8 +474,8 @@ export function getConfig(): AppConfig {
     siteSubtitle: settings.subtitle ?? env.SITE_SUBTITLE,
     heroImages: gallery.hero
       ? (Array.isArray(gallery.hero) ? gallery.hero : [gallery.hero]).map((id) =>
-          validateUuid(id, 'gallery.yaml hero'),
-        )
+        validateUuid(id, 'gallery.yaml hero'),
+      )
       : [],
     exifOnHover: settings.exifOnHover !== false,
     grid: {
@@ -486,11 +489,11 @@ export function getConfig(): AppConfig {
     theme,
     footer: settings.footer
       ? {
-          name: settings.footer.name,
-          instagram: settings.footer.instagram,
-          email: settings.footer.email,
-          website: settings.footer.website,
-        }
+        name: settings.footer.name,
+        instagram: settings.footer.instagram,
+        email: settings.footer.email,
+        website: settings.footer.website,
+      }
       : null,
     legal: {
       enabled: settings.legal?.enabled === true,

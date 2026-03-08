@@ -53,7 +53,8 @@
   border-radius: var(--radius-sm);
   user-select: none;
   -webkit-user-drag: none;
-  opacity: 1; /* Default to visible for robustness */
+  opacity: 1;
+  /* Default to visible for robustness */
   transition: opacity var(--transition-normal);
 }
 

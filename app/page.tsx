@@ -174,9 +174,56 @@ export default async function HomePage() {
     );
   }
 
-  // ── Default: split / fullbleed / minimal (existing layouts) ────
+  // ── Minimal: pure text, no image, simple centered ──────────────
+  if (heroStyle === 'minimal') {
+    return (
+      <div className="hero hero--minimal">
+        <div className="hero__content">
+          <FadeIn delay={0}>
+            <h1 className="hero__title">{config.siteTitle}</h1>
+          </FadeIn>
+          {config.siteSubtitle && (
+            <FadeIn delay={100}>
+              <p className="hero__subtitle">{config.siteSubtitle}</p>
+            </FadeIn>
+          )}
+          <FadeIn delay={200}>
+            <nav className="hero__nav">
+              <HeroNavLinks subpages={subpages} albums={albums} />
+            </nav>
+          </FadeIn>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Fullbleed: full-viewport image + centered overlay ───────────
+  if (heroStyle === 'fullbleed') {
+    return (
+      <div className="hero hero--fullbleed">
+        <HeroCarousel images={heroData} />
+        <div className="hero__fullbleed-overlay">
+          <FadeIn delay={0}>
+            <h1 className="hero__title">{config.siteTitle}</h1>
+          </FadeIn>
+          {config.siteSubtitle && (
+            <FadeIn delay={100}>
+              <p className="hero__subtitle">{config.siteSubtitle}</p>
+            </FadeIn>
+          )}
+          <FadeIn delay={200}>
+            <nav className="hero__nav">
+              <HeroNavLinks subpages={subpages} albums={albums} />
+            </nav>
+          </FadeIn>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Split: left text panel, right image (default) ───────────────
   return (
-    <div className="hero">
+    <div className="hero hero--split">
       {/* ── Left Panel ──────────────────────────────── */}
       <div className="hero__left">
         <div className="hero__content">
