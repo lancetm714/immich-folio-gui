@@ -8,6 +8,7 @@ services:
     ports:
       - '7211:7211'
     env_file:
-      - .env.local
+      - path: .env.local
+        required: false
     volumes:
       - ./content:/app/content:ro
