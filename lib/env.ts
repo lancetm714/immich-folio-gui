@@ -18,25 +18,15 @@ function parseEnv(): Env {
 
   const urlRaw = process.env.IMMICH_API_URL;
   let apiUrl = '';
-  if (!urlRaw) {
-    errors.push('IMMICH_API_URL is required');
-  } else {
+  if (urlRaw) {
     try {
       apiUrl = new URL(urlRaw).toString().replace(/\/+$/, '');
     } catch {
-      errors.push('IMMICH_API_URL must be a valid URL');
+      console.warn('⚠️ IMMICH_API_URL is invalid, falling back to empty string for setup.');
     }
   }
 
-  const apiKey = process.env.IMMICH_API_KEY;
-  if (!apiKey) {
-    errors.push('IMMICH_API_KEY is required');
-  }
-
-  if (errors.length > 0) {
-    const formatted = errors.map((err) => `  ✗ ${err}`).join('\n');
-    throw new Error(`\n❌ Environment validation failed:\n${formatted}\n`);
-  }
+  const apiKey = process.env.IMMICH_API_KEY || '';
 
   const cacheTtlStr = process.env.CACHE_TTL;
   const cacheTtl = cacheTtlStr && !isNaN(parseInt(cacheTtlStr, 10)) ? parseInt(cacheTtlStr, 10) : 300;

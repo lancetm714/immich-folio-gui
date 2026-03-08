@@ -22,7 +22,7 @@ export function getConfig(): AppConfig {
     const gallery = loadYaml<GalleryYaml>('gallery.yaml');
     const settings = loadYaml<SettingsYaml>('settings.yaml') || {};
 
-    if (!gallery) {
+    if (!gallery || !apiKey || !apiUrl) {
         // Return dummy config if gallery.yaml is missing
         _config = {
             immich: { apiUrl: `${apiUrl}/api`, apiKey },

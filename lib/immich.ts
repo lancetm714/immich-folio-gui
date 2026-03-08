@@ -78,10 +78,9 @@ class ImmichClient {
     return getConfig();
   }
 
-  /**
-   * Make an authenticated request to the Immich API.
-   */
   private async request<T>(endpoint: string): Promise<T | null> {
+    if (this.config.needsSetup) return null;
+
     const url = `${this.config.immich.apiUrl}${endpoint}`;
     try {
       const res = await fetch(url, {
@@ -114,6 +113,8 @@ class ImmichClient {
     assetId: string,
     size: ImageSize = 'preview',
   ): Promise<{ stream: ReadableStream; contentType: string; contentLength: string | null } | null> {
+    if (this.config.needsSetup || !this.config.immich.apiUrl) return null;
+
     const endpoint =
       size === 'original'
         ? `/assets/${encodeURIComponent(assetId)}/original`

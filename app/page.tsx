@@ -41,6 +41,11 @@ function HeroNavLinks({
 
 export default async function HomePage() {
   const config = getConfig();
+
+  if (config.needsSetup) {
+    return null;
+  }
+
   const [subpages, albums] = await Promise.all([
     immich.getSubpages(),
     immich.getStandaloneAlbums(),
