@@ -48,3 +48,4 @@ docs/dev/
 
 # Build cache
 tsconfig.tsbuildinfo
+content/about.md
