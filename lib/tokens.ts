@@ -24,8 +24,9 @@ function getKey(): Buffer {
  */
 export function encodeAssetId(assetId: string): string {
   const key = getKey();
-  // Deterministic IV from asset ID (same input → same token)
-  const iv = crypto.createHash('md5').update(assetId).digest();
+  // Deterministic IV from asset ID (same input → same token).
+  // SHA-256 slice → first 16 bytes. MD5 was deprecated for cryptographic use.
+  const iv = crypto.createHash('sha256').update(assetId).digest().subarray(0, 16);
   const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
   const encrypted = Buffer.concat([cipher.update(assetId, 'utf8'), cipher.final()]);
   // Compact: base64url(iv + ciphertext)

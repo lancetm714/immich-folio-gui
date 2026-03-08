@@ -77,11 +77,13 @@ export interface SubpageSummary {
   coverAssetId: string | null;
 }
 
+// Module-level flag so the album summary is only logged once even if the
+// ImmichClient singleton is replaced in hot-reload scenarios.
+let _hasLoggedAlbums = false;
+
 // ── API Client ─────────────────────────────────────────────────
 
 class ImmichClient {
-  private hasLoggedAlbums = false;
-
   private get config() {
     return getConfig();
   }
@@ -176,8 +178,8 @@ class ImmichClient {
       });
 
     // Log album summary on first load so admins can see what's published
-    if (!this.hasLoggedAlbums) {
-      this.hasLoggedAlbums = true;
+    if (!_hasLoggedAlbums) {
+      _hasLoggedAlbums = true;
       console.log('\n[Lightbox] Published albums:');
       console.log('─'.repeat(80));
 

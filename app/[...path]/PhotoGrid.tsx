@@ -55,6 +55,9 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
   useEffect(() => {
     const idx = parsePhotoHash(window.location.hash);
     if (idx !== null && idx < assets.length) {
+      // state from URL hash on mount only (equivalent to useState lazy initializer for
+      // client-only browser APIs).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLightboxIndex(idx);
     }
   }, [assets.length]);
@@ -139,8 +142,9 @@ export function PhotoGrid({ assets, layout = 'masonry', gridStyle }: PhotoGridPr
         {assets.map((asset, index) => (
           <FadeIn key={asset.id} delay={index < 12 ? index * 50 : 0}>
             <div
-              className={`photo-grid__item${layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
-                }`}
+              className={`photo-grid__item${
+                layout === 'showcase' && index === 0 ? ' photo-grid__featured' : ''
+              }`}
               onClick={() => openLightbox(index)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

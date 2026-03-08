@@ -12,8 +12,8 @@ import { getConfig } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const title = searchParams.get('title') || 'Gallery';
-  const subtitle = searchParams.get('subtitle') || '';
+  const title = (searchParams.get('title') || 'Gallery').slice(0, 200);
+  const subtitle = (searchParams.get('subtitle') || '').slice(0, 100);
   const { theme } = getConfig();
 
   return new ImageResponse(

@@ -28,11 +28,11 @@ type Tab = 'theme' | 'grid' | 'server';
 const PRESET_FONTS: Record<string, { heading: string; body: string; caption: string }> = {
   studio: { heading: 'Playfair Display', body: 'DM Sans', caption: 'EB Garamond' },
   minimal: { heading: 'Geist', body: 'Geist', caption: 'IBM Plex Mono' },
-  editorial: { heading: 'Bodoni Moda', body: 'Newsreader', caption: 'IBM Plex Mono' },
-  classic: { heading: 'Cinzel', body: 'Crimson Pro', caption: 'EB Garamond' },
-  noir: { heading: 'Libre Baskerville', body: 'Source Sans 3', caption: 'IBM Plex Mono' },
-  monograph: { heading: 'Instrument Serif', body: 'Inter', caption: 'JetBrains Mono' },
-  botanica: { heading: 'Cormorant Garamond', body: 'Nunito Sans', caption: 'Lora' },
+  editorial: { heading: 'Bodoni Moda', body: 'Newsreader', caption: 'Spectral' },
+  classic: { heading: 'Cinzel', body: 'Crimson Pro', caption: 'Crimson Pro' },
+  noir: { heading: 'Libre Baskerville', body: 'Source Sans 3', caption: 'Space Mono' },
+  monograph: { heading: 'Instrument Serif', body: 'Inter', caption: 'IBM Plex Mono' },
+  botanica: { heading: 'Cormorant Garamond', body: 'Nunito Sans', caption: 'Inconsolata' },
 };
 
 const PRESET_ACCENTS: Record<string, string> = {
@@ -307,7 +307,6 @@ exifOnHover: ${exifOnHover}`;
 
           {/* ── Tab Content ──────────────────────── */}
           <div style={{ padding: '12px 16px' }}>
-
             {/* ── THEME TAB ── */}
             {tab === 'theme' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -325,10 +324,7 @@ exifOnHover: ${exifOnHover}`;
                 </div>
                 <div>
                   <Label>Film Grain</Label>
-                  <ToggleButton
-                    on={grain === 'true'}
-                    onClick={toggleGrain}
-                  />
+                  <ToggleButton on={grain === 'true'} onClick={toggleGrain} />
                 </div>
                 <div>
                   <Label>EXIF on Hover</Label>
@@ -364,7 +360,11 @@ exifOnHover: ${exifOnHover}`;
                 </div>
                 <div>
                   <Label>Aspect Ratio</Label>
-                  <PillGrid items={ASPECT_RATIOS} active={aspectRatio} onSelect={updateAspectRatio} />
+                  <PillGrid
+                    items={ASPECT_RATIOS}
+                    active={aspectRatio}
+                    onSelect={updateAspectRatio}
+                  />
                 </div>
               </div>
             )}
@@ -395,8 +395,8 @@ exifOnHover: ${exifOnHover}`;
                   {copiedYaml === 'layout' && <CopyBadge />}
                 </div>
                 <p style={{ color: '#52525b', fontSize: 10, margin: 0, lineHeight: 1.5 }}>
-                  These settings require a server re-render. Click to copy the YAML snippet, then paste into{' '}
-                  <code style={{ color: '#a1a1aa' }}>content/settings.yaml</code>.
+                  These settings require a server re-render. Click to copy the YAML snippet, then
+                  paste into <code style={{ color: '#a1a1aa' }}>content/settings.yaml</code>.
                 </p>
               </div>
             )}
@@ -416,8 +416,7 @@ exifOnHover: ${exifOnHover}`;
                 padding: '9px 0',
                 borderRadius: 10,
                 border: 'none',
-                background:
-                  copiedYaml === 'all' ? '#16a34a' : 'rgba(255,255,255,0.92)',
+                background: copiedYaml === 'all' ? '#16a34a' : 'rgba(255,255,255,0.92)',
                 color: copiedYaml === 'all' ? '#fff' : '#111',
                 fontWeight: 600,
                 fontSize: 12,
@@ -465,13 +464,9 @@ function ToggleButton({ on, onClick }: { on: boolean; onClick: () => void }) {
         fontWeight: 500,
         cursor: 'pointer',
         transition: 'all 0.12s ease',
-        background: on
-          ? '#166534'
-          : 'rgba(255,255,255,0.06)',
+        background: on ? '#166534' : 'rgba(255,255,255,0.06)',
         color: on ? '#86efac' : '#71717a',
-        border: on
-          ? '1px solid #166534'
-          : '1px solid rgba(255,255,255,0.08)',
+        border: on ? '1px solid #166534' : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       {on ? '● On' : '○ Off'}
@@ -506,10 +501,7 @@ function PillGrid({
           onClick={() => onSelect(item)}
           style={{
             ...pillStyle,
-            background:
-              item === active
-                ? 'rgba(255,255,255,0.9)'
-                : 'rgba(255,255,255,0.06)',
+            background: item === active ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.06)',
             color: item === active ? '#111' : '#71717a',
             border:
               item === active

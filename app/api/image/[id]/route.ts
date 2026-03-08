@@ -64,8 +64,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
   }
 
-  console.log(`[Image API] ✅ Serving ${assetId} (${size}) - Type: ${result.contentType}`);
-
   const headers: Record<string, string> = {
     'Content-Type': result.contentType.includes('application/octet-stream')
       ? 'image/jpeg'
@@ -73,7 +71,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Images are immutable once uploaded to Immich — cache aggressively
     'Cache-Control': 'public, max-age=31536000, immutable',
     'X-RateLimit-Remaining': String(remaining),
-    'Access-Control-Allow-Origin': '*', // Allow cross-origin for lightbox
   };
 
   if (result.contentLength) {

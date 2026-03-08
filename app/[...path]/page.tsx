@@ -288,11 +288,7 @@ export default async function PathPage({ params }: PathPageProps) {
           {album.description && ` · ${album.description}`}
         </p>
       </div>
-      <PhotoGrid
-        assets={images}
-        layout={resolveLayout()}
-        gridStyle={buildGridStyle()}
-      />
+      <PhotoGrid assets={images} layout={resolveLayout()} gridStyle={buildGridStyle()} />
     </>
   );
 }
