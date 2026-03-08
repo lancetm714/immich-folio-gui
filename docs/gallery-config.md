@@ -33,7 +33,9 @@ hero:
 
 ## Standalone Albums
 
-Albums shown directly on the homepage as cards:
+Albums shown directly on the homepage as cards. 
+> [!NOTE]
+> The thumbnail image for each album grid card is automatically synced with the explicit **\"Cover Image\"** you select for that album inside the Immich Web UI.
 
 ```yaml
 albums:
@@ -43,7 +45,8 @@ albums:
 
 ## Subpages
 
-Group multiple albums into named collections. URLs are auto-generated from the name:
+Group multiple albums into named collections. URLs are auto-generated from the name.
+The overall **Subpage Cover Image** shown on the homepage is automatically inherited from the Cover Image of the **first album** inside its list.
 
 ```yaml
 subpages:
