@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true }, // Usually no need to index legal pages
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function ImpressumPage() {
   const { legal } = getConfig();
 
