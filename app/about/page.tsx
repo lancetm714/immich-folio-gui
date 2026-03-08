@@ -21,7 +21,11 @@ interface AboutFrontmatter {
 }
 
 function getAboutContent() {
-  const raw = readFileSync(join(process.cwd(), 'content', 'about.md'), 'utf-8');
+  const filePath = join(process.cwd(), 'content', 'about.md');
+  if (!require('fs').existsSync(filePath)) {
+    return { meta: {} as AboutFrontmatter, body: '' };
+  }
+  const raw = readFileSync(filePath, 'utf-8');
   const { data, content } = matter(raw);
   return { meta: data as AboutFrontmatter, body: content.trim() };
 }
