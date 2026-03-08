@@ -31,32 +31,25 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 - **Markdown about page** — `content/about.md` with frontmatter for portrait, name, location, and gear list
 - **Dynamic OG images** — auto-generated social preview images per album
 
-### Security
-
 <details>
-<summary><strong>View security architecture & protections</strong></summary>
+<summary><strong>Security &amp; Infrastructure</strong></summary>
 
 <br>
 
-| Concern                 | Protection                                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------------- |
-| **Server exposure**     | Immich URL and port are never sent to the browser — all requests are proxied server-side                |
-| **API key**             | Stored only in `.env.local`, never included in client-side code or responses                            |
-| **Asset IDs**           | Immich UUIDs are encrypted (AES-256) into opaque tokens — visitors cannot guess or enumerate asset IDs  |
-| **Album scope**         | Only albums explicitly listed in `gallery.yaml` are accessible — everything else is blocked             |
-| **Password protection** | Individual subpages can require a password before content is revealed                                   |
-| **Rate limiting**       | Per-IP sliding-window rate limiter on the image proxy (configurable RPM)                                |
-| **No direct access**    | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
+| Concern | Protection |
+| --- | --- |
+| **Server exposure** | Immich URL never leaves your network — all requests proxy server-side |
+| **API key** | Stored only in `.env.local`, never in client code |
+| **Asset IDs** | Immich UUIDs encrypted (AES-256) into opaque tokens |
+| **Album scope** | Only albums in `gallery.yaml` are accessible |
+| **Password protection** | Per-subpage password support |
+| **Rate limiting** | Per-IP sliding-window rate limiter (configurable RPM) |
 
-**Production Ready:** The codebase has been fully audited for production. It uses strict Content Security Policy (No `unsafe-eval`), strong cryptographic patterns (SHA-256 for IV generation instead of MD5), lengths-capped inputs for OG dynamic generation to prevent DoS, and is completely free of N+1 database queries since the API isolates Immich.
+- Health check endpoint at `GET /api/health`
+- In-memory caching with configurable TTL
+- Standalone Docker image — multi-stage, non-root, ~150 MB
 
 </details>
-
-### Infrastructure
-
-- **Health check endpoint** — `GET /api/health` for uptime monitoring and container orchestration
-- **In-memory caching** — configurable TTL for Immich API responses
-- **Standalone Docker image** — multi-stage build, runs as non-root, ~150 MB
 
 ## Quick Start
 
