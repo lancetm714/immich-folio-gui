@@ -1,0 +1,61 @@
+# ── Global Site Settings ──────────────────────────────────────────
+# This file controls the visual identity, global behavior, and legal info.
+# Structure is separated from gallery.yaml (album IDs) for clarity.
+
+# Public site title and subtitle (overrides .env if set)
+# title: "My Portfolio"
+# subtitle: "A visual journal"
+
+# ── SEO & Metadata ───────────────────────────────────────────────
+# Optional: Overrides global title/subtitle for search engines and social cards
+# seo:
+#   title: "My Portfolio | Photography"
+#   description: "A curated selection of my best photography work."
+#   noIndex: false # Set to true to hide from search engines
+#   noFollow: false # Set to true to prevent search engines from following links
+
+# Show EXIF metadata (camera, lens, ISO) on photo grid hover
+exifOnHover: true
+
+# Enable the interactive world map view (/map)
+map: true
+
+# Enable smooth page transitions between routes
+transitions: true
+
+# ── Theme configuration ──────────────────────────────────────────
+# Presets: studio, minimal, editorial, classic, noir, monograph
+theme:
+  preset: "studio"
+  accent: "#e60012"
+  photoFrame: "shadow" # none, passepartout, shadow
+  grain: true
+  heroStyle: "fullbleed" # split, fullbleed, minimal, stacked, typographic, mosaic
+
+# ── Grid configuration ───────────────────────────────────────────
+grid:
+  columns: 3
+  gap: 12
+  aspectRatio: "1" # "1" (square), "3/2", "2/3", "16/9", "auto"
+  layout: "masonry" # masonry, uniform, showcase, filmstrip, editorial-flow
+
+# ── Footer & Social ──────────────────────────────────────────────
+footer:
+  name: "John Doe - Portfolio"
+  #instagram: ""
+  #email: "hello@example.com"
+  #website: "https://example.com"
+
+# ── Legal / Impressum (German Law compliance) ────────────────────
+# If enabled: true, a link to /impressum will appear in the footer.
+legal:
+  enabled: true
+  name: "John Doe"
+  address: "123 Main St"
+  zipCity: "12345, Anytown"
+  country: "USA"
+  email: "[EMAIL_ADDRESS]"
+  #phone: "+49 123 456789"
+  # taxId: "DE123456789"
+  # vatId: "12/345/67890"
+  extraInfo: "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: Ralf Ohlenbostel"
