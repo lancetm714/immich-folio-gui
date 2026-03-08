@@ -61,6 +61,43 @@ Default is `studio` if no theme is specified.
   </tr>
 </table>
 
+### Grid View Examples
+
+<table>
+  <tr>
+    <td align="center"><strong>Studio</strong></td>
+    <td align="center"><strong>Minimal</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-studio-grid.png" width="400" alt="Studio grid" /></td>
+    <td><img src="screenshots/theme-minimal-grid.png" width="400" alt="Minimal grid" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Editorial</strong></td>
+    <td align="center"><strong>Classic</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-editorial-grid.png" width="400" alt="Editorial grid" /></td>
+    <td><img src="screenshots/theme-classic-grid.png" width="400" alt="Classic grid" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Noir</strong></td>
+    <td align="center"><strong>Monograph</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-noir-grid.png" width="400" alt="Noir grid" /></td>
+    <td><img src="screenshots/theme-monograph-grid.png" width="400" alt="Monograph grid" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Botanica</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-botanica-grid.png" width="400" alt="Botanica grid" /></td>
+    <td></td>
+  </tr>
+</table>
+
 ### What makes each theme unique
 
 **Studio** (default) — Leica-inspired with a red nav dot, passepartout photo frames, film grain, and a split hero layout. Clean editorial feel with Playfair Display headings.
