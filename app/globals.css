@@ -1453,8 +1453,9 @@
   letter-spacing: 0.15em;
 }
 
-/* Album header */
-[data-preset='minimal'] .album-header__title {
+/* Album & Subpage header */
+[data-preset='minimal'] .album-header__title,
+[data-preset='minimal'] .subpage-title {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   letter-spacing: 0.2em;
@@ -1462,7 +1463,8 @@
   font-weight: 400;
 }
 
-[data-preset='minimal'] .album-header__meta {
+[data-preset='minimal'] .album-header__meta,
+[data-preset='minimal'] .subpage-subtitle {
   font-size: 0.7rem;
   letter-spacing: 0.1em;
 }
@@ -1618,9 +1620,21 @@
   text-transform: none;
 }
 
-[data-preset='editorial'] .album-header__meta {
-  font-family: var(--font-caption);
-  font-style: italic;
+/* Album & Subpage Header overrides */
+[data-preset='editorial'] .album-header__title,
+[data-preset='editorial'] .subpage-title {
+  font-family: var(--font-serif);
+  font-size: 5rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+[data-preset='editorial'] .album-header__meta,
+[data-preset='editorial'] .subpage-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 /* Footer: centered italic attribution */
@@ -1794,14 +1808,16 @@
   color: var(--accent);
 }
 
-/* Album header: elegant serif */
-[data-preset='classic'] .album-header__title {
+/* Album & Subpage header: elegant serif */
+[data-preset='classic'] .album-header__title,
+[data-preset='classic'] .subpage-title {
   font-weight: 400;
   letter-spacing: 0.1em;
   font-size: 2.2rem;
 }
 
-[data-preset='classic'] .album-header__meta {
+[data-preset='classic'] .album-header__meta,
+[data-preset='classic'] .subpage-subtitle {
   font-family: var(--font-caption);
   font-style: italic;
 }
@@ -1921,8 +1937,9 @@
   text-transform: uppercase;
 }
 
-/* Album header */
-[data-preset='noir'] .album-header__title {
+/* Album & Subpage header */
+[data-preset='noir'] .album-header__title,
+[data-preset='noir'] .subpage-title {
   font-weight: 300;
   letter-spacing: 0.04em;
 }
@@ -2081,12 +2098,13 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Album header: large serif with wide spacing */
+/* Album & Subpage header: large serif with wide spacing */
 [data-preset='monograph'] .album-header {
   margin-bottom: 72px;
 }
 
-[data-preset='monograph'] .album-header__title {
+[data-preset='monograph'] .album-header__title,
+[data-preset='monograph'] .subpage-title {
   font-family: var(--font-serif);
   font-size: 3rem;
   font-weight: 400;
@@ -2094,7 +2112,8 @@
   text-transform: none;
 }
 
-[data-preset='monograph'] .album-header__meta {
+[data-preset='monograph'] .album-header__meta,
+[data-preset='monograph'] .subpage-subtitle {
   font-family: var(--font-caption);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
