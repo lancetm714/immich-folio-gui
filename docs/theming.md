@@ -26,6 +26,41 @@ That's it. Your entire gallery switches to the minimal theme.
 
 Default is `studio` if no theme is specified.
 
+<table>
+  <tr>
+    <td align="center"><strong>Studio</strong><br><em>Leica-inspired, red dot</em></td>
+    <td align="center"><strong>Minimal</strong><br><em>Swiss brutalist, fullbleed hero</em></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-studio-home.png" width="400" alt="Studio theme" /></td>
+    <td><img src="screenshots/theme-minimal-home.png" width="400" alt="Minimal theme" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Editorial</strong><br><em>Cinematic magazine, warm charcoal</em></td>
+    <td align="center"><strong>Classic</strong><br><em>Gilded gallery, gold accents</em></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-editorial-home.png" width="400" alt="Editorial theme" /></td>
+    <td><img src="screenshots/theme-classic-home.png" width="400" alt="Classic theme" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Noir</strong><br><em>Darkroom analog, film noir</em></td>
+    <td align="center"><strong>Monograph</strong><br><em>Typographic, book-like</em></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
+    <td><img src="screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Botanica</strong><br><em>Organic, nature-inspired</em></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/theme-botanica-home.png" width="400" alt="Botanica theme" /></td>
+    <td></td>
+  </tr>
+</table>
+
 ### What makes each theme unique
 
 **Studio** (default) — Leica-inspired with a red nav dot, passepartout photo frames, film grain, and a split hero layout. Clean editorial feel with Playfair Display headings.
@@ -111,6 +146,29 @@ Controls the homepage hero layout:
 - **`stacked`** — full-viewport hero image with title gradient-overlaid at the bottom, horizontal thumbnail navigation strip below
 - **`typographic`** — no hero image; massive centered title with numbered album navigation list (used by Monograph)
 - **`mosaic`** — asymmetric multi-image grid with frosted-glass title overlay centered on top
+
+<table>
+  <tr>
+    <td align="center"><strong>Split</strong></td>
+    <td align="center"><strong>Fullbleed</strong></td>
+    <td align="center"><strong>Minimal</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/hero-split-home.png" width="280" alt="Split Hero" /></td>
+    <td><img src="screenshots/hero-fullbleed-home.png" width="280" alt="Fullbleed Hero" /></td>
+    <td><img src="screenshots/hero-minimal-home.png" width="280" alt="Minimal Hero" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Stacked</strong></td>
+    <td align="center"><strong>Typographic</strong></td>
+    <td align="center"><strong>Mosaic</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/hero-stacked-home.png" width="280" alt="Stacked Hero" /></td>
+    <td><img src="screenshots/hero-typographic-home.png" width="280" alt="Typographic Hero" /></td>
+    <td><img src="screenshots/hero-mosaic-home.png" width="280" alt="Mosaic Hero" /></td>
+  </tr>
+</table>
 
 ### `grid.layout`
 

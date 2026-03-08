@@ -117,6 +117,22 @@ theme: studio # or: minimal, editorial, classic, noir, monograph, botanica
     <td><img src="docs/screenshots/theme-editorial-home.png" width="400" alt="Editorial theme" /></td>
     <td><img src="docs/screenshots/theme-classic-home.png" width="400" alt="Classic theme" /></td>
   </tr>
+  <tr>
+    <td align="center"><strong>Noir</strong><br><em>Darkroom analog, film noir</em></td>
+    <td align="center"><strong>Monograph</strong><br><em>Typographic, book-like</em></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
+    <td><img src="docs/screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Botanica</strong><br><em>Organic, nature-inspired</em></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/theme-botanica-home.png" width="400" alt="Botanica theme" /></td>
+    <td></td>
+  </tr>
 </table>
 
 → **[Theming Guide](docs/theming.md)**

@@ -19,11 +19,11 @@ import { spawn, type ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const THEMES = ['studio', 'minimal', 'editorial', 'classic'];
+const THEMES = ['studio', 'minimal', 'editorial', 'classic', 'noir', 'monograph', 'botanica'];
 const BASE_URL = 'http://localhost:3000';
-const GRID_PATH = '/deutschland/kloster-chorin-2024'; // public subpage with photos
+const GRID_PATH = '/deutschland/kloster-chorin'; // public subpage with photos
 const OUTPUT_DIR = path.join(process.cwd(), 'docs', 'screenshots');
-const GALLERY_YAML = path.join(process.cwd(), 'content', 'gallery.yaml');
+const SETTINGS_YAML = path.join(process.cwd(), 'content', 'settings.yaml');
 const VIEWPORT = { width: 1440, height: 900 };
 const IMAGE_LOAD_TIMEOUT = 8000; // ms to wait for images after networkidle
 
@@ -31,8 +31,8 @@ async function main() {
   // Ensure output directory exists
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  // Read original gallery.yaml to restore later
-  const originalYaml = fs.readFileSync(GALLERY_YAML, 'utf8');
+  // Read original settings.yaml to restore later
+  const originalYaml = fs.readFileSync(SETTINGS_YAML, 'utf8');
 
   // Dynamic import for Playwright (may not be installed globally)
   const { chromium } = await import('playwright');
@@ -43,9 +43,9 @@ async function main() {
       console.log(`\n🎨 Theme: ${theme}`);
       console.log('─'.repeat(50));
 
-      // Update gallery.yaml with the theme
-      const yamlWithTheme = setThemeInYaml(originalYaml, theme);
-      fs.writeFileSync(GALLERY_YAML, yamlWithTheme);
+      // Update settings.yaml with the theme
+      const yamlWithTheme = setThemeInSettingsYaml(originalYaml, theme);
+      fs.writeFileSync(SETTINGS_YAML, yamlWithTheme);
 
       // Start dev server
       console.log('  ⏳ Starting dev server...');
@@ -89,13 +89,62 @@ async function main() {
       await context.close();
 
       // Stop dev server
-      server.kill('SIGTERM');
-      await new Promise((resolve) => server.on('close', resolve));
+      if (server.pid) {
+        process.kill(-server.pid, 'SIGTERM');
+      }
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 3000);
+        server.on('close', () => {
+          clearTimeout(timeout);
+          resolve(null);
+        });
+      });
+      console.log('  🛑 Server stopped');
+    }
+
+    const HERO_STYLES = ['split', 'fullbleed', 'minimal', 'stacked', 'typographic', 'mosaic'];
+    for (const hero of HERO_STYLES) {
+      console.log(`\n🖼 Hero Style: ${hero} (Theme: studio)`);
+      console.log('─'.repeat(50));
+
+      const yamlWithTheme = setThemeInSettingsYaml(originalYaml, 'studio');
+      const yamlWithHero = setHeroStyleInSettingsYaml(yamlWithTheme, hero);
+      fs.writeFileSync(SETTINGS_YAML, yamlWithHero);
+
+      console.log('  ⏳ Starting dev server...');
+      const server = startDevServer();
+      await waitForServer(BASE_URL, 15000);
+      console.log('  ✅ Server ready');
+
+      const context = await browser.newContext({ viewport: VIEWPORT });
+      const page = await context.newPage();
+
+      console.log('  📸 Capturing homepage hero...');
+      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+      await waitForImages(page);
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `hero-${hero}-home.png`),
+        fullPage: false,
+      });
+      console.log(`  ✅ hero-${hero}-home.png`);
+
+      await context.close();
+
+      if (server.pid) {
+        process.kill(-server.pid, 'SIGTERM');
+      }
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 3000);
+        server.on('close', () => {
+          clearTimeout(timeout);
+          resolve(null);
+        });
+      });
       console.log('  🛑 Server stopped');
     }
   } finally {
-    // Always restore original gallery.yaml
-    fs.writeFileSync(GALLERY_YAML, originalYaml);
+    // Always restore original settings.yaml
+    fs.writeFileSync(SETTINGS_YAML, originalYaml);
     console.log('\n✅ Restored original gallery.yaml');
     await browser.close();
   }
@@ -111,14 +160,35 @@ async function main() {
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-function setThemeInYaml(yaml: string, theme: string): string {
-  // Replace existing theme line or insert after the header comment
-  if (/^theme:\s*.+$/m.test(yaml)) {
-    return yaml.replace(/^theme:\s*.+$/m, `theme: ${theme}`);
+/**
+ * Replace the theme preset in settings.yaml.
+ * Handles both `theme: preset` shorthand and `theme:\n  preset: "x"` block.
+ */
+function setThemeInSettingsYaml(yaml: string, theme: string): string {
+  // Handle `  preset: "studio"` or `  preset: studio` (block format)
+  if (/^  preset:\s*/m.test(yaml)) {
+    return yaml.replace(/^  preset:\s*.+$/m, `  preset: "${theme}"`);
   }
-  // Insert theme after the header comments
-  const marker = '# Secrets (API key, server URL) stay in .env.local.';
-  return yaml.replace(marker, `${marker}\n\ntheme: ${theme}`);
+  // Handle `theme: studio` shorthand
+  if (/^theme:\s*\w+\s*$/m.test(yaml)) {
+    return yaml.replace(/^theme:\s*\w+\s*$/m, `theme: ${theme}`);
+  }
+  // Fallback: insert block after the theme comment
+  const marker = '# Presets: studio, minimal, editorial, classic, noir, monograph, botanica';
+  if (yaml.includes(marker)) {
+    return yaml.replace(marker, `${marker}\ntheme: ${theme}`);
+  }
+  return yaml + `\ntheme: ${theme}\n`;
+}
+
+/**
+ * Replace the heroStyle in settings.yaml.
+ */
+function setHeroStyleInSettingsYaml(yaml: string, style: string): string {
+  if (/^  heroStyle:\s*/m.test(yaml)) {
+    return yaml.replace(/^  heroStyle:\s*.+$/m, `  heroStyle: "${style}"`);
+  }
+  return yaml;
 }
 
 function startDevServer(): ChildProcess {
@@ -126,6 +196,7 @@ function startDevServer(): ChildProcess {
     cwd: process.cwd(),
     stdio: 'pipe',
     env: { ...process.env },
+    detached: true,
   });
 
   // Suppress server output unless DEBUG is set
@@ -196,8 +267,8 @@ main().catch((err) => {
   console.error('❌ Screenshot generation failed:', err);
   // Try to restore gallery.yaml on error
   try {
-    const original = fs.readFileSync(GALLERY_YAML + '.bak', 'utf8');
-    fs.writeFileSync(GALLERY_YAML, original);
+    const original = fs.readFileSync(SETTINGS_YAML + '.bak', 'utf8');
+    fs.writeFileSync(SETTINGS_YAML, original);
   } catch {
     // Backup may not exist
   }
