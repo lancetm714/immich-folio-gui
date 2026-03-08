@@ -202,6 +202,7 @@ export default async function PathPage({ params }: PathPageProps) {
           images={images}
           layout={resolveLayout(result.subpage.grid)}
           gridStyle={buildGridStyle(result.subpage.grid)}
+          subtitle={result.subpage.subtitle}
           backLinkHref="/"
           backLinkLabel="Back to Gallery"
         />

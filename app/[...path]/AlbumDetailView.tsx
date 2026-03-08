@@ -12,6 +12,7 @@ interface AlbumDetailViewProps {
     gridStyle: React.CSSProperties;
     backLinkHref: string;
     backLinkLabel: string;
+    subtitle?: string;
 }
 
 export function AlbumDetailView({
@@ -21,12 +22,14 @@ export function AlbumDetailView({
     gridStyle,
     backLinkHref,
     backLinkLabel,
+    subtitle,
 }: AlbumDetailViewProps) {
     return (
         <>
             <div className="album-header">
                 <BackLink href={backLinkHref} label={backLinkLabel} />
                 <h1 className="album-header__title">{album.albumName}</h1>
+                {subtitle && <p className="subpage-subtitle" style={{ textAlign: "left", marginLeft: 0 }}>{subtitle}</p>}
                 <p className="album-header__meta">
                     {images.length} {images.length === 1 ? 'photo' : 'photos'}
                     {album.description && ` · ${album.description}`}
