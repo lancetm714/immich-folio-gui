@@ -44,7 +44,7 @@ yarn-error.log*
 next-env.d.ts
 
 # internal dev docs
-dev-docs/
+docs/dev/
 
 # Build cache
 tsconfig.tsbuildinfo
