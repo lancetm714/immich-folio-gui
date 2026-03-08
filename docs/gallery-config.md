@@ -6,6 +6,16 @@ All gallery structure is defined in `content/gallery.yaml`. Copy the example to 
 cp content/gallery.yaml.example content/gallery.yaml
 ```
 
+**Contents:**
+- [Hero Images](#hero-images)
+- [Standalone Albums](#standalone-albums)
+- [Subpages & Categories](#subpages)
+- [Grid Layout](#grid-layout)
+- [EXIF on Hover](#exif-on-hover)
+- [Footer](#footer)
+- [About Page](#about-page)
+- [Finding UUIDs](#finding-uuids)
+
 ## Hero Images
 
 Single image or crossfade carousel on the homepage:

@@ -25,61 +25,27 @@ That's it. Your entire gallery switches to the minimal theme.
 
 Default is `studio` if no theme is specified.
 
-<table>
-  <tr>
-    <td align="center"><strong>Studio</strong><br><em>Leica-inspired, red dot</em></td>
-    <td align="center"><strong>Minimal</strong><br><em>Swiss brutalist, fullbleed hero</em></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-studio-home.png" width="400" alt="Studio theme" /></td>
-    <td><img src="screenshots/theme-minimal-home.png" width="400" alt="Minimal theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Editorial</strong><br><em>Cinematic magazine, warm charcoal</em></td>
-    <td align="center"><strong>Classic</strong><br><em>Gilded gallery, gold accents</em></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-editorial-home.png" width="400" alt="Editorial theme" /></td>
-    <td><img src="screenshots/theme-classic-home.png" width="400" alt="Classic theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Noir</strong><br><em>Darkroom analog, film noir</em></td>
-    <td align="center"><strong>Monograph</strong><br><em>Typographic, book-like</em></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
-    <td><img src="screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
-  </tr>
-</table>
+### Theme Gallery
+_From top to bottom: Studio, Minimal, Editorial, Classic, Noir, Monograph_
+
+<p align="center">
+  <img src="screenshots/theme-studio-home.png" width="49%" alt="Studio theme" />
+  <img src="screenshots/theme-minimal-home.png" width="49%" alt="Minimal theme" />
+  <img src="screenshots/theme-editorial-home.png" width="49%" alt="Editorial theme" />
+  <img src="screenshots/theme-classic-home.png" width="49%" alt="Classic theme" />
+  <img src="screenshots/theme-noir-home.png" width="49%" alt="Noir theme" />
+  <img src="screenshots/theme-monograph-home.png" width="49%" alt="Monograph theme" />
+</p>
 
 ### Grid View Examples
-
-<table>
-  <tr>
-    <td align="center"><strong>Studio</strong></td>
-    <td align="center"><strong>Minimal</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-studio-grid.png" width="400" alt="Studio grid" /></td>
-    <td><img src="screenshots/theme-minimal-grid.png" width="400" alt="Minimal grid" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Editorial</strong></td>
-    <td align="center"><strong>Classic</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-editorial-grid.png" width="400" alt="Editorial grid" /></td>
-    <td><img src="screenshots/theme-classic-grid.png" width="400" alt="Classic grid" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Noir</strong></td>
-    <td align="center"><strong>Monograph</strong></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/theme-noir-grid.png" width="400" alt="Noir grid" /></td>
-    <td><img src="screenshots/theme-monograph-grid.png" width="400" alt="Monograph grid" /></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="screenshots/theme-studio-grid.png" width="49%" alt="Studio grid" />
+  <img src="screenshots/theme-minimal-grid.png" width="49%" alt="Minimal grid" />
+  <img src="screenshots/theme-editorial-grid.png" width="49%" alt="Editorial grid" />
+  <img src="screenshots/theme-classic-grid.png" width="49%" alt="Classic grid" />
+  <img src="screenshots/theme-noir-grid.png" width="49%" alt="Noir grid" />
+  <img src="screenshots/theme-monograph-grid.png" width="49%" alt="Monograph grid" />
+</p>
 
 ### What makes each theme unique
 

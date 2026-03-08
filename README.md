@@ -94,40 +94,13 @@ All gallery structure — hero images, albums, subpages, grid layout, footer —
 
 ### Theming
 
-Seven built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, hero layout, and grid style.
+Six built-in presets with distinct visual identities — or mix and match with fine-grained control over colors, fonts, corners, photo frames, hero layout, and grid style.
 
 ```yaml
 theme: studio # or: minimal, editorial, classic, noir, monograph
 ```
 
-<table>
-  <tr>
-    <td align="center"><strong>Studio</strong><br><em>Leica-inspired, red dot</em></td>
-    <td align="center"><strong>Minimal</strong><br><em>Swiss brutalist, fullbleed hero</em></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/theme-studio-home.png" width="400" alt="Studio theme" /></td>
-    <td><img src="docs/screenshots/theme-minimal-home.png" width="400" alt="Minimal theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Editorial</strong><br><em>Cinematic magazine, warm charcoal</em></td>
-    <td align="center"><strong>Classic</strong><br><em>Gilded gallery, gold accents</em></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/theme-editorial-home.png" width="400" alt="Editorial theme" /></td>
-    <td><img src="docs/screenshots/theme-classic-home.png" width="400" alt="Classic theme" /></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Noir</strong><br><em>Darkroom analog, film noir</em></td>
-    <td align="center"><strong>Monograph</strong><br><em>Typographic, book-like</em></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/theme-noir-home.png" width="400" alt="Noir theme" /></td>
-    <td><img src="docs/screenshots/theme-monograph-home.png" width="400" alt="Monograph theme" /></td>
-  </tr>
-</table>
-
-→ **[Theming Guide](docs/theming.md)**
+→ **[View all Themes & Configuration Guide](docs/theming.md)**
 
 ## Docker
 
