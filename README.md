@@ -43,6 +43,8 @@ Immich Folio acts as a **secure reverse proxy** between your visitors and your p
 | **Rate limiting**       | Per-IP sliding-window rate limiter on the image proxy (configurable RPM)                                |
 | **No direct access**    | Visitors interact only with the Next.js app; they have zero knowledge of your Immich server's existence |
 
+**Production Ready:** The codebase has been fully audited for production. It uses strict Content Security Policy (No `unsafe-eval`), strong cryptographic patterns (SHA-256 for IV generation instead of MD5), lengths-capped inputs for OG dynamic generation to prevent DoS, and is completely free of N+1 database queries since the API isolates Immich.
+
 ### Infrastructure
 
 - **Health check endpoint** — `GET /api/health` for uptime monitoring and container orchestration
