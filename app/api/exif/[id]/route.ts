@@ -5,17 +5,33 @@
  * The :token is an encoded asset ID (not a raw UUID).
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { immich } from '@/lib/immich';
 import { decodeAssetId } from '@/lib/tokens';
 import { getConfig } from '@/lib/config';
+import { checkRateLimit } from '@/lib/rate-limit';
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const config = getConfig();
 
   // Security: If EXIF is globally disabled, do not serve it via API either
   if (!config.exifOnHover) {
     return NextResponse.json({ error: 'EXIF metadata is disabled' }, { status: 403 });
+  }
+
+  // ── Rate limiting ──────────────────────────────────
+  // Security: Prioritize x-real-ip (set by trusted reverse proxies like nginx/Traefik)
+  // over x-forwarded-for which can be spoofed by clients.
+  const ip =
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    'unknown';
+  const { success, resetAt } = checkRateLimit(`exif:${ip}`, config.rateLimitRpm);
+
+  if (!success) {
+    const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+    console.warn(`[EXIF API] ⚠️ Rate limit exceeded for IP: ${ip}. Retry after ${retryAfter}s`);
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   const { id: token } = await params;
