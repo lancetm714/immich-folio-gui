@@ -1,0 +1,42 @@
+version: 2
+
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      # Batch minor/patch Next.js updates together
+      nextjs:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+      # Batch React updates
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+    ignore:
+      # Don't auto-update major versions (review manually)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Berlin"
+    labels:
+      - "dependencies"
+      - "github-actions"
