@@ -15,12 +15,12 @@ import { checkRateLimit } from '@/lib/rate-limit';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  // Rate limit: 30 requests/minute per IP
+  // Rate limit: 120 requests/minute per IP (map data is cached client-side; this guards against abuse)
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
     request.headers.get('x-real-ip') ??
     '127.0.0.1';
-  const rl = checkRateLimit(ip, 30);
+  const rl = checkRateLimit(ip, 120);
   if (!rl.success) {
     return NextResponse.json(
       { error: 'Too many requests' },
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         status: 429,
         headers: {
           'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
-          'X-RateLimit-Limit': '30',
+          'X-RateLimit-Limit': '120',
           'X-RateLimit-Remaining': '0',
         },
       },
@@ -74,7 +74,9 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(publicLocations, {
     headers: {
-      'Cache-Control': `private, no-cache, no-store, must-revalidate`, // Don't cache personalized map data publicly
+      // Private 5-minute browser cache: reduces re-fetches during a session
+      // while still preventing shared/CDN caching of personalised data.
+      'Cache-Control': 'private, max-age=300, must-revalidate',
     },
   });
 }
