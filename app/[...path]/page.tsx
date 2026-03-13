@@ -106,6 +106,21 @@ function toPhotoItems(assets: ImmichAsset[], showExif: boolean): PhotoItem[] {
     });
 }
 
+/**
+ * Returns a PasswordGate element if the slug is protected and not yet
+ * authenticated, otherwise returns null. Centralises the duplicated
+ * cookie-check boilerplate.
+ */
+async function gateIfProtected(slug: string): Promise<React.ReactElement | null> {
+  if (!isProtected(slug)) return null;
+  const cookieStore = await cookies();
+  const getCookie = (name: string) => cookieStore.get(name)?.value;
+  if (isAuthenticated(slug, getCookie)) return null;
+  const subpageData = await immich.getSubpageAlbums(slug);
+  const title = subpageData?.subpage.name ?? slug;
+  return <PasswordGate slug={slug} title={title} />;
+}
+
 export default async function PathPage({ params }: PathPageProps) {
   const { path } = await params;
   const config = getConfig();
@@ -131,15 +146,8 @@ export default async function PathPage({ params }: PathPageProps) {
     const [subpageSlug, albumSlug] = path;
 
     // Password gate for protected subpages
-    if (isProtected(subpageSlug)) {
-      const cookieStore = await cookies();
-      const getCookie = (name: string) => cookieStore.get(name)?.value;
-      if (!isAuthenticated(subpageSlug, getCookie)) {
-        const subpageData = await immich.getSubpageAlbums(subpageSlug);
-        const subpageName = subpageData?.subpage.name ?? subpageSlug;
-        return <PasswordGate slug={subpageSlug} title={subpageName} />;
-      }
-    }
+    const gate = await gateIfProtected(subpageSlug);
+    if (gate) return gate;
 
     const album = await immich.getAlbumBySlug(albumSlug, subpageSlug);
 
@@ -172,15 +180,8 @@ export default async function PathPage({ params }: PathPageProps) {
   // Check if it's a subpage
   if (immich.isSubpageSlug(slug)) {
     // Password gate for protected subpages
-    if (isProtected(slug)) {
-      const cookieStore = await cookies();
-      const getCookie = (name: string) => cookieStore.get(name)?.value;
-      if (!isAuthenticated(slug, getCookie)) {
-        const subpageData = await immich.getSubpageAlbums(slug);
-        const subpageName = subpageData?.subpage.name ?? slug;
-        return <PasswordGate slug={slug} title={subpageName} />;
-      }
-    }
+    const gate = await gateIfProtected(slug);
+    if (gate) return gate;
 
     const result = await immich.getSubpageAlbums(slug);
     if (!result || result.albums.length === 0) {

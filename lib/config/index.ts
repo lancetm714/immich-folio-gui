@@ -15,6 +15,28 @@ export * from './schema';
 export * from './theme';
 
 let _config: AppConfig | null = null;
+
+/** Converts raw YAML grid overrides into a typed partial GridConfig. */
+export function buildSubpageGrid(
+  raw?: { columns?: number; gap?: number; aspectRatio?: string; layout?: string },
+): { grid: Partial<GridConfig> } | Record<string, never> {
+  if (!raw) return {};
+  return {
+    grid: {
+      ...(raw.columns != null ? { columns: raw.columns } : {}),
+      ...(raw.gap != null ? { gap: raw.gap } : {}),
+      ...(raw.aspectRatio != null ? { aspectRatio: raw.aspectRatio } : {}),
+      ...(raw.layout != null
+        ? {
+            layout: (VALID_LAYOUTS.includes(raw.layout)
+              ? raw.layout
+              : 'masonry') as GridConfig['layout'],
+          }
+        : {}),
+    },
+  };
+}
+
 export function getConfig(): AppConfig {
   const isDev = process.env.NODE_ENV !== 'production';
   if (_config && !isDev) return _config;
@@ -135,22 +157,7 @@ export function getConfig(): AppConfig {
         albumIds,
         sections,
         password: sp.password,
-        ...(sp.grid
-          ? {
-              grid: {
-                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-                ...(sp.grid.layout != null
-                  ? {
-                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                        ? sp.grid.layout
-                        : 'masonry') as GridConfig['layout'],
-                    }
-                  : {}),
-              },
-            }
-          : {}),
+        ...buildSubpageGrid(sp.grid),
       };
     });
   } else if (gallery.subpages) {
@@ -178,22 +185,7 @@ export function getConfig(): AppConfig {
         subtitle: sp.subtitle,
         albumIds: albumEntries.map((entry) => processAlbumEntry(entry, `subpage "${name}"`)),
         password: sp.password,
-        ...(sp.grid
-          ? {
-              grid: {
-                ...(sp.grid.columns != null ? { columns: sp.grid.columns } : {}),
-                ...(sp.grid.gap != null ? { gap: sp.grid.gap } : {}),
-                ...(sp.grid.aspectRatio != null ? { aspectRatio: sp.grid.aspectRatio } : {}),
-                ...(sp.grid.layout != null
-                  ? {
-                      layout: (VALID_LAYOUTS.includes(sp.grid.layout)
-                        ? sp.grid.layout
-                        : 'masonry') as GridConfig['layout'],
-                    }
-                  : {}),
-              },
-            }
-          : {}),
+        ...buildSubpageGrid(sp.grid),
       };
     });
   }

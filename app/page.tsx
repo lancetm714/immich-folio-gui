@@ -140,6 +140,27 @@ export default async function HomePage() {
     );
   }
 
+  /** Title + optional subtitle + nav — shared by mosaic, minimal, fullbleed, split. */
+  function HeroTextContent() {
+    return (
+      <>
+        <FadeIn delay={0}>
+          <h1 className="hero__title">{config.siteTitle}</h1>
+        </FadeIn>
+        {config.siteSubtitle && (
+          <FadeIn delay={100}>
+            <p className="hero__subtitle">{config.siteSubtitle}</p>
+          </FadeIn>
+        )}
+        <FadeIn delay={200}>
+          <nav className="hero__nav">
+            <HeroNavLinks subpages={subpages} albums={albums} />
+          </nav>
+        </FadeIn>
+      </>
+    );
+  }
+
   // ── Mosaic: multi-image grid with frosted title overlay ────────
   if (heroStyle === 'mosaic') {
     return (
@@ -161,19 +182,7 @@ export default async function HomePage() {
           ))}
         </div>
         <div className="hero__mosaic-overlay">
-          <FadeIn delay={0}>
-            <h1 className="hero__title">{config.siteTitle}</h1>
-          </FadeIn>
-          {config.siteSubtitle && (
-            <FadeIn delay={100}>
-              <p className="hero__subtitle">{config.siteSubtitle}</p>
-            </FadeIn>
-          )}
-          <FadeIn delay={200}>
-            <nav className="hero__nav">
-              <HeroNavLinks subpages={subpages} albums={albums} />
-            </nav>
-          </FadeIn>
+          <HeroTextContent />
         </div>
       </div>
     );
@@ -184,19 +193,7 @@ export default async function HomePage() {
     return (
       <div className="hero hero--minimal">
         <div className="hero__content">
-          <FadeIn delay={0}>
-            <h1 className="hero__title">{config.siteTitle}</h1>
-          </FadeIn>
-          {config.siteSubtitle && (
-            <FadeIn delay={100}>
-              <p className="hero__subtitle">{config.siteSubtitle}</p>
-            </FadeIn>
-          )}
-          <FadeIn delay={200}>
-            <nav className="hero__nav">
-              <HeroNavLinks subpages={subpages} albums={albums} />
-            </nav>
-          </FadeIn>
+          <HeroTextContent />
         </div>
       </div>
     );
@@ -208,19 +205,7 @@ export default async function HomePage() {
       <div className="hero hero--fullbleed">
         <HeroCarousel images={heroData} />
         <div className="hero__fullbleed-overlay">
-          <FadeIn delay={0}>
-            <h1 className="hero__title">{config.siteTitle}</h1>
-          </FadeIn>
-          {config.siteSubtitle && (
-            <FadeIn delay={100}>
-              <p className="hero__subtitle">{config.siteSubtitle}</p>
-            </FadeIn>
-          )}
-          <FadeIn delay={200}>
-            <nav className="hero__nav">
-              <HeroNavLinks subpages={subpages} albums={albums} />
-            </nav>
-          </FadeIn>
+          <HeroTextContent />
         </div>
       </div>
     );
@@ -232,20 +217,7 @@ export default async function HomePage() {
       {/* ── Left Panel ──────────────────────────────── */}
       <div className="hero__left">
         <div className="hero__content">
-          <FadeIn delay={0}>
-            <h1 className="hero__title">{config.siteTitle}</h1>
-          </FadeIn>
-          {config.siteSubtitle && (
-            <FadeIn delay={100}>
-              <p className="hero__subtitle">{config.siteSubtitle}</p>
-            </FadeIn>
-          )}
-
-          <FadeIn delay={200}>
-            <nav className="hero__nav">
-              <HeroNavLinks subpages={subpages} albums={albums} />
-            </nav>
-          </FadeIn>
+          <HeroTextContent />
         </div>
       </div>
 

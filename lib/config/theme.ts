@@ -61,16 +61,6 @@ export const THEME_PRESETS: Record<string, ThemeConfig> = {
     headerDot: false,
     heroStyle: 'typographic',
   },
-  botanica: {
-    preset: 'botanica',
-    accent: '#4a7c59',
-    fonts: { heading: 'Cormorant Garamond', body: 'Nunito Sans', caption: 'Inconsolata' },
-    radius: 8,
-    photoFrame: 'none',
-    grain: false,
-    headerDot: true,
-    heroStyle: 'split',
-  },
 };
 
 export const VALID_PHOTO_FRAMES = ['none', 'passepartout', 'shadow'];
