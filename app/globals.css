@@ -1395,6 +1395,19 @@
   color: var(--accent);
 }
 
+/* ── Tablet (iPad, kleine Laptops) ─────────────────── */
+/* Direkt column-count setzen → kein Konflikt mit Inline-Style der Custom Property */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .photo-grid {
+    column-count: 2;
+  }
+
+  .photo-grid--uniform,
+  .photo-grid--showcase {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1415,8 +1428,26 @@
     font-size: 2rem;
   }
 
+  /* Portrait: 2 Spalten — direkt gesetzt, kein !important nötig */
   .photo-grid {
-    --grid-columns: 1;
+    column-count: 2;
+  }
+
+  .photo-grid--uniform,
+  .photo-grid--showcase {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Landscape-Handy → 3 Spalten */
+  @media (orientation: landscape) {
+    .photo-grid {
+      column-count: 3;
+    }
+
+    .photo-grid--uniform,
+    .photo-grid--showcase {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   .album-grid {

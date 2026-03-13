@@ -34,7 +34,7 @@ function parseEnv(): Env {
 
   const rateLimitStr = process.env.RATE_LIMIT_RPM;
   const rateLimit =
-    rateLimitStr && !isNaN(parseInt(rateLimitStr, 10)) ? parseInt(rateLimitStr, 10) : 600;
+    rateLimitStr && !isNaN(parseInt(rateLimitStr, 10)) ? parseInt(rateLimitStr, 10) : 1500;
 
   return {
     IMMICH_API_URL: apiUrl,
