@@ -35,7 +35,10 @@ export function MapView() {
       // Fetch map data
       const res = await fetch('/api/map');
       if (!res.ok) {
-        setError('Failed to load map data');
+        let detail = '';
+        try { detail = await res.text(); } catch { /* ignore */ }
+        console.error('[Map] API error', res.status, detail);
+        setError(`Failed to load map data (${res.status})`);
         setLoading(false);
         return;
       }
