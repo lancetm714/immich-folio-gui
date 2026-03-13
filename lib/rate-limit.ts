@@ -16,6 +16,9 @@ interface RateLimitEntry {
 
 const store = new Map<string, RateLimitEntry>();
 
+// Hard ceiling to prevent unbounded memory growth under DDoS conditions
+const MAX_STORE_ENTRIES = 10_000;
+
 // Evict expired entries periodically (every 60s)
 let lastCleanup = Date.now();
 const CLEANUP_INTERVAL = 60_000;
@@ -27,6 +30,15 @@ function cleanup() {
   for (const [key, entry] of store) {
     if (now > entry.expiresAt) store.delete(key);
   }
+}
+
+/**
+ * Evict oldest entry when store is at capacity (FIFO).
+ */
+function evictIfFull() {
+  if (store.size < MAX_STORE_ENTRIES) return;
+  const firstKey = store.keys().next().value;
+  if (firstKey) store.delete(firstKey);
 }
 
 /**
@@ -49,6 +61,7 @@ export function checkRateLimit(
 
   // New window or expired
   if (!entry || now > entry.expiresAt) {
+    evictIfFull();
     const resetAt = now + windowMs;
     store.set(key, { count: 1, expiresAt: resetAt });
     return { success: true, remaining: maxRpm - 1, resetAt };

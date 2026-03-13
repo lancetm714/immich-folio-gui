@@ -10,10 +10,31 @@ import { getConfig } from '@/lib/config';
 import { imageUrl } from '@/lib/urls';
 import { isAuthenticated } from '@/lib/auth';
 import { getMapData } from '@/lib/mapService';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
+  // Rate limit: 30 requests/minute per IP
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    request.headers.get('x-real-ip') ??
+    '127.0.0.1';
+  const rl = checkRateLimit(ip, 30);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+          'X-RateLimit-Limit': '30',
+          'X-RateLimit-Remaining': '0',
+        },
+      },
+    );
+  }
+
   const config = getConfig();
 
   if (!config.map) {
