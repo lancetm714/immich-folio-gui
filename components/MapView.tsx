@@ -7,6 +7,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+/** Escapes special HTML characters to prevent XSS in Leaflet popup templates. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 interface MapLocationPublic {
   city: string;
   country: string;
@@ -81,15 +91,15 @@ export function MapView() {
         });
 
         const albumLinks = loc.albums
-          .map((a) => `<a href="${a.url}" class="map-popup__album-link">${a.name} →</a>`)
+          .map((a) => `<a href="${escapeHtml(a.url)}" class="map-popup__album-link">${escapeHtml(a.name)} →</a>`)
           .join('');
 
         const popupHtml = `
           <div class="map-popup">
-            <img src="${loc.coverUrl}" alt="${loc.city}" class="map-popup__cover" loading="lazy" />
+            <img src="${escapeHtml(loc.coverUrl)}" alt="${escapeHtml(loc.city)}" class="map-popup__cover" loading="lazy" />
             <div class="map-popup__body">
-              <h3 class="map-popup__city">${loc.city}</h3>
-              <p class="map-popup__country">${loc.country}</p>
+              <h3 class="map-popup__city">${escapeHtml(loc.city)}</h3>
+              <p class="map-popup__country">${escapeHtml(loc.country)}</p>
               <p class="map-popup__count">${loc.photoCount} photo${loc.photoCount === 1 ? '' : 's'}</p>
               <div class="map-popup__albums">${albumLinks}</div>
             </div>

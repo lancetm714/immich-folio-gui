@@ -57,4 +57,19 @@ describe('checkRateLimit', () => {
     // Should be within ~60 seconds from now
     expect(result.resetAt).toBeLessThanOrEqual(before + 61_000);
   });
+
+  it('does not crash when store is at capacity and still accepts new IPs', () => {
+    // Fill the store beyond MAX_STORE_ENTRIES (1 000 in test env or 10 000 in prod)
+    // by hammering with unique IPs; evictIfFull must silently evict stale entries.
+    const uniqueIps = Array.from({ length: 200 }, (_, i) => `evict-test-ip-${i}-${Date.now()}`);
+    for (const ip of uniqueIps) {
+      checkRateLimit(ip, 5);
+    }
+
+    // A brand-new IP must still be accepted after potential eviction
+    const freshIp = `evict-fresh-${Date.now()}`;
+    const result = checkRateLimit(freshIp, 5);
+    expect(result.success).toBe(true);
+    expect(result.remaining).toBe(4);
+  });
 });
