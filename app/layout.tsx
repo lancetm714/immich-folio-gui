@@ -5,7 +5,6 @@
  */
 
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import './globals.css';
 import { SubpageNav } from '@/components/SubpageNav';
@@ -13,11 +12,8 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
 import { getConfig, getGoogleFontsUrl, AppConfig } from '@/lib/config';
-
-// Lazy-load DevToolbar — keeps 17KB+ out of the production bundle
-const DevToolbar = dynamic(() => import('@/components/DevToolbar').then(m => ({ default: m.DevToolbar })), {
-  ssr: false,
-});
+// DevToolbarLoader ist eine Client Component (ssr: false nur dort erlaubt)
+import { DevToolbarLoader } from '@/components/DevToolbarLoader';
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = getConfig();
@@ -181,7 +177,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="main">{children}</main>
         <Footer />
         <ScrollToTop />
-        {process.env.NODE_ENV === 'development' && <DevToolbar />}
+        {process.env.NODE_ENV === 'development' && <DevToolbarLoader />}
       </body>
     </html>
   );
