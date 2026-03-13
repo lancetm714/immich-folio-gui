@@ -145,7 +145,7 @@ export default async function HomePage() {
     return (
       <div className="hero hero--mosaic">
         <div className="hero__mosaic-grid">
-          {heroData.slice(0, 6).map((img, i) => (
+          {heroData.slice(0, 4).map((img, i) => (
             <div key={i} className={`hero__mosaic-cell hero__mosaic-cell--${i + 1}`}>
               <Image
                 src={img.src}
