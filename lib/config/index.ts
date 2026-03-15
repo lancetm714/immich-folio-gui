@@ -6,6 +6,7 @@ import {
   AppConfig,
   SubpageConfig,
   SubpageSectionConfig,
+  SubpageObjectValue,
   GalleryYaml,
   SettingsYaml,
   GridConfig,
@@ -17,9 +18,12 @@ export * from './theme';
 let _config: AppConfig | null = null;
 
 /** Converts raw YAML grid overrides into a typed partial GridConfig. */
-export function buildSubpageGrid(
-  raw?: { columns?: number; gap?: number; aspectRatio?: string; layout?: string },
-): { grid: Partial<GridConfig> } | Record<string, never> {
+export function buildSubpageGrid(raw?: {
+  columns?: number;
+  gap?: number;
+  aspectRatio?: string;
+  layout?: string;
+}): { grid: Partial<GridConfig> } | Record<string, never> {
   if (!raw) return {};
   return {
     grid: {
@@ -43,13 +47,19 @@ export function getConfig(): AppConfig {
 
   const apiUrl = env.IMMICH_API_URL;
   const apiKey = env.IMMICH_API_KEY;
-  const authSecret = env.AUTH_SECRET || apiKey;
-
-  if (!env.AUTH_SECRET && process.env.NODE_ENV === 'production') {
+  let { AUTH_SECRET } = env;
+  if (!AUTH_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'SECURITY ERROR: AUTH_SECRET is not set in production. Please set a long random string as AUTH_SECRET in your .env.',
+      );
+    }
     console.warn(
       '\n⚠️  SECURITY WARNING: AUTH_SECRET is not set. Falling back to IMMICH_API_KEY.\n   Please set a long random string as AUTH_SECRET in your .env for better security.\n',
     );
+    AUTH_SECRET = apiKey;
   }
+  const authSecret = AUTH_SECRET;
 
   const gallery = loadYaml<GalleryYaml>('gallery.yaml');
   const settings = loadYaml<SettingsYaml>('settings.yaml') || {};
@@ -64,6 +74,7 @@ export function getConfig(): AppConfig {
       subpages: [],
       siteTitle: env.SITE_TITLE || 'Immich Folio',
       siteSubtitle: env.SITE_SUBTITLE || 'Setup Required',
+      lang: 'en',
       seo: {
         title: 'Setup Required',
         description: 'Please configure Immich Folio',
@@ -169,13 +180,6 @@ export function getConfig(): AppConfig {
           albumIds: value.map((entry) => processAlbumEntry(entry, `subpage "${name}"`)),
         };
       }
-      interface SubpageObjectValue {
-        title?: string;
-        subtitle?: string;
-        albums?: Array<string | Record<string, string>>;
-        password?: string;
-        grid?: { columns?: number; gap?: number; aspectRatio?: string; layout?: string };
-      }
       const sp = value as SubpageObjectValue;
       const albumEntries = sp.albums || [];
       return {
@@ -201,6 +205,7 @@ export function getConfig(): AppConfig {
     subpages,
     siteTitle: settings.title ?? env.SITE_TITLE,
     siteSubtitle: settings.subtitle ?? env.SITE_SUBTITLE,
+    lang: settings.lang ?? 'en',
     seo: {
       title: settings.seo?.title || settings.title || env.SITE_TITLE || 'Gallery',
       description:

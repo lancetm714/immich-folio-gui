@@ -1,18 +1,6 @@
 import type { NextConfig } from 'next';
 
-// ── Content Security Policy ────────────────────────────────────
-// Locks down the public-facing site to only trusted sources.
-const cspDirectives = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com", // Added blob: and osm
-  "connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com", // Added fonts for connectivity checks
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join('; ');
+// Security headers configuration
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -25,7 +13,6 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'Content-Security-Policy', value: cspDirectives },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

@@ -102,16 +102,16 @@ albums:
 subpages:
   - name: Japan
     title: Japan
-    subtitle: 'Reisen durch ein Land voller Kontraste.'
+    subtitle: 'Travel through a land full of contrasts.'
     sections:
       - title: Tokyo
-        description: 'Megacity, Neonlichter, Stille im Lärm.'
+        description: 'Megacity, neon lights, silence in the noise.'
         albums:
           - '33333333-3333-3333-3333-333333333333'
-          - '44444444-4444-4444-4444-444444444444': Shinjuku bei Nacht
+          - '44444444-4444-4444-4444-444444444444': Shinjuku at night
 
       - title: Kyoto
-        description: 'Tempel und Bambuswälder.'
+        description: 'Temples and bamboo forests.'
         albums:
           - '55555555-5555-5555-5555-555555555555': Fushimi Inari
           - '66666666-6666-6666-6666-666666666666'

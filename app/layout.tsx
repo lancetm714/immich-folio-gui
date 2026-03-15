@@ -11,8 +11,9 @@ import { SubpageNav } from '@/components/SubpageNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
+import { SetupScreen } from '@/components/SetupScreen';
 import { getConfig, getGoogleFontsUrl, AppConfig } from '@/lib/config';
-// DevToolbarLoader ist eine Client Component (ssr: false nur dort erlaubt)
+// DevToolbarLoader is a Client Component (ssr: false is only allowed there)
 import { DevToolbarLoader } from '@/components/DevToolbarLoader';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,75 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
       <html lang="en" suppressHydrationWarning>
         <body>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '100dvh',
-              padding: '2rem',
-              backgroundColor: '#ffffff',
-              color: '#111111',
-              fontFamily: 'system-ui, sans-serif',
-            }}
-          >
-            <div style={{ maxWidth: '600px', width: '100%' }}>
-              <h1
-                style={{
-                  fontSize: 'clamp(2rem, 5vw, 3rem)',
-                  fontWeight: 500,
-                  marginBottom: '0.5rem',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                Setup Required
-              </h1>
-              <p
-                style={{
-                  fontSize: '1.125rem',
-                  opacity: 0.7,
-                  marginBottom: '2rem',
-                  lineHeight: 1.5,
-                }}
-              >
-                Immich Folio is running, but it looks like your configuration files or environment
-                variables are missing.
-              </p>
-              <div
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
-                  padding: '1.5rem',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem',
-                  lineHeight: 1.6,
-                }}
-              >
-                <p style={{ marginBottom: '1rem' }}>
-                  To get started, follow these steps in your repository or mounted{' '}
-                  <code>content/</code> volume:
-                </p>
-                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                  <li style={{ marginBottom: '0.5rem' }}>
-                    Copy <code>.env.example</code> to <code>.env.local</code> and fill in your
-                    Immich API URL and Key
-                  </li>
-                  <li style={{ marginBottom: '0.5rem' }}>
-                    Copy <code>settings.yaml.example</code> to <code>settings.yaml</code>
-                  </li>
-                  <li style={{ marginBottom: '0.5rem' }}>
-                    Copy <code>gallery.yaml.example</code> to <code>gallery.yaml</code>
-                  </li>
-                  <li style={{ marginBottom: '0.5rem' }}>
-                    Copy <code>about.md.example</code> to <code>about.md</code> (optional)
-                  </li>
-                </ol>
-                <p style={{ marginTop: '1.5rem', marginBottom: 0 }}>
-                  Open <code>gallery.yaml</code> and add the album IDs you want to display, then{' '}
-                  <strong>restart your server</strong>.
-                </p>
-              </div>
-            </div>
-          </div>
+          <SetupScreen />
         </body>
       </html>
     );
@@ -142,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html
-      lang="de"
+      lang={config.lang || 'en'}
       suppressHydrationWarning
       style={themeVars as React.CSSProperties}
       data-preset={theme.preset}

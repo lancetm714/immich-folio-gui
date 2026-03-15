@@ -16,6 +16,19 @@ export interface SubpageConfig {
   grid?: Partial<GridConfig>;
 }
 
+export interface SubpageObjectValue {
+  title?: string;
+  subtitle?: string;
+  password?: string;
+  grid?: Partial<GridConfig>;
+  albums?: Array<string | Record<string, string>>;
+  sections?: Array<{
+    title: string;
+    description?: string;
+    albums: Array<string | Record<string, string>>;
+  }>;
+}
+
 export interface FooterConfig {
   name?: string;
   instagram?: string;
@@ -62,6 +75,7 @@ export interface AppConfig {
   subpages: SubpageConfig[];
   siteTitle: string;
   siteSubtitle: string;
+  lang: string;
   seo: {
     title: string;
     description: string;
@@ -110,6 +124,7 @@ export interface GalleryYaml {
 export interface SettingsYaml {
   title?: string;
   subtitle?: string;
+  lang?: string;
   seo?: {
     title?: string;
     description?: string;

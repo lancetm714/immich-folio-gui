@@ -21,6 +21,10 @@ function getKey(): Buffer {
 
 /**
  * Encode an asset ID into an opaque URL-safe token.
+ * Note: The AES-CBC deterministic IV causes the identical input asset ID
+ * to encrypt to the exact same cipher token. This provides URL obfuscation
+ * and caching consistency, but it does NOT provide k-anonymous cryptographic
+ * security guarantees against recognizing identical items if intercepted.
  */
 export function encodeAssetId(assetId: string): string {
   const key = getKey();

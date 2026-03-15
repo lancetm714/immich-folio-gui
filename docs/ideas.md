@@ -1,6 +1,6 @@
 # Portfolio Backlog & Ideas
 
-Eine konsolidierte Liste an Features und Ideen für zukünftige Versionen, bereinigt um alles, was bereits implementiert wurde.
+A consolidated list of features and ideas for future versions, cleaned up from everything that has already been implemented.
 
 ## 🏆 Quick Wins (High Impact / Low Effort)
 
