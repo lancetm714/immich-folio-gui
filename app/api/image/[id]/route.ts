@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { immich, ImageSize } from '@/lib/immich';
 import { decodeAssetId } from '@/lib/tokens';
 import { getConfig } from '@/lib/config';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const VALID_SIZES: ImageSize[] = ['thumbnail', 'preview', 'original'];
 
@@ -26,13 +26,7 @@ function widthToSize(w: number): ImageSize {
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // ── Rate limiting ──────────────────────────────────
-  // Security: Prioritize x-real-ip (set by trusted reverse proxies like nginx/Traefik)
-  // over x-forwarded-for which can be spoofed by clients.
-  // Note: request.ip was removed in Next.js 15+.
-  const ip =
-    request.headers.get('x-real-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    'unknown';
+  const ip = getClientIp(request);
   const { success, remaining, resetAt } = checkRateLimit(ip, getConfig().rateLimitRpm);
 
   if (!success) {

@@ -9,6 +9,16 @@
  * multiple nodes, a persistent store like Redis would be required.
  */
 
+import { NextRequest } from 'next/server';
+
+export function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    'unknown'
+  );
+}
+
 interface RateLimitEntry {
   count: number;
   expiresAt: number;
@@ -33,15 +43,6 @@ function cleanup() {
 }
 
 /**
- * Evict oldest entry when store is at capacity (FIFO).
- */
-function evictIfFull() {
-  if (store.size < MAX_STORE_ENTRIES) return;
-  const firstKey = store.keys().next().value;
-  if (firstKey) store.delete(firstKey);
-}
-
-/**
  * Check if a request should be allowed.
  * @param ip - Client IP address
  * @param maxRpm - Maximum requests per minute
@@ -61,7 +62,10 @@ export function checkRateLimit(
 
   // New window or expired
   if (!entry || now > entry.expiresAt) {
-    evictIfFull();
+    if (store.size >= MAX_STORE_ENTRIES) {
+      // Store is completely full with active IPs -> block to prevent memory exhaustion & rate limit bypass
+      return { success: false, remaining: 0, resetAt: now + windowMs };
+    }
     const resetAt = now + windowMs;
     store.set(key, { count: 1, expiresAt: resetAt });
     return { success: true, remaining: maxRpm - 1, resetAt };

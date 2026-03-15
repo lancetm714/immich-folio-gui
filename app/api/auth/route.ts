@@ -5,20 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, isProtected } from '@/lib/auth';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 /** Tight limit for auth attempts — 10 per minute per IP. */
 const AUTH_RPM = 10;
 
 export async function POST(request: NextRequest) {
   // ── Rate limiting (brute-force protection) ──────────
-  // Security: Prioritize x-real-ip (set by trusted reverse proxies like nginx/Traefik)
-  // over x-forwarded-for which can be spoofed by clients.
-  // Note: request.ip was removed in Next.js 15+.
-  const ip =
-    request.headers.get('x-real-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    'unknown';
+  const ip = getClientIp(request);
   const { success } = checkRateLimit(`auth:${ip}`, AUTH_RPM);
 
   if (!success) {

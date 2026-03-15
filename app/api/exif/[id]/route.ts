@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { immich } from '@/lib/immich';
 import { decodeAssetId } from '@/lib/tokens';
 import { getConfig } from '@/lib/config';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const config = getConfig();
@@ -20,12 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   // ── Rate limiting ──────────────────────────────────
-  // Security: Prioritize x-real-ip (set by trusted reverse proxies like nginx/Traefik)
-  // over x-forwarded-for which can be spoofed by clients.
-  const ip =
-    request.headers.get('x-real-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    'unknown';
+  const ip = getClientIp(request);
   const { success, resetAt } = checkRateLimit(`exif:${ip}`, config.rateLimitRpm);
 
   if (!success) {
