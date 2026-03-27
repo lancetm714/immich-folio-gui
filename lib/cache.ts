@@ -21,12 +21,19 @@ class MemoryCache {
       return null;
     }
 
+    // LRU: Move accessed item to the back of the Map (newest)
+    this.store.delete(key);
+    this.store.set(key, entry);
+
     return entry.data as T;
   }
 
   set<T>(key: string, data: T, ttlMs: number): void {
-    // Evict oldest entries if at capacity
-    if (this.store.size >= this.maxEntries) {
+    // If key exists, delete it first to ensure we push it to the back
+    if (this.store.has(key)) {
+      this.store.delete(key);
+    } else if (this.store.size >= this.maxEntries) {
+      // Evict oldest entry (first item) if at capacity
       const firstKey = this.store.keys().next().value;
       if (firstKey) this.store.delete(firstKey);
     }

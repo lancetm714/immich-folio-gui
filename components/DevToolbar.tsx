@@ -35,12 +35,12 @@ const PRESET_FONTS: Record<string, { heading: string; body: string; caption: str
 };
 
 const PRESET_ACCENTS: Record<string, string> = {
-  studio: '#e60012',
-  minimal: '#000000',
-  editorial: '#8B2500',
-  classic: '#c49a3c',
-  noir: '#ff6b35',
-  monograph: '#333333',
+  studio: 'var(--accent-studio, #e60012)',
+  minimal: 'var(--accent-minimal, #000000)',
+  editorial: 'var(--accent-editorial, #8B2500)',
+  classic: 'var(--accent-classic, #c49a3c)',
+  noir: 'var(--accent-noir, #ff6b35)',
+  monograph: 'var(--accent-monograph, #333333)',
 };
 
 function getAttr(attr: string): string {
@@ -91,9 +91,12 @@ export function DevToolbar() {
     setAttr('data-preset', p);
     setPreset(p);
     // Update accent + fonts
-    const accent = PRESET_ACCENTS[p] || '#e60012';
+    const accent = PRESET_ACCENTS[p] || 'var(--accent-studio, #e60012)';
     setVar('--accent', accent);
-    setVar('--accent-dim', `${accent}1f`);
+    // Note: since accent might be a CSS var, appending hex opacity won't work in all browsers if it's a var, 
+    // but we provide it for backward compatibility where possible. Or use color-mix if supported.
+    // For now we set it to same var or use a generic dim if needed.
+    setVar('--accent-dim', `color-mix(in srgb, ${accent} 12%, transparent)`);
     const fonts = PRESET_FONTS[p];
     if (fonts) {
       setVar('--font-serif', `'${fonts.heading}', Georgia, 'Times New Roman', serif`);

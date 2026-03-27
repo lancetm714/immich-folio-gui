@@ -33,11 +33,11 @@ export default function PasswordGate({ slug, title }: PasswordGateProps) {
       if (res.ok) {
         window.location.reload();
       } else {
-        setError('Wrong password');
+        setError('Incorrect password. Please try again.');
         setPassword('');
       }
     } catch {
-      setError('Something went wrong');
+      setError('Unable to verify password. Please try again later.');
     } finally {
       setLoading(false);
     }

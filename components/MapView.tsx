@@ -151,7 +151,7 @@ export function MapView() {
 
   if (error) {
     return (
-      <div className="map-container__loading">
+      <div className="map-container__loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
         <p>{error}</p>
       </div>
     );
@@ -162,9 +162,39 @@ export function MapView() {
       {loading && (
         <div
           className="map-container__loading"
-          style={{ position: 'absolute', inset: 0, zIndex: 1000 }}
+          style={{ 
+            position: 'absolute', 
+            inset: 0, 
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.5)',
+            color: '#fff'
+          }}
         >
+          <svg 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            style={{ animation: 'spin 1s linear infinite', marginBottom: '8px' }}
+          >
+            <circle cx="12" cy="12" r="10" strokeOpacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
           <p>Loading map…</p>
+          <style>{`
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
         </div>
       )}
       <div ref={containerRef} className="map-container" />

@@ -61,6 +61,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
   }
 
+  // ── Browser Cache Optimization ─────────────────────
+  // Use the opaque token to generate a safe ETag without leaking Immich UUIDs
+  const etag = `W/"${token}-${size}"`;
+  if (request.headers.get('if-none-match') === etag) {
+    return new NextResponse(null, {
+      status: 304,
+      headers: {
+        'ETag': etag,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'X-RateLimit-Remaining': String(remaining),
+      },
+    });
+  }
+
   const result = await immich.streamAsset(assetId, size);
   if (!result) {
     console.error(`[Image API] ❌ Asset not found in Immich: ${assetId} (Size: ${size})`);
@@ -73,6 +87,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       : result.contentType,
     // Images are immutable once uploaded to Immich — cache aggressively
     'Cache-Control': 'public, max-age=31536000, immutable',
+    'ETag': etag,
     'X-RateLimit-Remaining': String(remaining),
   };
 
