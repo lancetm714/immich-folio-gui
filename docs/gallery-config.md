@@ -60,9 +60,12 @@ subpages:
       - 44444444-4444-4444-4444-444444444444 # Kyoto
 
   - name: Wedding – Smith # → /wedding-smith
-    password: clientpass123 # Optional: password-protected
+    password: clientpass123 # Optional: subpage-level protection
     albums:
       - 55555555-5555-5555-5555-555555555555
+      - 66666666-6666-6666-6666-666666666666:
+          title: "Private Highlights"
+          password: "album-secret-123" # Optional: album-level protection
 ```
 
 Alternatively, you can use the object notation (recommended):
@@ -88,12 +91,15 @@ Each section can have:
 | `description` | string | ➖       | Optional subline under the heading          |
 | `albums`      | list   | ✅       | Album UUIDs (same format as regular albums) |
 
-Within the `albums` list you can use a plain UUID or override the display title:
+Within the `albums` list you can use a plain UUID, a simple title override, or an object with `title` and `password`:
 
 ```yaml
 albums:
   - 'album-uuid' # → uses the Immich album name
   - 'album-uuid': My Title # → displays "My Title" instead
+  - 'album-uuid':
+      title: My Private Title
+      password: "secure-password" # → adds a password gate to this specific album
 ```
 
 **Full example:**

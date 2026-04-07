@@ -21,11 +21,11 @@ export interface SubpageObjectValue {
   subtitle?: string;
   password?: string;
   grid?: Partial<GridConfig>;
-  albums?: Array<string | Record<string, string>>;
+  albums?: Array<string | Record<string, string | { title: string; password?: string }>>;
   sections?: Array<{
     title: string;
     description?: string;
-    albums: Array<string | Record<string, string>>;
+    albums: Array<string | Record<string, string | { title: string; password?: string }>>;
   }>;
 }
 
@@ -91,6 +91,7 @@ export interface AppConfig {
   map: boolean;
   transitions: boolean;
   albumOverrides: Record<string, string>;
+  albumPasswords: Record<string, string>;
   cacheTtl: number;
   rateLimitRpm: number;
   needsSetup?: boolean;
@@ -105,11 +106,11 @@ export interface GalleryYaml {
         name: string;
         title?: string;
         subtitle?: string;
-        albums?: Array<string | Record<string, string>>;
+        albums?: Array<string | Record<string, string | { title: string; password?: string }>>;
         sections?: Array<{
           title: string;
           description?: string;
-          albums: Array<string | Record<string, string>>;
+          albums: Array<string | Record<string, string | { title: string; password?: string }>>;
         }>;
         password?: string;
         grid?: {

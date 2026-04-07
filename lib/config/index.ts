@@ -90,6 +90,7 @@ export function getConfig(): AppConfig {
       map: false,
       transitions: false,
       albumOverrides: {},
+      albumPasswords: {},
       cacheTtl: env.CACHE_TTL * 1000,
       rateLimitRpm: env.RATE_LIMIT_RPM,
       needsSetup: true,
@@ -100,14 +101,24 @@ export function getConfig(): AppConfig {
   const theme = resolveTheme(settings.theme);
 
   const albumOverrides: Record<string, string> = {};
+  const albumPasswords: Record<string, string> = {};
 
-  function processAlbumEntry(entry: string | Record<string, string>, context: string): string {
+  function processAlbumEntry(
+    entry: string | Record<string, string | { title: string; password?: string }>,
+    context: string,
+  ): string {
     if (typeof entry === 'string') {
       return validateUuid(entry, context);
     }
-    const [uuid, name] = Object.entries(entry)[0];
+    const [uuid, value] = Object.entries(entry)[0];
     const validatedUuid = validateUuid(uuid, context);
-    albumOverrides[validatedUuid] = name;
+
+    if (typeof value === 'string') {
+      albumOverrides[validatedUuid] = value;
+    } else {
+      if (value.title) albumOverrides[validatedUuid] = value.title;
+      if (value.password) albumPasswords[validatedUuid] = value.password;
+    }
     return validatedUuid;
   }
 
@@ -254,6 +265,7 @@ export function getConfig(): AppConfig {
     map: settings.map === true,
     transitions: settings.transitions !== false,
     albumOverrides,
+    albumPasswords,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
     needsSetup: false,

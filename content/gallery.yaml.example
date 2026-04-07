@@ -23,7 +23,9 @@ subpages:
     password: "your-password" # Optional protection
     albums:
       - "album-uuid-5"
-      - "album-uuid-6"
+      - "album-uuid-6":
+          title: "Private Project #7"
+          password: "scrypt:..." # Recommended: secure hash (generated via logs)
 
 # ── Subpage with Sections ──────────────────────────────────────────
 # Use sections to group albums by location, theme, or any other logic.

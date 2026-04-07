@@ -11,9 +11,10 @@ import styles from './PasswordGate.module.css';
 interface PasswordGateProps {
   slug: string;
   title: string;
+  type?: 'subpage' | 'album';
 }
 
-export default function PasswordGate({ slug, title }: PasswordGateProps) {
+export default function PasswordGate({ slug, title, type = 'subpage' }: PasswordGateProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,7 @@ export default function PasswordGate({ slug, title }: PasswordGateProps) {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, password }),
+        body: JSON.stringify({ slug, password, type }),
       });
 
       if (res.ok) {

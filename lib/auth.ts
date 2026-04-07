@@ -48,13 +48,13 @@ function hmac(data: string): string {
   return crypto.createHmac('sha256', getConfig().authSecret).update(data).digest('hex');
 }
 
-function authToken(slug: string, passwordSecret: string): string {
+function authToken(key: string, passwordSecret: string): string {
   // Use the hash/password as part of the HMAC for a secure, unique session token
-  return hmac(`${slug}:${passwordSecret}`);
+  return hmac(`${key}:${passwordSecret}`);
 }
 
-function cookieName(slug: string): string {
-  return `lb_auth_${slug}`;
+function cookieName(key: string, type: 'subpage' | 'album'): string {
+  return type === 'subpage' ? `lb_auth_${key}` : `lb_auth_album_${key}`;
 }
 
 /**
@@ -65,26 +65,40 @@ export function findSubpageBySlug(slug: string): SubpageConfig | undefined {
 }
 
 /**
- * Check if a slug corresponds to a password-protected subpage.
+ * Find the password secret for a given subpage slug or album ID.
  */
-export function isProtected(slug: string): boolean {
-  const sp = findSubpageBySlug(slug);
-  return !!sp?.password;
+function findPassword(key: string, type: 'subpage' | 'album'): string | undefined {
+  const config = getConfig();
+  if (type === 'subpage') {
+    return config.subpages.find((sp) => sp.slug === key)?.password;
+  }
+  return config.albumPasswords[key];
+}
+
+/**
+ * Check if a subpage slug or album ID is password-protected.
+ */
+export function isProtected(key: string, type: 'subpage' | 'album' = 'subpage'): boolean {
+  return !!findPassword(key, type);
 }
 
 /**
  * Validate a password attempt and return a Set-Cookie header value on success.
  * Returns null if the password is wrong.
  */
-export function authenticate(slug: string, password: string): string | null {
-  const sp = findSubpageBySlug(slug);
-  if (!sp?.password) return null;
+export function authenticate(
+  key: string,
+  password: string,
+  type: 'subpage' | 'album' = 'subpage',
+): string | null {
+  const storedPassword = findPassword(key, type);
+  if (!storedPassword) return null;
 
   let isValid = false;
 
-  if (isBcryptHash(sp.password)) {
+  if (isBcryptHash(storedPassword)) {
     console.error(
-      `\n❌ SECURITY ERROR: Subpage "${slug}" is using an outdated bcrypt password hash.\n` +
+      `\n❌ SECURITY ERROR: ${type === 'subpage' ? 'Subpage' : 'Album'} "${key}" is using an outdated bcrypt password hash.\n` +
         `   Bcrypt dependency has been removed to reduce bundle size.\n` +
         `   Please switch temporarily to plaintext in your gallery.yaml, log in again\n` +
         `   to see your new secure "scrypt:..." hash in the logs, and update your file.\n`,
@@ -92,19 +106,19 @@ export function authenticate(slug: string, password: string): string | null {
     return null;
   }
 
-  if (sp.password.startsWith('scrypt:')) {
-    isValid = verifyScrypt(password, sp.password);
+  if (storedPassword.startsWith('scrypt:')) {
+    isValid = verifyScrypt(password, storedPassword);
   } else {
     // Plaintext fallback (deprecated)
     // Hash both to a fixed length before constant-time comparison to prevent timing and length attacks
     const attemptHash = crypto.createHash('sha256').update(password).digest();
-    const storedHash = crypto.createHash('sha256').update(sp.password).digest();
+    const storedHash = crypto.createHash('sha256').update(storedPassword).digest();
     isValid = crypto.timingSafeEqual(attemptHash, storedHash);
 
     if (isValid) {
-      const recommendedHash = generateScryptHash(sp.password);
+      const recommendedHash = generateScryptHash(storedHash.toString('hex'));
       console.warn(
-        `\n⚠️  SECURITY WARNING: Subpage "${slug}" is using a plaintext password in gallery.yaml.\n` +
+        `\n⚠️  SECURITY WARNING: ${type === 'subpage' ? 'Subpage' : 'Album'} "${key}" is using a plaintext password in gallery.yaml.\n` +
           `   Please replace it with this native secure hash:\n\n   ${recommendedHash}\n`,
       );
     }
@@ -112,28 +126,29 @@ export function authenticate(slug: string, password: string): string | null {
 
   if (!isValid) return null;
 
-  const token = authToken(slug, sp.password);
+  const token = authToken(key, storedPassword);
   const maxAge = TOKEN_EXPIRY_HOURS * 60 * 60;
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 
-  return `${cookieName(slug)}=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict${secure}`;
+  return `${cookieName(key, type)}=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict${secure}`;
 }
 
 /**
- * Check if the request has a valid auth cookie for the given slug.
+ * Check if the request has a valid auth cookie for the given subpage or album.
  * Works with the cookies() API from Next.js server components.
  */
 export function isAuthenticated(
-  slug: string,
+  key: string,
   getCookie: (name: string) => string | undefined,
+  type: 'subpage' | 'album' = 'subpage',
 ): boolean {
-  const sp = findSubpageBySlug(slug);
-  if (!sp?.password) return true; // not protected
+  const storedPassword = findPassword(key, type);
+  if (!storedPassword) return true; // not protected
 
-  const cookie = getCookie(cookieName(slug));
+  const cookie = getCookie(cookieName(key, type));
   if (!cookie) return false;
 
-  const expected = authToken(slug, sp.password);
+  const expected = authToken(key, storedPassword);
   // Constant-time comparison to prevent timing attacks
   try {
     return crypto.timingSafeEqual(Buffer.from(cookie, 'hex'), Buffer.from(expected, 'hex'));

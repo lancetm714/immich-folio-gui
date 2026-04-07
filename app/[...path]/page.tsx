@@ -107,18 +107,26 @@ function toPhotoItems(assets: ImmichAsset[], showExif: boolean): PhotoItem[] {
 }
 
 /**
- * Returns a PasswordGate element if the slug is protected and not yet
- * authenticated, otherwise returns null. Centralises the duplicated
- * cookie-check boilerplate.
+ * Returns a PasswordGate element if the key (slug or ID) is protected and
+ * not yet authenticated, otherwise returns null.
  */
-async function gateIfProtected(slug: string): Promise<React.ReactElement | null> {
-  if (!isProtected(slug)) return null;
+async function gateIfProtected(
+  key: string,
+  type: 'subpage' | 'album' = 'subpage',
+  titleOverride?: string,
+): Promise<React.ReactElement | null> {
+  if (!isProtected(key, type)) return null;
   const cookieStore = await cookies();
   const getCookie = (name: string) => cookieStore.get(name)?.value;
-  if (isAuthenticated(slug, getCookie)) return null;
-  const subpageData = await immich.getSubpageAlbums(slug);
-  const title = subpageData?.subpage.name ?? slug;
-  return <PasswordGate slug={slug} title={title} />;
+  if (isAuthenticated(key, getCookie, type)) return null;
+
+  let title = titleOverride || key;
+  if (!titleOverride && type === 'subpage') {
+    const subpageData = await immich.getSubpageAlbums(key);
+    title = subpageData?.subpage.name ?? key;
+  }
+
+  return <PasswordGate slug={key} title={title} type={type} />;
 }
 
 export default async function PathPage({ params }: PathPageProps) {
@@ -162,6 +170,10 @@ export default async function PathPage({ params }: PathPageProps) {
 
     const images = toPhotoItems(album.assets, config.exifOnHover);
 
+    // Password gate for protected albums
+    const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
+    if (albumGate) return albumGate;
+
     return (
       <AlbumDetailView
         album={album}
@@ -196,6 +208,10 @@ export default async function PathPage({ params }: PathPageProps) {
       if (!album) notFound();
 
       const images = toPhotoItems(album.assets, config.exifOnHover);
+
+      // Password gate for protected albums
+      const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
+      if (albumGate) return albumGate;
 
       return (
         <AlbumDetailView
@@ -240,6 +256,10 @@ export default async function PathPage({ params }: PathPageProps) {
   }
 
   const images = toPhotoItems(album.assets, config.exifOnHover);
+
+  // Password gate for protected albums
+  const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
+  if (albumGate) return albumGate;
 
   return (
     <AlbumDetailView
