@@ -10,15 +10,32 @@
  */
 
 import { NextRequest } from 'next/server';
+import { getConfig } from './config';
 
 export function getClientIp(request: NextRequest): string {
-  // @ts-expect-error - Next.js 15 removed request.ip but hosting platforms like Vercel still populate it
-  const ip = request.ip as string | undefined;
+  const config = getConfig();
+  const directIp = request.ip; // Populated by Next.js if on Vercel/Netlify
 
+  const xForwardedFor = request.headers.get('x-forwarded-for');
+  const xRealIp = request.headers.get('x-real-ip');
+
+  // If trusted proxies are configured, only trust headers if the request
+  // comes from one of those proxies.
+  if (config.trustedProxies.length > 0) {
+    if (directIp && config.trustedProxies.includes(directIp)) {
+      return xRealIp ?? xForwardedFor?.split(',')[0].trim() ?? directIp;
+    }
+    // If we have trusted proxies but the direct IP is unknown or untrusted,
+    // we return the direct IP (if any) and ignore potentially spoofed headers.
+    return directIp ?? 'unknown';
+  }
+
+  // Fallback for self-hosted environments without explicit trusted proxies:
+  // We have to trust headers as a best-effort, but this is vulnerable to spoofing.
   return (
-    ip ??
-    request.headers.get('x-real-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    directIp ??
+    xRealIp ??
+    xForwardedFor?.split(',')[0].trim() ??
     'unknown'
   );
 }

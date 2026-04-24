@@ -11,6 +11,7 @@ export interface Env {
   CACHE_TTL: number;
   RATE_LIMIT_RPM: number;
   AUTH_SECRET?: string;
+  TRUSTED_PROXIES: string[];
 }
 
 function parseEnv(): Env {
@@ -44,6 +45,10 @@ function parseEnv(): Env {
     CACHE_TTL: Math.max(0, cacheTtl),
     RATE_LIMIT_RPM: Math.max(1, rateLimit),
     AUTH_SECRET: process.env.AUTH_SECRET,
+    TRUSTED_PROXIES: (process.env.TRUSTED_PROXIES || '')
+      .split(',')
+      .map((ip) => ip.trim())
+      .filter((ip) => ip !== ''),
   };
 }
 

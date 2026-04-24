@@ -94,6 +94,7 @@ export interface AppConfig {
   albumPasswords: Record<string, string>;
   cacheTtl: number;
   rateLimitRpm: number;
+  trustedProxies: string[];
   needsSetup?: boolean;
 }
 
