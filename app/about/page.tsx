@@ -3,7 +3,7 @@
  * Reads content from content/about.md (frontmatter + markdown body).
  */
 
-import { readFileSync } from 'fs';
+import { promises as fsPromises } from 'fs';
 import { join } from 'path';
 import yaml from 'js-yaml';
 import Image from 'next/image';
@@ -20,12 +20,15 @@ interface AboutFrontmatter {
   gear?: string[];
 }
 
-function getAboutContent() {
+async function getAboutContent() {
   const filePath = join(process.cwd(), 'content', 'about.md');
-  if (!require('fs').existsSync(filePath)) {
+  let raw: string;
+
+  try {
+    raw = await fsPromises.readFile(filePath, 'utf-8');
+  } catch {
     return { meta: {} as AboutFrontmatter, body: '' };
   }
-  const raw = readFileSync(filePath, 'utf-8');
 
   let meta = {} as AboutFrontmatter;
   let body = raw;
@@ -44,7 +47,7 @@ function getAboutContent() {
 }
 
 export default async function AboutPage() {
-  const { meta, body } = getAboutContent();
+  const { meta, body } = await getAboutContent();
 
   // Fetch ThumbHash for portrait placeholder
   const portraitAsset = meta.portrait ? await immich.getAssetInfo(meta.portrait) : null;
