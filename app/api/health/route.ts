@@ -5,8 +5,10 @@
  * GET /api/health → { status, immich, uptime }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { immich } from '@/lib/immich';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { getConfig } from '@/lib/config';
 
 const startTime = Date.now();
 
@@ -17,7 +19,25 @@ let cachedImmichOkPromise: Promise<boolean> | null = null;
 let lastCheckTime = 0;
 const CACHE_DURATION_MS = 10_000;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const ip = getClientIp(request);
+  const { rateLimitRpm } = getConfig();
+
+  const { success, remaining, resetAt } = checkRateLimit(`health:${ip}`, rateLimitRpm);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)),
+          'X-RateLimit-Limit': String(rateLimitRpm),
+          'X-RateLimit-Remaining': String(remaining),
+        },
+      },
+    );
+  }
+
   const now = Date.now();
   if (!cachedImmichOkPromise || now - lastCheckTime > CACHE_DURATION_MS) {
     cachedImmichOkPromise = immich.ping();
