@@ -14,7 +14,8 @@ import { getConfig } from './config';
 
 export function getClientIp(request: NextRequest): string {
   const config = getConfig();
-  const directIp = request.ip; // Populated by Next.js if on Vercel/Netlify
+  // @ts-expect-error - Next.js 15+ removed request.ip from types but hosting platforms still populate it
+  const directIp = request.ip as string | undefined;
 
   const xForwardedFor = request.headers.get('x-forwarded-for');
   const xRealIp = request.headers.get('x-real-ip');
