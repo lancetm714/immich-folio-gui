@@ -111,12 +111,18 @@ export function authenticate(
   } else {
     // Plaintext fallback (deprecated)
     // Hash both to a fixed length before constant-time comparison to prevent timing and length attacks
-    const attemptHash = crypto.createHash('sha256').update(password).digest();
-    const storedHash = crypto.createHash('sha256').update(storedPassword).digest();
+    const attemptHash = crypto
+      .createHmac('sha256', getConfig().authSecret)
+      .update(password)
+      .digest();
+    const storedHash = crypto
+      .createHmac('sha256', getConfig().authSecret)
+      .update(storedPassword)
+      .digest();
     isValid = crypto.timingSafeEqual(attemptHash, storedHash);
 
     if (isValid) {
-      const recommendedHash = generateScryptHash(storedHash.toString('hex'));
+      const recommendedHash = generateScryptHash(storedPassword);
       console.warn(
         `\n⚠️  SECURITY WARNING: ${type === 'subpage' ? 'Subpage' : 'Album'} "${key}" is using a plaintext password in gallery.yaml.\n` +
           `   Please replace it with this native secure hash:\n\n   ${recommendedHash}\n`,
