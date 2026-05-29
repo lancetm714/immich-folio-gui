@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { isAdminAuthenticated, isAdminEnabled } from '@/lib/admin/auth';
 import { readGalleryYaml, writeGalleryYaml } from '@/lib/admin/yaml-service';
 import { invalidateConfigCache } from '@/lib/config';
@@ -42,6 +43,8 @@ export async function PUT(request: Request) {
     await writeGalleryYaml(gallery);
     invalidateConfigCache();
     immich.invalidateAll();
+    // Revalidate all pages so the homepage picks up new hero images immediately
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write gallery.yaml:', err);

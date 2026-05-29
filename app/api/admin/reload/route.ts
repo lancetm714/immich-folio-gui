@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { isAdminAuthenticated, isAdminEnabled } from '@/lib/admin/auth';
 import { invalidateConfigCache } from '@/lib/config';
 import { immich } from '@/lib/immich';
@@ -14,6 +15,7 @@ export async function POST() {
 
   invalidateConfigCache();
   immich.invalidateAll();
+  revalidatePath('/', 'layout');
 
   return NextResponse.json({ success: true, message: 'Config and cache reloaded' });
 }

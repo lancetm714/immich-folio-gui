@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { isAdminAuthenticated, isAdminEnabled } from '@/lib/admin/auth';
 import { readSettingsYaml, writeSettingsYaml } from '@/lib/admin/yaml-service';
 import { invalidateConfigCache } from '@/lib/config';
@@ -38,6 +39,7 @@ export async function PUT(request: Request) {
     await writeSettingsYaml(settings);
     invalidateConfigCache();
     immich.invalidateAll();
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write settings.yaml:', err);
