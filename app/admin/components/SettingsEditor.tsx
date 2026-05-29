@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Settings {
   title?: string;
@@ -66,6 +66,37 @@ export default function SettingsEditor() {
   useEffect(() => {
     loadSettings();
   }, []);
+
+  // ── Keyboard shortcut: ⌘+S / Ctrl+S ─────────────────────────
+  const handleSaveRef = useCallback(() => {
+    if (dirty && !saving) {
+      handleSave();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, saving, settings]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        handleSaveRef();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSaveRef]);
+
+  // ── Unsaved changes guard ────────────────────────────────────
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (dirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [dirty]);
 
   async function loadSettings() {
     setLoading(true);

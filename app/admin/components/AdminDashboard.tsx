@@ -49,6 +49,15 @@ export default function AdminDashboard({ onLogout }: Props) {
           </nav>
         </div>
         <div className="admin-header-right">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="admin-btn admin-btn-ghost"
+            title="Open site in new tab"
+          >
+            ↗ Site
+          </a>
           <button
             className="admin-btn admin-btn-ghost"
             onClick={handleReload}

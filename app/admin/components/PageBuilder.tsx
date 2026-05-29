@@ -1,7 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import AlbumPicker from './AlbumPicker';
+import AssetPicker from './AssetPicker';
 
 // ── Types ──────────────────────────────────────────────────────
 interface AlbumEntry {
@@ -79,6 +98,145 @@ function serializeAlbumEntries(
   });
 }
 
+// ── Sortable Hero Tile ─────────────────────────────────────────
+
+function SortableHeroTile({
+  id,
+  index,
+  onRemove,
+}: {
+  id: string;
+  index: number;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `hero-${index}`,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="hero-tile" {...attributes}>
+      <div className="hero-tile-drag" {...listeners} title="Drag to reorder">
+        ⠿
+      </div>
+      <img src={`/api/admin/thumbnail/${id}`} alt="" loading="lazy" />
+      <button className="hero-tile-remove" onClick={onRemove} title="Remove">
+        ×
+      </button>
+      <span className="hero-tile-index">{index + 1}</span>
+    </div>
+  );
+}
+
+// ── Sortable Album Card ────────────────────────────────────────
+
+function SortableAlbumCard({
+  album,
+  index,
+  name,
+  count,
+  thumbnailId,
+  onRemove,
+  onUpdate,
+}: {
+  album: AlbumEntry;
+  index: number;
+  name: string;
+  count: number;
+  thumbnailId: string | null;
+  onRemove: () => void;
+  onUpdate: (updates: Partial<AlbumEntry>) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `album-${album.id}-${index}`,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <AlbumCard
+        album={album}
+        name={name}
+        count={count}
+        thumbnailId={thumbnailId}
+        onRemove={onRemove}
+        onUpdate={onUpdate}
+        dragListeners={listeners}
+      />
+    </div>
+  );
+}
+
+// ── Sortable Subpage Tile ──────────────────────────────────────
+
+function SortableSubpageTile({
+  sp,
+  spIndex,
+  isActive,
+  onClick,
+  getFirstThumb,
+}: {
+  sp: Subpage;
+  spIndex: number;
+  isActive: boolean;
+  onClick: () => void;
+  getFirstThumb: (sp: Subpage) => string | null;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `subpage-${spIndex}`,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  const totalAlbums =
+    sp.albums.length + (sp.sections?.reduce((sum, sec) => sum + sec.albums.length, 0) || 0);
+  const firstThumb = getFirstThumb(sp);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`subpage-tile ${isActive ? 'active' : ''}`}
+      onClick={onClick}
+      {...attributes}
+    >
+      <div className="subpage-tile-drag" {...listeners} title="Drag to reorder">
+        ⠿
+      </div>
+      <div className="subpage-tile-cover">
+        {firstThumb ? (
+          <img src={`/api/admin/thumbnail/${firstThumb}`} alt="" loading="lazy" />
+        ) : (
+          <div className="subpage-tile-placeholder">📂</div>
+        )}
+      </div>
+      <div className="subpage-tile-info">
+        <span className="subpage-tile-name">{sp.title || sp.name}</span>
+        <span className="subpage-tile-meta">
+          {totalAlbums} album{totalAlbums !== 1 ? 's' : ''}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────
 
 export default function PageBuilder() {
@@ -94,12 +252,46 @@ export default function PageBuilder() {
     subpageIndex?: number;
     sectionIndex?: number;
   } | null>(null);
+  const [showHeroPicker, setShowHeroPicker] = useState(false);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   // Load data
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Keyboard shortcut: ⌘+S / Ctrl+S ─────────────────────────
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        if (dirty && !saving) {
+          handleSave();
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, saving, gallery]);
+
+  // ── Unsaved changes guard ────────────────────────────────────
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (dirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [dirty]);
 
   async function loadData() {
     setLoading(true);
@@ -181,7 +373,6 @@ export default function PageBuilder() {
     setSaving(true);
     setSaveMessage('');
 
-    // Serialize back to YAML-compatible format
     const yamlData: Record<string, unknown> = {};
 
     if (gallery.hero.length > 0) {
@@ -207,7 +398,6 @@ export default function PageBuilder() {
             if (sec.description) s.description = sec.description;
             return s;
           });
-          // Also include top-level albums if they exist alongside sections
           if (sp.albums.length > 0) {
             entry.albums = serializeAlbumEntries(sp.albums);
           }
@@ -240,6 +430,13 @@ export default function PageBuilder() {
     } finally {
       setSaving(false);
     }
+  }
+
+  // ── Hero Picker ──────────────────────────────────────────────
+  function handleHeroSelect(assetId: string) {
+    setGallery((g) => ({ ...g, hero: [...g.hero, assetId] }));
+    setShowHeroPicker(false);
+    markDirty();
   }
 
   // ── Album Picker Handlers ────────────────────────────────────
@@ -278,6 +475,75 @@ export default function PageBuilder() {
 
     setPickerTarget(null);
     markDirty();
+  }
+
+  // ── Drag & Drop Handlers ─────────────────────────────────────
+  function handleHeroDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = gallery.hero.findIndex((_, i) => `hero-${i}` === active.id);
+    const newIndex = gallery.hero.findIndex((_, i) => `hero-${i}` === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setGallery((g) => ({ ...g, hero: arrayMove(g.hero, oldIndex, newIndex) }));
+      markDirty();
+    }
+  }
+
+  function handleAlbumDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = gallery.albums.findIndex((a, i) => `album-${a.id}-${i}` === active.id);
+    const newIndex = gallery.albums.findIndex((a, i) => `album-${a.id}-${i}` === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setGallery((g) => ({ ...g, albums: arrayMove(g.albums, oldIndex, newIndex) }));
+      markDirty();
+    }
+  }
+
+  function handleSubpageDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = gallery.subpages.findIndex((_, i) => `subpage-${i}` === active.id);
+    const newIndex = gallery.subpages.findIndex((_, i) => `subpage-${i}` === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setGallery((g) => ({ ...g, subpages: arrayMove(g.subpages, oldIndex, newIndex) }));
+      if (expandedSubpage === oldIndex) setExpandedSubpage(newIndex);
+      else if (expandedSubpage !== null) {
+        if (oldIndex < expandedSubpage && newIndex >= expandedSubpage)
+          setExpandedSubpage(expandedSubpage - 1);
+        else if (oldIndex > expandedSubpage && newIndex <= expandedSubpage)
+          setExpandedSubpage(expandedSubpage + 1);
+      }
+      markDirty();
+    }
+  }
+
+  function handleSubpageAlbumDragEnd(spIndex: number) {
+    return (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const sp = gallery.subpages[spIndex];
+      const oldIndex = sp.albums.findIndex((a, i) => `album-${a.id}-${i}` === active.id);
+      const newIndex = sp.albums.findIndex((a, i) => `album-${a.id}-${i}` === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setGallery((g) => {
+          const subpages = [...g.subpages];
+          const sp2 = { ...subpages[spIndex] };
+          sp2.albums = arrayMove(sp2.albums, oldIndex, newIndex);
+          subpages[spIndex] = sp2;
+          return { ...g, subpages };
+        });
+        markDirty();
+      }
+    };
   }
 
   // ── Subpage Management ────────────────────────────────────────
@@ -390,26 +656,6 @@ export default function PageBuilder() {
     markDirty();
   }
 
-  function addHero() {
-    const uuid = prompt('Enter Immich asset UUID for hero image:');
-    if (uuid?.trim()) {
-      setGallery((g) => ({ ...g, hero: [...g.hero, uuid.trim()] }));
-      markDirty();
-    }
-  }
-
-  // ── Move helpers ──────────────────────────────────────────────
-  function moveSubpage(index: number, direction: -1 | 1) {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= gallery.subpages.length) return;
-    setGallery((g) => {
-      const subpages = [...g.subpages];
-      [subpages[index], subpages[newIndex]] = [subpages[newIndex], subpages[index]];
-      return { ...g, subpages };
-    });
-    markDirty();
-  }
-
   // ── Helpers ──────────────────────────────────────────────────
   function getAlbumName(id: string): string {
     const found = immichAlbums.find((a) => a.id === id);
@@ -427,12 +673,10 @@ export default function PageBuilder() {
   }
 
   function getFirstSubpageThumb(sp: Subpage): string | null {
-    // Try albums first
     for (const album of sp.albums) {
       const thumb = getAlbumThumbnailId(album.id);
       if (thumb) return thumb;
     }
-    // Try sections
     if (sp.sections) {
       for (const sec of sp.sections) {
         for (const album of sec.albums) {
@@ -442,6 +686,13 @@ export default function PageBuilder() {
       }
     }
     return null;
+  }
+
+  function slugify(str: string): string {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
   }
 
   // ── Render ───────────────────────────────────────────────────
@@ -466,48 +717,62 @@ export default function PageBuilder() {
               {saveMessage}
             </span>
           )}
+          {!dirty && !saveMessage && <span className="save-hint">⌘S to save</span>}
         </div>
-        <button
-          className="admin-btn admin-btn-primary"
-          onClick={handleSave}
-          disabled={!dirty || saving}
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        <div className="save-bar-right">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="admin-btn admin-btn-ghost admin-btn-preview"
+            title="Open site in new tab"
+          >
+            ↗ Preview Site
+          </a>
+          <button
+            className="admin-btn admin-btn-primary"
+            onClick={handleSave}
+            disabled={!dirty || saving}
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
       {/* Hero Section */}
       <section className="builder-section">
         <div className="builder-section-header">
           <h2>🏠 Homepage Hero</h2>
-          <button className="admin-btn admin-btn-sm" onClick={addHero}>
+          <button className="admin-btn admin-btn-sm" onClick={() => setShowHeroPicker(true)}>
             + Add Hero
           </button>
         </div>
-        <div className="hero-grid">
-          {gallery.hero.length === 0 && (
-            <p className="empty-hint">
-              No hero images configured. Add asset UUIDs to show a hero carousel.
-            </p>
-          )}
-          {gallery.hero.map((id, i) => (
-            <div key={i} className="hero-tile">
-              <img
-                src={`/api/admin/thumbnail/${id}`}
-                alt=""
-                loading="lazy"
-              />
-              <button
-                className="hero-tile-remove"
-                onClick={() => removeHero(i)}
-                title="Remove"
-              >
-                ×
-              </button>
-              <span className="hero-tile-index">{i + 1}</span>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleHeroDragEnd}
+        >
+          <SortableContext
+            items={gallery.hero.map((_, i) => `hero-${i}`)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className="hero-grid">
+              {gallery.hero.length === 0 && (
+                <p className="empty-hint">
+                  No hero images configured. Add photos to show a hero carousel on the homepage.
+                </p>
+              )}
+              {gallery.hero.map((id, i) => (
+                <SortableHeroTile
+                  key={`hero-${i}`}
+                  id={id}
+                  index={i}
+                  onRemove={() => removeHero(i)}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       </section>
 
       {/* Standalone Albums */}
@@ -521,29 +786,43 @@ export default function PageBuilder() {
             + Add Album
           </button>
         </div>
-        <div className="album-list">
-          {gallery.albums.length === 0 && (
-            <p className="empty-hint">No standalone albums. These show directly on the homepage.</p>
-          )}
-          {gallery.albums.map((album, i) => (
-            <AlbumCard
-              key={`${album.id}-${i}`}
-              album={album}
-              name={getAlbumName(album.id)}
-              count={getAlbumCount(album.id)}
-              thumbnailId={getAlbumThumbnailId(album.id)}
-              onRemove={() => removeStandaloneAlbum(i)}
-              onUpdate={(updates) => {
-                setGallery((g) => {
-                  const albums = [...g.albums];
-                  albums[i] = { ...albums[i], ...updates };
-                  return { ...g, albums };
-                });
-                markDirty();
-              }}
-            />
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleAlbumDragEnd}
+        >
+          <SortableContext
+            items={gallery.albums.map((a, i) => `album-${a.id}-${i}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="album-list">
+              {gallery.albums.length === 0 && (
+                <p className="empty-hint">
+                  No standalone albums. These show directly on the homepage.
+                </p>
+              )}
+              {gallery.albums.map((album, i) => (
+                <SortableAlbumCard
+                  key={`${album.id}-${i}`}
+                  album={album}
+                  index={i}
+                  name={getAlbumName(album.id)}
+                  count={getAlbumCount(album.id)}
+                  thumbnailId={getAlbumThumbnailId(album.id)}
+                  onRemove={() => removeStandaloneAlbum(i)}
+                  onUpdate={(updates) => {
+                    setGallery((g) => {
+                      const albums = [...g.albums];
+                      albums[i] = { ...albums[i], ...updates };
+                      return { ...g, albums };
+                    });
+                    markDirty();
+                  }}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </section>
 
       {/* Subpages */}
@@ -561,38 +840,30 @@ export default function PageBuilder() {
           </p>
         )}
 
-        {/* Collapsed overview grid */}
-        <div className="subpage-grid">
-          {gallery.subpages.map((sp, spIndex) => {
-            const totalAlbums =
-              sp.albums.length +
-              (sp.sections?.reduce((sum, sec) => sum + sec.albums.length, 0) || 0);
-            const firstThumb = getFirstSubpageThumb(sp);
-            return (
-              <div
-                key={spIndex}
-                className={`subpage-tile ${expandedSubpage === spIndex ? 'active' : ''}`}
-                onClick={() =>
-                  setExpandedSubpage(expandedSubpage === spIndex ? null : spIndex)
-                }
-              >
-                <div className="subpage-tile-cover">
-                  {firstThumb ? (
-                    <img src={`/api/admin/thumbnail/${firstThumb}`} alt="" loading="lazy" />
-                  ) : (
-                    <div className="subpage-tile-placeholder">📂</div>
-                  )}
-                </div>
-                <div className="subpage-tile-info">
-                  <span className="subpage-tile-name">{sp.title || sp.name}</span>
-                  <span className="subpage-tile-meta">
-                    {totalAlbums} album{totalAlbums !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Collapsed overview grid with DnD */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleSubpageDragEnd}
+        >
+          <SortableContext
+            items={gallery.subpages.map((_, i) => `subpage-${i}`)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className="subpage-grid">
+              {gallery.subpages.map((sp, spIndex) => (
+                <SortableSubpageTile
+                  key={`subpage-${spIndex}`}
+                  sp={sp}
+                  spIndex={spIndex}
+                  isActive={expandedSubpage === spIndex}
+                  onClick={() => setExpandedSubpage(expandedSubpage === spIndex ? null : spIndex)}
+                  getFirstThumb={getFirstSubpageThumb}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
         {/* Expanded subpage detail */}
         {expandedSubpage !== null && gallery.subpages[expandedSubpage] && (
@@ -604,30 +875,6 @@ export default function PageBuilder() {
                 <>
                   <div className="subpage-detail-header">
                     <div className="subpage-detail-header-left">
-                      <div className="subpage-move-btns">
-                        <button
-                          className="admin-btn-icon"
-                          onClick={() => {
-                            moveSubpage(spIndex, -1);
-                            setExpandedSubpage(spIndex - 1);
-                          }}
-                          disabled={spIndex === 0}
-                          title="Move up"
-                        >
-                          ←
-                        </button>
-                        <button
-                          className="admin-btn-icon"
-                          onClick={() => {
-                            moveSubpage(spIndex, 1);
-                            setExpandedSubpage(spIndex + 1);
-                          }}
-                          disabled={spIndex === gallery.subpages.length - 1}
-                          title="Move down"
-                        >
-                          →
-                        </button>
-                      </div>
                       <input
                         className="subpage-name-input"
                         value={sp.name}
@@ -635,8 +882,19 @@ export default function PageBuilder() {
                         placeholder="Page name (used for URL)"
                         onClick={(e) => e.stopPropagation()}
                       />
+                      <span className="subpage-slug-preview">/{slugify(sp.name)}</span>
                     </div>
                     <div className="subpage-detail-header-right">
+                      <a
+                        href={`/${slugify(sp.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-btn-icon"
+                        title="Preview this page"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        ↗
+                      </a>
                       <button
                         className="admin-btn-icon"
                         onClick={() => setExpandedSubpage(null)}
@@ -645,7 +903,7 @@ export default function PageBuilder() {
                         ✕
                       </button>
                       <button
-                        className="admin-btn-icon"
+                        className="admin-btn-icon admin-btn-icon-danger"
                         onClick={() => {
                           removeSubpage(spIndex);
                           setExpandedSubpage(null);
@@ -696,7 +954,7 @@ export default function PageBuilder() {
                     </div>
                   </div>
 
-                  {/* Albums (if no sections) */}
+                  {/* Albums (if no sections) with DnD */}
                   {(!sp.sections || sp.sections.length === 0) && (
                     <div className="subpage-albums">
                       <div className="subpage-albums-header">
@@ -710,30 +968,42 @@ export default function PageBuilder() {
                           + Add
                         </button>
                       </div>
-                      <div className="album-list">
-                        {sp.albums.map((album, aIndex) => (
-                          <AlbumCard
-                            key={`${album.id}-${aIndex}`}
-                            album={album}
-                            name={getAlbumName(album.id)}
-                            count={getAlbumCount(album.id)}
-                            thumbnailId={getAlbumThumbnailId(album.id)}
-                            onRemove={() => removeSubpageAlbum(spIndex, aIndex)}
-                            onUpdate={(updates) => {
-                              setGallery((g) => {
-                                const subpages = [...g.subpages];
-                                const sp2 = { ...subpages[spIndex] };
-                                const albums = [...sp2.albums];
-                                albums[aIndex] = { ...albums[aIndex], ...updates };
-                                sp2.albums = albums;
-                                subpages[spIndex] = sp2;
-                                return { ...g, subpages };
-                              });
-                              markDirty();
-                            }}
-                          />
-                        ))}
-                      </div>
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleSubpageAlbumDragEnd(spIndex)}
+                      >
+                        <SortableContext
+                          items={sp.albums.map((a, i) => `album-${a.id}-${i}`)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          <div className="album-list">
+                            {sp.albums.map((album, aIndex) => (
+                              <SortableAlbumCard
+                                key={`${album.id}-${aIndex}`}
+                                album={album}
+                                index={aIndex}
+                                name={getAlbumName(album.id)}
+                                count={getAlbumCount(album.id)}
+                                thumbnailId={getAlbumThumbnailId(album.id)}
+                                onRemove={() => removeSubpageAlbum(spIndex, aIndex)}
+                                onUpdate={(updates) => {
+                                  setGallery((g) => {
+                                    const subpages = [...g.subpages];
+                                    const sp2 = { ...subpages[spIndex] };
+                                    const albums = [...sp2.albums];
+                                    albums[aIndex] = { ...albums[aIndex], ...updates };
+                                    sp2.albums = albums;
+                                    subpages[spIndex] = sp2;
+                                    return { ...g, subpages };
+                                  });
+                                  markDirty();
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </SortableContext>
+                      </DndContext>
                     </div>
                   )}
 
@@ -817,18 +1087,13 @@ export default function PageBuilder() {
                   )}
 
                   <div className="subpage-actions">
-                    <button
-                      className="admin-btn admin-btn-xs"
-                      onClick={() => addSection(spIndex)}
-                    >
+                    <button className="admin-btn admin-btn-xs" onClick={() => addSection(spIndex)}>
                       + Add Section
                     </button>
                     {sp.sections && sp.sections.length > 0 && (
                       <button
                         className="admin-btn admin-btn-xs"
-                        onClick={() =>
-                          setPickerTarget({ type: 'subpage', subpageIndex: spIndex })
-                        }
+                        onClick={() => setPickerTarget({ type: 'subpage', subpageIndex: spIndex })}
                       >
                         + Add Album (outside sections)
                       </button>
@@ -848,6 +1113,15 @@ export default function PageBuilder() {
           onSelect={handlePickAlbum}
           onClose={() => setPickerTarget(null)}
           usedAlbumIds={getAllUsedAlbumIds()}
+        />
+      )}
+
+      {/* Hero Asset Picker Modal */}
+      {showHeroPicker && (
+        <AssetPicker
+          onSelect={handleHeroSelect}
+          onClose={() => setShowHeroPicker(false)}
+          currentAssetIds={gallery.hero}
         />
       )}
     </div>
@@ -873,20 +1147,30 @@ interface AlbumCardProps {
   thumbnailId: string | null;
   onRemove: () => void;
   onUpdate: (updates: Partial<AlbumEntry>) => void;
+  dragListeners?: Record<string, unknown>;
 }
 
-function AlbumCard({ album, name, count, thumbnailId, onRemove, onUpdate }: AlbumCardProps) {
+function AlbumCard({
+  album,
+  name,
+  count,
+  thumbnailId,
+  onRemove,
+  onUpdate,
+  dragListeners,
+}: AlbumCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="album-tile">
       <div className="album-tile-cover">
+        {dragListeners && (
+          <div className="album-tile-drag" {...dragListeners} title="Drag to reorder">
+            ⠿
+          </div>
+        )}
         {thumbnailId ? (
-          <img
-            src={`/api/admin/thumbnail/${thumbnailId}`}
-            alt=""
-            loading="lazy"
-          />
+          <img src={`/api/admin/thumbnail/${thumbnailId}`} alt="" loading="lazy" />
         ) : (
           <div className="album-tile-placeholder">📷</div>
         )}
