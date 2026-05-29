@@ -226,9 +226,10 @@ export default function PageBuilder() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         setDirty(false);
-        setSaveMessage('Saved successfully!');
-        setTimeout(() => setSaveMessage(''), 3000);
+        setSaveMessage(data.message || 'Saved successfully!');
+        setTimeout(() => setSaveMessage(''), 5000);
       } else {
         const err = await res.json();
         setSaveMessage(`Error: ${err.error}`);

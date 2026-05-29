@@ -123,9 +123,10 @@ export default function SettingsEditor() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         setDirty(false);
-        setSaveMessage('Saved!');
-        setTimeout(() => setSaveMessage(''), 3000);
+        setSaveMessage(data.message || 'Saved!');
+        setTimeout(() => setSaveMessage(''), 5000);
       } else {
         const err = await res.json();
         setSaveMessage(`Error: ${err.error}`);

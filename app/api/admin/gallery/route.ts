@@ -40,7 +40,7 @@ export async function PUT(request: Request) {
   try {
     await writeGalleryYaml(gallery);
     invalidateConfigCache();
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write gallery.yaml:', err);
     return NextResponse.json({ error: 'Failed to save gallery config' }, { status: 500 });

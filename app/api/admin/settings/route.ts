@@ -36,7 +36,7 @@ export async function PUT(request: Request) {
   try {
     await writeSettingsYaml(settings);
     invalidateConfigCache();
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write settings.yaml:', err);
     return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });
