@@ -465,26 +465,27 @@ export default function PageBuilder() {
             + Add Hero
           </button>
         </div>
-        <div className="hero-list">
+        <div className="hero-grid">
           {gallery.hero.length === 0 && (
             <p className="empty-hint">
               No hero images configured. Add asset UUIDs to show a hero carousel.
             </p>
           )}
           {gallery.hero.map((id, i) => (
-            <div key={i} className="hero-item">
+            <div key={i} className="hero-tile">
               <img
-                className="hero-item-thumb"
                 src={`/api/admin/thumbnail/${id}`}
                 alt=""
                 loading="lazy"
               />
-              <span className="hero-uuid" title={id}>
-                {id.slice(0, 8)}...{id.slice(-4)}
-              </span>
-              <button className="admin-btn-icon" onClick={() => removeHero(i)} title="Remove">
+              <button
+                className="hero-tile-remove"
+                onClick={() => removeHero(i)}
+                title="Remove"
+              >
                 ×
               </button>
+              <span className="hero-tile-index">{i + 1}</span>
             </div>
           ))}
         </div>
