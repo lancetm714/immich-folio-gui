@@ -19,6 +19,11 @@ export * from './theme';
 let _config: AppConfig | null = null;
 let _fallbackSecret: string | null = null;
 
+/** Invalidate the cached config so the next getConfig() call re-reads YAML files. */
+export function invalidateConfigCache(): void {
+  _config = null;
+}
+
 /** Converts raw YAML grid overrides into a typed partial GridConfig. */
 export function buildSubpageGrid(raw?: {
   columns?: number;
@@ -95,6 +100,7 @@ export function getConfig(): AppConfig {
       map: false,
       transitions: false,
       albumOverrides: {},
+      albumDescriptions: {},
       albumPasswords: {},
       cacheTtl: env.CACHE_TTL * 1000,
       rateLimitRpm: env.RATE_LIMIT_RPM,
@@ -107,10 +113,13 @@ export function getConfig(): AppConfig {
   const theme = resolveTheme(settings.theme);
 
   const albumOverrides: Record<string, string> = {};
+  const albumDescriptions: Record<string, string> = {};
   const albumPasswords: Record<string, string> = {};
 
   function processAlbumEntry(
-    entry: string | Record<string, string | { title: string; password?: string }>,
+    entry:
+      | string
+      | Record<string, string | { title: string; description?: string; password?: string }>,
     context: string,
   ): string {
     if (typeof entry === 'string') {
@@ -123,6 +132,7 @@ export function getConfig(): AppConfig {
       albumOverrides[validatedUuid] = value;
     } else {
       if (value.title) albumOverrides[validatedUuid] = value.title;
+      if (value.description) albumDescriptions[validatedUuid] = value.description;
       if (value.password) albumPasswords[validatedUuid] = value.password;
     }
     return validatedUuid;
@@ -271,6 +281,7 @@ export function getConfig(): AppConfig {
     map: settings.map === true,
     transitions: settings.transitions !== false,
     albumOverrides,
+    albumDescriptions,
     albumPasswords,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
