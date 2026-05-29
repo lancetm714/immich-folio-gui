@@ -434,7 +434,8 @@ class ImmichClient {
    */
   invalidateAll(): void {
     cache.clear();
-    console.log('[Immich] 🔄 Full cache cleared via webhook');
+    this.hasLoggedAlbums = false;
+    console.log('[Immich] 🔄 Full cache cleared');
   }
 
   /**

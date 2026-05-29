@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated, isAdminEnabled } from '@/lib/admin/auth';
 import { readGalleryYaml, writeGalleryYaml } from '@/lib/admin/yaml-service';
 import { invalidateConfigCache } from '@/lib/config';
+import { immich } from '@/lib/immich';
 import type { GalleryYaml } from '@/lib/config/schema';
 
 /** GET: Read current gallery.yaml config. */
@@ -40,6 +41,7 @@ export async function PUT(request: Request) {
   try {
     await writeGalleryYaml(gallery);
     invalidateConfigCache();
+    immich.invalidateAll();
     return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write gallery.yaml:', err);

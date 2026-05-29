@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isAdminAuthenticated, isAdminEnabled } from '@/lib/admin/auth';
 import { readSettingsYaml, writeSettingsYaml } from '@/lib/admin/yaml-service';
 import { invalidateConfigCache } from '@/lib/config';
+import { immich } from '@/lib/immich';
 import type { SettingsYaml } from '@/lib/config/schema';
 
 /** GET: Read current settings.yaml config. */
@@ -36,6 +37,7 @@ export async function PUT(request: Request) {
   try {
     await writeSettingsYaml(settings);
     invalidateConfigCache();
+    immich.invalidateAll();
     return NextResponse.json({ success: true, message: 'Saved successfully. Backup of previous version created.' });
   } catch (err) {
     console.error('[Admin] Failed to write settings.yaml:', err);
