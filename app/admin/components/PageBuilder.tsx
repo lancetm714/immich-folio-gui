@@ -791,36 +791,36 @@ function AlbumCard({ album, name, count, thumbnailId, onRemove, onUpdate }: Albu
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="album-card">
-      <div className="album-card-main">
-        {thumbnailId && (
-          <div className="album-card-thumb">
-            <img
-              src={`/api/admin/thumbnail/${thumbnailId}`}
-              alt=""
-              loading="lazy"
-            />
-          </div>
+    <div className="album-tile">
+      <div className="album-tile-cover">
+        {thumbnailId ? (
+          <img
+            src={`/api/admin/thumbnail/${thumbnailId}`}
+            alt=""
+            loading="lazy"
+          />
+        ) : (
+          <div className="album-tile-placeholder">📷</div>
         )}
-        <div className="album-card-info">
-          <span className="album-card-name">{album.title || name}</span>
-          <span className="album-card-count">{count} photos</span>
-        </div>
-        <div className="album-card-actions">
+        <div className="album-tile-overlay">
           <button
-            className="admin-btn-icon"
+            className="album-tile-btn"
             onClick={() => setExpanded(!expanded)}
             title="Edit details"
           >
             ✏️
           </button>
-          <button className="admin-btn-icon" onClick={onRemove} title="Remove">
+          <button className="album-tile-btn" onClick={onRemove} title="Remove">
             ×
           </button>
         </div>
       </div>
+      <div className="album-tile-info">
+        <span className="album-tile-name">{album.title || name}</span>
+        <span className="album-tile-count">{count} photos</span>
+      </div>
       {expanded && (
-        <div className="album-card-details">
+        <div className="album-tile-details">
           <div className="admin-field">
             <label>Title override</label>
             <input
@@ -846,7 +846,7 @@ function AlbumCard({ album, name, count, thumbnailId, onRemove, onUpdate }: Albu
               placeholder="Leave empty for public"
             />
           </div>
-          <div className="album-card-uuid">
+          <div className="album-tile-uuid">
             <code>{album.id}</code>
           </div>
         </div>

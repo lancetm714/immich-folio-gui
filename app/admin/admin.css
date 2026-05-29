@@ -487,88 +487,115 @@
   color: var(--admin-text-secondary);
 }
 
-/* Album List */
+/* Album Grid */
 .album-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.album-card {
-  background: var(--admin-bg-raised);
-  border: 1px solid var(--admin-border);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.15s;
-}
-
-.album-card:hover {
-  border-color: var(--admin-border-hover);
-}
-
-.album-card-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 0.75rem;
 }
 
-.album-card-thumb {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
+.album-tile {
+  background: var(--admin-bg-raised);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
   overflow: hidden;
-  background: var(--admin-bg-elevated);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.album-card-thumb img {
+.album-tile:hover {
+  border-color: var(--admin-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.album-tile-cover {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--admin-bg-elevated);
+  overflow: hidden;
+}
+
+.album-tile-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.album-card-info {
+.album-tile-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  min-width: 0;
-  flex: 1;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
 }
 
-.album-card-name {
+.album-tile-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.album-tile:hover .album-tile-overlay {
+  opacity: 1;
+}
+
+.album-tile-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   font-size: 0.85rem;
+  transition: background 0.1s;
+}
+
+.album-tile-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.album-tile-info {
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.album-tile-name {
+  font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.album-card-count {
+.album-tile-count {
   font-size: 0.7rem;
   color: var(--admin-text-muted);
-  white-space: nowrap;
 }
 
-.album-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-.album-card-details {
+.album-tile-details {
   padding: 0.75rem;
   border-top: 1px solid var(--admin-border);
   background: var(--admin-bg);
 }
 
-.album-card-uuid {
+.album-tile-uuid {
   margin-top: 0.5rem;
 }
 
-.album-card-uuid code {
+.album-tile-uuid code {
   font-size: 0.7rem;
   color: var(--admin-text-muted);
   word-break: break-all;
