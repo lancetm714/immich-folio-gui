@@ -88,6 +88,7 @@ export default function PageBuilder() {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [expandedSubpage, setExpandedSubpage] = useState<number | null>(null);
   const [pickerTarget, setPickerTarget] = useState<{
     type: 'standalone' | 'subpage' | 'section';
     subpageIndex?: number;
@@ -425,6 +426,24 @@ export default function PageBuilder() {
     return found?.thumbnailAssetId || null;
   }
 
+  function getFirstSubpageThumb(sp: Subpage): string | null {
+    // Try albums first
+    for (const album of sp.albums) {
+      const thumb = getAlbumThumbnailId(album.id);
+      if (thumb) return thumb;
+    }
+    // Try sections
+    if (sp.sections) {
+      for (const sec of sp.sections) {
+        for (const album of sec.albums) {
+          const thumb = getAlbumThumbnailId(album.id);
+          if (thumb) return thumb;
+        }
+      }
+    }
+    return null;
+  }
+
   // ── Render ───────────────────────────────────────────────────
   if (loading) {
     return (
@@ -542,216 +561,284 @@ export default function PageBuilder() {
           </p>
         )}
 
-        {gallery.subpages.map((sp, spIndex) => (
-          <div key={spIndex} className="subpage-card">
-            <div className="subpage-header">
-              <div className="subpage-header-left">
-                <div className="subpage-move-btns">
-                  <button
-                    className="admin-btn-icon"
-                    onClick={() => moveSubpage(spIndex, -1)}
-                    disabled={spIndex === 0}
-                    title="Move up"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    className="admin-btn-icon"
-                    onClick={() => moveSubpage(spIndex, 1)}
-                    disabled={spIndex === gallery.subpages.length - 1}
-                    title="Move down"
-                  >
-                    ↓
-                  </button>
+        {/* Collapsed overview grid */}
+        <div className="subpage-grid">
+          {gallery.subpages.map((sp, spIndex) => {
+            const totalAlbums =
+              sp.albums.length +
+              (sp.sections?.reduce((sum, sec) => sum + sec.albums.length, 0) || 0);
+            const firstThumb = getFirstSubpageThumb(sp);
+            return (
+              <div
+                key={spIndex}
+                className={`subpage-tile ${expandedSubpage === spIndex ? 'active' : ''}`}
+                onClick={() =>
+                  setExpandedSubpage(expandedSubpage === spIndex ? null : spIndex)
+                }
+              >
+                <div className="subpage-tile-cover">
+                  {firstThumb ? (
+                    <img src={`/api/admin/thumbnail/${firstThumb}`} alt="" loading="lazy" />
+                  ) : (
+                    <div className="subpage-tile-placeholder">📂</div>
+                  )}
                 </div>
-                <input
-                  className="subpage-name-input"
-                  value={sp.name}
-                  onChange={(e) => updateSubpage(spIndex, { name: e.target.value })}
-                  placeholder="Page name (used for URL)"
-                />
+                <div className="subpage-tile-info">
+                  <span className="subpage-tile-name">{sp.title || sp.name}</span>
+                  <span className="subpage-tile-meta">
+                    {totalAlbums} album{totalAlbums !== 1 ? 's' : ''}
+                  </span>
+                </div>
               </div>
-              <div className="subpage-header-right">
-                <button
-                  className="admin-btn-icon"
-                  onClick={() => removeSubpage(spIndex)}
-                  title="Delete subpage"
-                >
-                  🗑
-                </button>
-              </div>
-            </div>
+            );
+          })}
+        </div>
 
-            {/* Subpage metadata */}
-            <div className="subpage-meta">
-              <div className="admin-field-row">
-                <div className="admin-field">
-                  <label>Title (optional)</label>
-                  <input
-                    value={sp.title || ''}
-                    onChange={(e) => updateSubpage(spIndex, { title: e.target.value || undefined })}
-                    placeholder="Display title (defaults to name)"
-                  />
-                </div>
-                <div className="admin-field">
-                  <label>Subtitle</label>
-                  <input
-                    value={sp.subtitle || ''}
-                    onChange={(e) =>
-                      updateSubpage(spIndex, { subtitle: e.target.value || undefined })
-                    }
-                    placeholder="Subtitle text"
-                  />
-                </div>
-              </div>
-              <div className="admin-field-row">
-                <div className="admin-field">
-                  <label>Password (optional)</label>
-                  <input
-                    type="password"
-                    value={sp.password || ''}
-                    onChange={(e) =>
-                      updateSubpage(spIndex, { password: e.target.value || undefined })
-                    }
-                    placeholder="Leave empty for public"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Albums (if no sections) */}
-            {(!sp.sections || sp.sections.length === 0) && (
-              <div className="subpage-albums">
-                <div className="subpage-albums-header">
-                  <span>Albums</span>
-                  <button
-                    className="admin-btn admin-btn-xs"
-                    onClick={() => setPickerTarget({ type: 'subpage', subpageIndex: spIndex })}
-                  >
-                    + Add
-                  </button>
-                </div>
-                <div className="album-list">
-                  {sp.albums.map((album, aIndex) => (
-                    <AlbumCard
-                      key={`${album.id}-${aIndex}`}
-                      album={album}
-                      name={getAlbumName(album.id)}
-                      count={getAlbumCount(album.id)}
-                      thumbnailId={getAlbumThumbnailId(album.id)}
-                      onRemove={() => removeSubpageAlbum(spIndex, aIndex)}
-                      onUpdate={(updates) => {
-                        setGallery((g) => {
-                          const subpages = [...g.subpages];
-                          const sp2 = { ...subpages[spIndex] };
-                          const albums = [...sp2.albums];
-                          albums[aIndex] = { ...albums[aIndex], ...updates };
-                          sp2.albums = albums;
-                          subpages[spIndex] = sp2;
-                          return { ...g, subpages };
-                        });
-                        markDirty();
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Sections */}
-            {sp.sections && sp.sections.length > 0 && (
-              <div className="subpage-sections">
-                {sp.sections.map((sec, secIndex) => (
-                  <div key={secIndex} className="section-card">
-                    <div className="section-header">
+        {/* Expanded subpage detail */}
+        {expandedSubpage !== null && gallery.subpages[expandedSubpage] && (
+          <div className="subpage-detail">
+            {(() => {
+              const sp = gallery.subpages[expandedSubpage];
+              const spIndex = expandedSubpage;
+              return (
+                <>
+                  <div className="subpage-detail-header">
+                    <div className="subpage-detail-header-left">
+                      <div className="subpage-move-btns">
+                        <button
+                          className="admin-btn-icon"
+                          onClick={() => {
+                            moveSubpage(spIndex, -1);
+                            setExpandedSubpage(spIndex - 1);
+                          }}
+                          disabled={spIndex === 0}
+                          title="Move up"
+                        >
+                          ←
+                        </button>
+                        <button
+                          className="admin-btn-icon"
+                          onClick={() => {
+                            moveSubpage(spIndex, 1);
+                            setExpandedSubpage(spIndex + 1);
+                          }}
+                          disabled={spIndex === gallery.subpages.length - 1}
+                          title="Move down"
+                        >
+                          →
+                        </button>
+                      </div>
                       <input
-                        className="section-title-input"
-                        value={sec.title}
-                        onChange={(e) =>
-                          updateSection(spIndex, secIndex, { title: e.target.value })
-                        }
-                        placeholder="Section title"
+                        className="subpage-name-input"
+                        value={sp.name}
+                        onChange={(e) => updateSubpage(spIndex, { name: e.target.value })}
+                        placeholder="Page name (used for URL)"
+                        onClick={(e) => e.stopPropagation()}
                       />
+                    </div>
+                    <div className="subpage-detail-header-right">
                       <button
                         className="admin-btn-icon"
-                        onClick={() => removeSection(spIndex, secIndex)}
-                        title="Remove section"
+                        onClick={() => setExpandedSubpage(null)}
+                        title="Collapse"
                       >
-                        ×
+                        ✕
+                      </button>
+                      <button
+                        className="admin-btn-icon"
+                        onClick={() => {
+                          removeSubpage(spIndex);
+                          setExpandedSubpage(null);
+                        }}
+                        title="Delete subpage"
+                      >
+                        🗑
                       </button>
                     </div>
-                    <div className="admin-field">
-                      <input
-                        value={sec.description || ''}
-                        onChange={(e) =>
-                          updateSection(spIndex, secIndex, {
-                            description: e.target.value || undefined,
-                          })
-                        }
-                        placeholder="Section description (optional)"
-                        className="section-desc-input"
-                      />
-                    </div>
-                    <div className="album-list">
-                      {sec.albums.map((album, aIndex) => (
-                        <AlbumCard
-                          key={`${album.id}-${aIndex}`}
-                          album={album}
-                          name={getAlbumName(album.id)}
-                          count={getAlbumCount(album.id)}
-                          thumbnailId={getAlbumThumbnailId(album.id)}
-                          onRemove={() => removeSectionAlbum(spIndex, secIndex, aIndex)}
-                          onUpdate={(updates) => {
-                            setGallery((g) => {
-                              const subpages = [...g.subpages];
-                              const sp2 = { ...subpages[spIndex] };
-                              const sections = [...(sp2.sections || [])];
-                              const sec2 = { ...sections[secIndex] };
-                              const albums = [...sec2.albums];
-                              albums[aIndex] = { ...albums[aIndex], ...updates };
-                              sec2.albums = albums;
-                              sections[secIndex] = sec2;
-                              sp2.sections = sections;
-                              subpages[spIndex] = sp2;
-                              return { ...g, subpages };
-                            });
-                            markDirty();
-                          }}
+                  </div>
+
+                  {/* Subpage metadata */}
+                  <div className="subpage-meta">
+                    <div className="admin-field-row">
+                      <div className="admin-field">
+                        <label>Title (optional)</label>
+                        <input
+                          value={sp.title || ''}
+                          onChange={(e) =>
+                            updateSubpage(spIndex, { title: e.target.value || undefined })
+                          }
+                          placeholder="Display title (defaults to name)"
                         />
+                      </div>
+                      <div className="admin-field">
+                        <label>Subtitle</label>
+                        <input
+                          value={sp.subtitle || ''}
+                          onChange={(e) =>
+                            updateSubpage(spIndex, { subtitle: e.target.value || undefined })
+                          }
+                          placeholder="Subtitle text"
+                        />
+                      </div>
+                    </div>
+                    <div className="admin-field-row">
+                      <div className="admin-field">
+                        <label>Password (optional)</label>
+                        <input
+                          type="password"
+                          value={sp.password || ''}
+                          onChange={(e) =>
+                            updateSubpage(spIndex, { password: e.target.value || undefined })
+                          }
+                          placeholder="Leave empty for public"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Albums (if no sections) */}
+                  {(!sp.sections || sp.sections.length === 0) && (
+                    <div className="subpage-albums">
+                      <div className="subpage-albums-header">
+                        <span>Albums</span>
+                        <button
+                          className="admin-btn admin-btn-xs"
+                          onClick={() =>
+                            setPickerTarget({ type: 'subpage', subpageIndex: spIndex })
+                          }
+                        >
+                          + Add
+                        </button>
+                      </div>
+                      <div className="album-list">
+                        {sp.albums.map((album, aIndex) => (
+                          <AlbumCard
+                            key={`${album.id}-${aIndex}`}
+                            album={album}
+                            name={getAlbumName(album.id)}
+                            count={getAlbumCount(album.id)}
+                            thumbnailId={getAlbumThumbnailId(album.id)}
+                            onRemove={() => removeSubpageAlbum(spIndex, aIndex)}
+                            onUpdate={(updates) => {
+                              setGallery((g) => {
+                                const subpages = [...g.subpages];
+                                const sp2 = { ...subpages[spIndex] };
+                                const albums = [...sp2.albums];
+                                albums[aIndex] = { ...albums[aIndex], ...updates };
+                                sp2.albums = albums;
+                                subpages[spIndex] = sp2;
+                                return { ...g, subpages };
+                              });
+                              markDirty();
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sections */}
+                  {sp.sections && sp.sections.length > 0 && (
+                    <div className="subpage-sections">
+                      {sp.sections.map((sec, secIndex) => (
+                        <div key={secIndex} className="section-card">
+                          <div className="section-header">
+                            <input
+                              className="section-title-input"
+                              value={sec.title}
+                              onChange={(e) =>
+                                updateSection(spIndex, secIndex, { title: e.target.value })
+                              }
+                              placeholder="Section title"
+                            />
+                            <button
+                              className="admin-btn-icon"
+                              onClick={() => removeSection(spIndex, secIndex)}
+                              title="Remove section"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <div className="admin-field">
+                            <input
+                              value={sec.description || ''}
+                              onChange={(e) =>
+                                updateSection(spIndex, secIndex, {
+                                  description: e.target.value || undefined,
+                                })
+                              }
+                              placeholder="Section description (optional)"
+                              className="section-desc-input"
+                            />
+                          </div>
+                          <div className="album-list">
+                            {sec.albums.map((album, aIndex) => (
+                              <AlbumCard
+                                key={`${album.id}-${aIndex}`}
+                                album={album}
+                                name={getAlbumName(album.id)}
+                                count={getAlbumCount(album.id)}
+                                thumbnailId={getAlbumThumbnailId(album.id)}
+                                onRemove={() => removeSectionAlbum(spIndex, secIndex, aIndex)}
+                                onUpdate={(updates) => {
+                                  setGallery((g) => {
+                                    const subpages = [...g.subpages];
+                                    const sp2 = { ...subpages[spIndex] };
+                                    const sections = [...(sp2.sections || [])];
+                                    const sec2 = { ...sections[secIndex] };
+                                    const albums = [...sec2.albums];
+                                    albums[aIndex] = { ...albums[aIndex], ...updates };
+                                    sec2.albums = albums;
+                                    sections[secIndex] = sec2;
+                                    sp2.sections = sections;
+                                    subpages[spIndex] = sp2;
+                                    return { ...g, subpages };
+                                  });
+                                  markDirty();
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <button
+                            className="admin-btn admin-btn-xs"
+                            onClick={() =>
+                              setPickerTarget({
+                                type: 'section',
+                                subpageIndex: spIndex,
+                                sectionIndex: secIndex,
+                              })
+                            }
+                          >
+                            + Add Album
+                          </button>
+                        </div>
                       ))}
                     </div>
+                  )}
+
+                  <div className="subpage-actions">
                     <button
                       className="admin-btn admin-btn-xs"
-                      onClick={() =>
-                        setPickerTarget({
-                          type: 'section',
-                          subpageIndex: spIndex,
-                          sectionIndex: secIndex,
-                        })
-                      }
+                      onClick={() => addSection(spIndex)}
                     >
-                      + Add Album
+                      + Add Section
                     </button>
+                    {sp.sections && sp.sections.length > 0 && (
+                      <button
+                        className="admin-btn admin-btn-xs"
+                        onClick={() =>
+                          setPickerTarget({ type: 'subpage', subpageIndex: spIndex })
+                        }
+                      >
+                        + Add Album (outside sections)
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-
-            <div className="subpage-actions">
-              <button className="admin-btn admin-btn-xs" onClick={() => addSection(spIndex)}>
-                + Add Section
-              </button>
-              {sp.sections && sp.sections.length > 0 && (
-                <button
-                  className="admin-btn admin-btn-xs"
-                  onClick={() => setPickerTarget({ type: 'subpage', subpageIndex: spIndex })}
-                >
-                  + Add Album (outside sections)
-                </button>
-              )}
-            </div>
+                </>
+              );
+            })()}
           </div>
-        ))}
+        )}
       </section>
 
       {/* Album Picker Modal */}
