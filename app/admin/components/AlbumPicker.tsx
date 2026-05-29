@@ -68,7 +68,12 @@ export default function AlbumPicker({ albums, onSelect, onClose, usedAlbumIds }:
               >
                 <div className="picker-item-thumb">
                   {album.thumbnailAssetId ? (
-                    <div className="picker-thumb-placeholder">📷</div>
+                    <img
+                      className="picker-thumb-img"
+                      src={`/api/admin/thumbnail/${album.thumbnailAssetId}`}
+                      alt=""
+                      loading="lazy"
+                    />
                   ) : (
                     <div className="picker-thumb-placeholder">📁</div>
                   )}

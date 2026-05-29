@@ -419,6 +419,11 @@ export default function PageBuilder() {
     return found?.assetCount || 0;
   }
 
+  function getAlbumThumbnailId(id: string): string | null {
+    const found = immichAlbums.find((a) => a.id === id);
+    return found?.thumbnailAssetId || null;
+  }
+
   // ── Render ───────────────────────────────────────────────────
   if (loading) {
     return (
@@ -467,6 +472,12 @@ export default function PageBuilder() {
           )}
           {gallery.hero.map((id, i) => (
             <div key={i} className="hero-item">
+              <img
+                className="hero-item-thumb"
+                src={`/api/admin/thumbnail/${id}`}
+                alt=""
+                loading="lazy"
+              />
               <span className="hero-uuid" title={id}>
                 {id.slice(0, 8)}...{id.slice(-4)}
               </span>
@@ -499,6 +510,7 @@ export default function PageBuilder() {
               album={album}
               name={getAlbumName(album.id)}
               count={getAlbumCount(album.id)}
+              thumbnailId={getAlbumThumbnailId(album.id)}
               onRemove={() => removeStandaloneAlbum(i)}
               onUpdate={(updates) => {
                 setGallery((g) => {
@@ -624,6 +636,7 @@ export default function PageBuilder() {
                       album={album}
                       name={getAlbumName(album.id)}
                       count={getAlbumCount(album.id)}
+                      thumbnailId={getAlbumThumbnailId(album.id)}
                       onRemove={() => removeSubpageAlbum(spIndex, aIndex)}
                       onUpdate={(updates) => {
                         setGallery((g) => {
@@ -684,6 +697,7 @@ export default function PageBuilder() {
                           album={album}
                           name={getAlbumName(album.id)}
                           count={getAlbumCount(album.id)}
+                          thumbnailId={getAlbumThumbnailId(album.id)}
                           onRemove={() => removeSectionAlbum(spIndex, secIndex, aIndex)}
                           onUpdate={(updates) => {
                             setGallery((g) => {
@@ -767,16 +781,26 @@ interface AlbumCardProps {
   album: AlbumEntry;
   name: string;
   count: number;
+  thumbnailId: string | null;
   onRemove: () => void;
   onUpdate: (updates: Partial<AlbumEntry>) => void;
 }
 
-function AlbumCard({ album, name, count, onRemove, onUpdate }: AlbumCardProps) {
+function AlbumCard({ album, name, count, thumbnailId, onRemove, onUpdate }: AlbumCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="album-card">
       <div className="album-card-main">
+        {thumbnailId && (
+          <div className="album-card-thumb">
+            <img
+              src={`/api/admin/thumbnail/${thumbnailId}`}
+              alt=""
+              loading="lazy"
+            />
+          </div>
+        )}
         <div className="album-card-info">
           <span className="album-card-name">{album.title || name}</span>
           <span className="album-card-count">{count} photos</span>
