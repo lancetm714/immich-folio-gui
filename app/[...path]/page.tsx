@@ -20,6 +20,7 @@ import { PhotoGrid, type PhotoItem } from './PhotoGrid';
 import {
   imageUrl,
   exifUrl,
+  videoUrl,
   assetPlaceholder,
   assetExifSummary,
   assetAspectRatio,
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: PathPageProps): Promise<Metad
     const album = await immich.getAlbumBySlug(path[1], slug);
     if (album) {
       title = album.albumName;
-      const count = album.assets.filter((a) => a.type === 'IMAGE').length;
+      const count = album.assets.filter((a) => a.type === 'IMAGE' || a.type === 'VIDEO').length;
       subtitle = `${count} photo${count === 1 ? '' : 's'}`;
     }
   } else if (immich.isSubpageSlug(slug)) {
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: PathPageProps): Promise<Metad
         const album = await immich.getAlbumBySlug(result.albums[0].slug, slug);
         if (album) {
           title = album.albumName;
-          const count = album.assets.filter((a) => a.type === 'IMAGE').length;
+          const count = album.assets.filter((a) => a.type === 'IMAGE' || a.type === 'VIDEO').length;
           subtitle = `${count} photo${count === 1 ? '' : 's'}`;
         }
       } else {
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: PathPageProps): Promise<Metad
     const album = await immich.getAlbumBySlug(slug);
     if (album) {
       title = album.albumName;
-      const count = album.assets.filter((a) => a.type === 'IMAGE').length;
+      const count = album.assets.filter((a) => a.type === 'IMAGE' || a.type === 'VIDEO').length;
       subtitle = `${count} photo${count === 1 ? '' : 's'}`;
     }
   }
@@ -89,15 +90,18 @@ export async function generateMetadata({ params }: PathPageProps): Promise<Metad
 /** Map Immich assets to PhotoItem props for the grid/lightbox. */
 function toPhotoItems(assets: ImmichAsset[], showExif: boolean): PhotoItem[] {
   return assets
-    .filter((a) => a.type === 'IMAGE')
+    .filter((a) => a.type === 'IMAGE' || a.type === 'VIDEO')
     .map((a) => {
       const ph = assetPlaceholder(a);
-      const exif = showExif ? assetExifSummary(a) : undefined;
+      const exif = showExif && a.type === 'IMAGE' ? assetExifSummary(a) : undefined;
+      const isVideo = a.type === 'VIDEO';
       return {
         id: a.id,
-        thumbUrl: imageUrl(a.id, 'preview'),
+        type: isVideo ? 'video' : 'image',
+        thumbUrl: imageUrl(a.id, 'thumbnail'),
         previewUrl: imageUrl(a.id, 'preview'),
         originalUrl: imageUrl(a.id, 'original'),
+        ...(isVideo ? { videoUrl: videoUrl(a.id) } : {}),
         exifUrl: exifUrl(a.id),
         ...(ph ? { blurDataURL: ph.blurDataURL, dominantColor: ph.dominantColor } : {}),
         ...(exif ?? {}),

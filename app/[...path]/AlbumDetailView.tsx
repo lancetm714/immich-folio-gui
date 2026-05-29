@@ -34,9 +34,9 @@ export function AlbumDetailView({
             {subtitle}
           </p>
         )}
+        {album.description && <p className="album-header__description">{album.description}</p>}
         <p className="album-header__meta">
           {images.length} {images.length === 1 ? 'photo' : 'photos'}
-          {album.description && ` · ${album.description}`}
         </p>
       </div>
       <PhotoGrid assets={images} layout={layout} gridStyle={gridStyle} />
