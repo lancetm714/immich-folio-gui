@@ -2,7 +2,6 @@ services:
   lightbox:
     build:
       context: .
-      network: host
     container_name: immich-folio
     restart: unless-stopped
     ports:
