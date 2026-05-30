@@ -253,9 +253,15 @@ export default async function PathPage({ params }: PathPageProps) {
 
     // ── Multiple albums → show album grid ─────────────────────
 
+    // Override albumThumbnailAssetId with the configured hero image (if any)
+    const albumsWithHero = albums.map((album) => {
+      const heroId = config.albumHeroImages[album.id];
+      return heroId ? { ...album, albumThumbnailAssetId: heroId } : album;
+    });
+
     // Batch-fetch ThumbHash for album cover placeholders
     const coverPlaceholders = await Promise.all(
-      albums.map(async (album) => {
+      albumsWithHero.map(async (album) => {
         if (!album.albumThumbnailAssetId) return null;
         const asset = await immich.getAssetInfo(album.albumThumbnailAssetId);
         return asset ? assetPlaceholder(asset) : null;
@@ -267,7 +273,7 @@ export default async function PathPage({ params }: PathPageProps) {
         slug={slug}
         title={result.subpage.title || result.subpage.name}
         subtitle={result.subpage.subtitle}
-        albums={albums}
+        albums={albumsWithHero}
         coverPlaceholders={coverPlaceholders}
         sections={result.subpage.sections}
       />
