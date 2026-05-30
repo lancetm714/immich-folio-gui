@@ -816,8 +816,30 @@
 }
 
 /* ── Photo Grid (Album Detail) ────────────────────── */
+/* ── Album Hero Image ────────────────────────────────────────── */
+.album-hero {
+  position: relative;
+  width: 100%;
+  height: clamp(240px, 40vw, 520px);
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.album-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--bg-primary, #fff) 100%);
+  pointer-events: none;
+}
+
 .album-header {
   margin-bottom: 40px;
+}
+
+.album-header--has-hero {
+  margin-top: -60px;
+  position: relative;
+  z-index: 1;
 }
 
 .album-header__back {

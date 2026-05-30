@@ -133,6 +133,21 @@ async function gateIfProtected(
   return <PasswordGate slug={key} title={title} type={type} />;
 }
 
+/** Fetch hero image URL + blur placeholder for an album if configured. */
+async function getAlbumHeroData(
+  albumId: string,
+  config: ReturnType<typeof getConfig>,
+): Promise<{ heroImageUrl: string; heroBlurDataURL?: string } | null> {
+  const heroAssetId = config.albumHeroImages[albumId];
+  if (!heroAssetId) return null;
+  const asset = await immich.getAssetInfo(heroAssetId);
+  const ph = asset ? assetPlaceholder(asset) : null;
+  return {
+    heroImageUrl: imageUrl(heroAssetId, 'preview'),
+    heroBlurDataURL: ph?.blurDataURL,
+  };
+}
+
 export default async function PathPage({ params }: PathPageProps) {
   const { path } = await params;
   const config = getConfig();
@@ -178,6 +193,8 @@ export default async function PathPage({ params }: PathPageProps) {
     const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
     if (albumGate) return albumGate;
 
+    const heroData = await getAlbumHeroData(album.id, config);
+
     return (
       <AlbumDetailView
         album={album}
@@ -186,6 +203,7 @@ export default async function PathPage({ params }: PathPageProps) {
         gridStyle={buildGridStyle(spGrid)}
         backLinkHref={`/${subpageSlug}`}
         backLinkLabel={`Back to ${subpageName}`}
+        {...heroData}
       />
     );
   }
@@ -217,6 +235,8 @@ export default async function PathPage({ params }: PathPageProps) {
       const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
       if (albumGate) return albumGate;
 
+      const heroData = await getAlbumHeroData(album.id, config);
+
       return (
         <AlbumDetailView
           album={album}
@@ -226,6 +246,7 @@ export default async function PathPage({ params }: PathPageProps) {
           subtitle={result.subpage.subtitle}
           backLinkHref="/"
           backLinkLabel="Back to Gallery"
+          {...heroData}
         />
       );
     }
@@ -265,6 +286,8 @@ export default async function PathPage({ params }: PathPageProps) {
   const albumGate = await gateIfProtected(album.id, 'album', album.albumName);
   if (albumGate) return albumGate;
 
+  const heroData = await getAlbumHeroData(album.id, config);
+
   return (
     <AlbumDetailView
       album={album}
@@ -273,6 +296,7 @@ export default async function PathPage({ params }: PathPageProps) {
       gridStyle={buildGridStyle()}
       backLinkHref="/"
       backLinkLabel="Back to Gallery"
+      {...heroData}
     />
   );
 }

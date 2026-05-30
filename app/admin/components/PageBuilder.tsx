@@ -28,6 +28,7 @@ interface AlbumEntry {
   title?: string;
   description?: string;
   password?: string;
+  heroImage?: string;
 }
 
 interface Section {
@@ -66,7 +67,11 @@ interface ImmichAlbumInfo {
 function parseAlbumEntries(
   raw:
     | Array<
-        string | Record<string, string | { title: string; description?: string; password?: string }>
+        | string
+        | Record<
+            string,
+            string | { title: string; description?: string; password?: string; heroImage?: string }
+          >
       >
     | undefined,
 ): AlbumEntry[] {
@@ -75,25 +80,33 @@ function parseAlbumEntries(
     if (typeof entry === 'string') return { id: entry };
     const [id, value] = Object.entries(entry)[0];
     if (typeof value === 'string') return { id, title: value };
-    return { id, title: value.title, description: value.description, password: value.password };
+    return {
+      id,
+      title: value.title,
+      description: value.description,
+      password: value.password,
+      heroImage: value.heroImage,
+    };
   });
 }
 
 function serializeAlbumEntries(
   entries: AlbumEntry[],
 ): Array<
-  string | Record<string, string | { title: string; description?: string; password?: string }>
+  | string
+  | Record<string, string | { title: string; description?: string; password?: string; heroImage?: string }>
 > {
   return entries.map((entry) => {
-    if (!entry.title && !entry.description && !entry.password) return entry.id;
-    if (entry.title && !entry.description && !entry.password) {
+    if (!entry.title && !entry.description && !entry.password && !entry.heroImage) return entry.id;
+    if (entry.title && !entry.description && !entry.password && !entry.heroImage) {
       return { [entry.id]: entry.title };
     }
-    const val: { title: string; description?: string; password?: string } = {
+    const val: { title: string; description?: string; password?: string; heroImage?: string } = {
       title: entry.title || '',
     };
     if (entry.description) val.description = entry.description;
     if (entry.password) val.password = entry.password;
+    if (entry.heroImage) val.heroImage = entry.heroImage;
     return { [entry.id]: val };
   });
 }
@@ -1160,6 +1173,7 @@ function AlbumCard({
   dragListeners,
 }: AlbumCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showHeroPicker, setShowHeroPicker] = useState(false);
 
   return (
     <div className="album-tile">
@@ -1218,10 +1232,48 @@ function AlbumCard({
               placeholder="Leave empty for public"
             />
           </div>
+          {/* Hero Image */}
+          <div className="admin-field">
+            <label>Hero Image</label>
+            <div className="album-hero-field">
+              {album.heroImage ? (
+                <div className="album-hero-preview">
+                  <img src={`/api/admin/thumbnail/${album.heroImage}`} alt="Hero" />
+                  <button
+                    className="album-hero-remove"
+                    onClick={() => onUpdate({ heroImage: undefined })}
+                    title="Remove hero image"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <span className="album-hero-empty">No hero image set</span>
+              )}
+              <button
+                className="admin-btn admin-btn-xs"
+                onClick={() => setShowHeroPicker(true)}
+              >
+                {album.heroImage ? 'Change' : '+ Pick'}
+              </button>
+            </div>
+          </div>
           <div className="album-tile-uuid">
             <code>{album.id}</code>
           </div>
         </div>
+      )}
+      {showHeroPicker && (
+        <AssetPicker
+          albumId={album.id}
+          onSelect={(assetId) => {
+            onUpdate({ heroImage: assetId });
+            setShowHeroPicker(false);
+          }}
+          onClose={() => setShowHeroPicker(false)}
+          currentAssetIds={album.heroImage ? [album.heroImage] : []}
+          title="Pick Hero Image for Album"
+        />
       )}
     </div>
   );

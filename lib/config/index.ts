@@ -102,6 +102,7 @@ export function getConfig(): AppConfig {
       albumOverrides: {},
       albumDescriptions: {},
       albumPasswords: {},
+      albumHeroImages: {},
       cacheTtl: env.CACHE_TTL * 1000,
       rateLimitRpm: env.RATE_LIMIT_RPM,
       trustedProxies: env.TRUSTED_PROXIES,
@@ -115,11 +116,12 @@ export function getConfig(): AppConfig {
   const albumOverrides: Record<string, string> = {};
   const albumDescriptions: Record<string, string> = {};
   const albumPasswords: Record<string, string> = {};
+  const albumHeroImages: Record<string, string> = {};
 
   function processAlbumEntry(
     entry:
       | string
-      | Record<string, string | { title: string; description?: string; password?: string }>,
+      | Record<string, string | { title: string; description?: string; password?: string; heroImage?: string }>,
     context: string,
   ): string {
     if (typeof entry === 'string') {
@@ -134,6 +136,7 @@ export function getConfig(): AppConfig {
       if (value.title) albumOverrides[validatedUuid] = value.title;
       if (value.description) albumDescriptions[validatedUuid] = value.description;
       if (value.password) albumPasswords[validatedUuid] = value.password;
+      if (value.heroImage) albumHeroImages[validatedUuid] = value.heroImage;
     }
     return validatedUuid;
   }
@@ -283,6 +286,7 @@ export function getConfig(): AppConfig {
     albumOverrides,
     albumDescriptions,
     albumPasswords,
+    albumHeroImages,
     cacheTtl: env.CACHE_TTL * 1000,
     rateLimitRpm: env.RATE_LIMIT_RPM,
     trustedProxies: env.TRUSTED_PROXIES,

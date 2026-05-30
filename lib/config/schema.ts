@@ -97,34 +97,34 @@ export interface AppConfig {
   albumOverrides: Record<string, string>;
   albumDescriptions: Record<string, string>;
   albumPasswords: Record<string, string>;
+  albumHeroImages: Record<string, string>;
   cacheTtl: number;
   rateLimitRpm: number;
   trustedProxies: string[];
   needsSetup?: boolean;
 }
 
+export interface AlbumEntryObject {
+  title: string;
+  description?: string;
+  password?: string;
+  heroImage?: string;
+}
+
 export interface GalleryYaml {
   hero?: string | string[];
-  albums?: Array<
-    string | Record<string, string | { title: string; description?: string; password?: string }>
-  >;
+  albums?: Array<string | Record<string, string | AlbumEntryObject>>;
   subpages?:
     | Record<string, string[] | Array<string | Record<string, string>>>
     | Array<{
         name: string;
         title?: string;
         subtitle?: string;
-        albums?: Array<
-          | string
-          | Record<string, string | { title: string; description?: string; password?: string }>
-        >;
+        albums?: Array<string | Record<string, string | AlbumEntryObject>>;
         sections?: Array<{
           title: string;
           description?: string;
-          albums: Array<
-            | string
-            | Record<string, string | { title: string; description?: string; password?: string }>
-          >;
+          albums: Array<string | Record<string, string | AlbumEntryObject>>;
         }>;
         password?: string;
         grid?: {

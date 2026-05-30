@@ -13,12 +13,20 @@ interface Props {
   onSelect: (assetId: string) => void;
   onClose: () => void;
   currentAssetIds?: string[];
+  albumId?: string;
+  title?: string;
 }
 
-type Tab = 'favorites' | 'all';
+type Tab = 'album' | 'favorites' | 'all';
 
-export default function AssetPicker({ onSelect, onClose, currentAssetIds = [] }: Props) {
-  const [tab, setTab] = useState<Tab>('favorites');
+export default function AssetPicker({
+  onSelect,
+  onClose,
+  currentAssetIds = [],
+  albumId,
+  title,
+}: Props) {
+  const [tab, setTab] = useState<Tab>(albumId ? 'album' : 'favorites');
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -35,12 +43,16 @@ export default function AssetPicker({ onSelect, onClose, currentAssetIds = [] }:
       else setLoadingMore(true);
 
       try {
-        const params = new URLSearchParams({
-          page: pageNum.toString(),
-          favorites: tab === 'favorites' ? 'true' : 'false',
-        });
-
-        const res = await fetch(`/api/admin/assets?${params}`);
+        let res: Response;
+        if (tab === 'album' && albumId) {
+          res = await fetch(`/api/admin/albums/${albumId}/assets`);
+        } else {
+          const params = new URLSearchParams({
+            page: pageNum.toString(),
+            favorites: tab === 'favorites' ? 'true' : 'false',
+          });
+          res = await fetch(`/api/admin/assets?${params}`);
+        }
         if (res.ok) {
           const data = await res.json();
           setAssets((prev) => (append ? [...prev, ...data.assets] : data.assets));
@@ -54,7 +66,7 @@ export default function AssetPicker({ onSelect, onClose, currentAssetIds = [] }:
         setLoadingMore(false);
       }
     },
-    [tab],
+    [tab, albumId],
   );
 
   useEffect(() => {
@@ -101,7 +113,7 @@ export default function AssetPicker({ onSelect, onClose, currentAssetIds = [] }:
     <div className="picker-overlay" onClick={onClose}>
       <div className="asset-picker-modal" onClick={(e) => e.stopPropagation()}>
         <div className="picker-header">
-          <h3>Select Hero Image</h3>
+          <h3>{title || 'Select Hero Image'}</h3>
           <button className="admin-btn-icon" onClick={onClose}>
             ×
           </button>
@@ -109,6 +121,14 @@ export default function AssetPicker({ onSelect, onClose, currentAssetIds = [] }:
 
         {/* Tabs */}
         <div className="asset-picker-tabs">
+          {albumId && (
+            <button
+              className={`asset-picker-tab ${tab === 'album' ? 'active' : ''}`}
+              onClick={() => setTab('album')}
+            >
+              📂 This Album
+            </button>
+          )}
           <button
             className={`asset-picker-tab ${tab === 'favorites' ? 'active' : ''}`}
             onClick={() => setTab('favorites')}
