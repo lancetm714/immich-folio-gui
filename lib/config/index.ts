@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { env } from '../env';
-import { loadYaml, validateUuid } from './parser';
+import { loadYaml, clearYamlCache, validateUuid } from './parser';
 import { resolveTheme, VALID_LAYOUTS } from './theme';
 import {
   slugify,
@@ -22,6 +22,7 @@ let _fallbackSecret: string | null = null;
 /** Invalidate the cached config so the next getConfig() call re-reads YAML files. */
 export function invalidateConfigCache(): void {
   _config = null;
+  clearYamlCache();
 }
 
 /** Converts raw YAML grid overrides into a typed partial GridConfig. */
@@ -49,8 +50,11 @@ export function buildSubpageGrid(raw?: {
 }
 
 export function getConfig(): AppConfig {
-  const isDev = process.env.NODE_ENV !== 'production';
-  if (_config && !isDev) return _config;
+  // _config is a per-worker in-memory cache.
+  // invalidateConfigCache() clears it + the underlying YAML mtime cache,
+  // so after an admin save every worker re-parses on next request.
+  // In dev we always re-parse so hot-reload works.
+  if (_config && process.env.NODE_ENV === 'production') return _config;
 
   const apiUrl = env.IMMICH_API_URL;
   const apiKey = env.IMMICH_API_KEY;
