@@ -98,7 +98,7 @@ function toPhotoItems(assets: ImmichAsset[], showExif: boolean): PhotoItem[] {
       return {
         id: a.id,
         type: isVideo ? 'video' : 'image',
-        thumbUrl: imageUrl(a.id, 'thumbnail'),
+        thumbUrl: imageUrl(a.id, 'preview'),
         previewUrl: imageUrl(a.id, 'preview'),
         originalUrl: imageUrl(a.id, 'original'),
         ...(isVideo ? { videoUrl: videoUrl(a.id) } : {}),
