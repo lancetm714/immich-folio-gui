@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export function SetupScreen() {
   return (
@@ -38,36 +39,62 @@ export function SetupScreen() {
         </p>
         <div
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.03)',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            fontSize: '0.95rem',
-            lineHeight: 1.6,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
           }}
         >
-          <p style={{ marginBottom: '1rem' }}>
-            To get started, follow these steps in your repository or mounted <code>content/</code>{' '}
-            volume:
-          </p>
-          <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
-            <li style={{ marginBottom: '0.5rem' }}>
-              Copy <code>.env.example</code> to <code>.env.local</code> and fill in your Immich API
-              URL and Key
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              Copy <code>settings.yaml.example</code> to <code>settings.yaml</code>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              Copy <code>gallery.yaml.example</code> to <code>gallery.yaml</code>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              Copy <code>about.md.example</code> to <code>about.md</code> (optional)
-            </li>
-          </ol>
-          <p style={{ marginTop: '1.5rem', marginBottom: 0 }}>
-            Open <code>gallery.yaml</code> and add the album IDs you want to display, then{' '}
-            <strong>restart your server</strong>.
-          </p>
+          <Link
+            href="/install"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0.85rem 2rem',
+              backgroundColor: '#111111',
+              color: '#ffffff',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: 500,
+              textDecoration: 'none',
+              transition: 'opacity 0.15s',
+            }}
+          >
+            Launch Setup Wizard
+          </Link>
+          <div
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.03)',
+              padding: '1.5rem',
+              borderRadius: '8px',
+              fontSize: '0.95rem',
+              lineHeight: 1.6,
+            }}
+          >
+            <p style={{ marginBottom: '1rem' }}>
+              To get started, follow these steps in your repository or mounted <code>content/</code>{' '}
+              volume:
+            </p>
+            <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+              <li style={{ marginBottom: '0.5rem' }}>
+                Copy <code>.env.example</code> to <code>.env.local</code> and fill in your Immich
+                API URL and Key
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                Copy <code>settings.yaml.example</code> to <code>settings.yaml</code>
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                Copy <code>gallery.yaml.example</code> to <code>gallery.yaml</code>
+              </li>
+              <li style={{ marginBottom: '0.5rem' }}>
+                Copy <code>about.md.example</code> to <code>about.md</code> (optional)
+              </li>
+            </ol>
+            <p style={{ marginTop: '1.5rem', marginBottom: 0 }}>
+              Open <code>gallery.yaml</code> and add the album IDs you want to display, then{' '}
+              <strong>restart your server</strong>.
+            </p>
+          </div>
         </div>
       </div>
     </div>

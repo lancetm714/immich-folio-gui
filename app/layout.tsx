@@ -6,6 +6,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import './globals.css';
 import { SubpageNav } from '@/components/SubpageNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -47,7 +48,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || '';
+
+  // Install page gets a clean layout without gallery chrome
+  const isInstall = pathname === '/install';
+  if (isInstall) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body>{children}</body>
+      </html>
+    );
+  }
   const config = getConfig();
   const { theme } = config;
   const fontsUrl = getGoogleFontsUrl(theme);

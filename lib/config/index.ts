@@ -125,7 +125,10 @@ export function getConfig(): AppConfig {
   function processAlbumEntry(
     entry:
       | string
-      | Record<string, string | { title: string; description?: string; password?: string; heroImage?: string }>,
+      | Record<
+          string,
+          string | { title: string; description?: string; password?: string; heroImage?: string }
+        >,
     context: string,
   ): string {
     if (typeof entry === 'string') {
@@ -155,7 +158,40 @@ export function getConfig(): AppConfig {
         ? gallery.subpages.length === 0
         : Object.keys(gallery.subpages).length === 0))
   ) {
-    throw new Error('gallery.yaml must define at least one album or subpage');
+    // Return needsSetup config so the install wizard can render
+    _config = {
+      immich: { apiUrl: `${apiUrl}/api`, apiKey },
+      authSecret,
+      albums: [],
+      standaloneAlbums: [],
+      subpages: [],
+      siteTitle: env.SITE_TITLE || 'Immich Folio',
+      siteSubtitle: env.SITE_SUBTITLE || 'Setup Required',
+      lang: 'en',
+      seo: {
+        title: 'Setup Required',
+        description: 'Please configure Immich Folio',
+        noIndex: true,
+        noFollow: true,
+      },
+      heroImages: [],
+      exifOnHover: true,
+      grid: { columns: 3, gap: 12, aspectRatio: '1', layout: 'masonry' },
+      theme: resolveTheme('studio'),
+      footer: null,
+      legal: { enabled: false, name: '', address: '', zipCity: '', country: '' },
+      map: false,
+      transitions: false,
+      albumOverrides: {},
+      albumDescriptions: {},
+      albumPasswords: {},
+      albumHeroImages: {},
+      cacheTtl: env.CACHE_TTL * 1000,
+      rateLimitRpm: env.RATE_LIMIT_RPM,
+      trustedProxies: env.TRUSTED_PROXIES,
+      needsSetup: true,
+    };
+    return _config;
   }
 
   let subpages: SubpageConfig[] = [];
