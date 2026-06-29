@@ -1,0 +1,44 @@
+.subpage-container {
+  padding: 4rem 2rem;
+  min-height: 80vh;
+}
+.subpage-header {
+  margin-bottom: 4rem;
+  text-align: center;
+}
+.subpage-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+.subpage-subtitle {
+  font-family: var(--font-caption);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+.subpage-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.legal-section {
+  margin-bottom: 2rem;
+}
+.legal-section__title {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+.legal-section__text {
+  line-height: 1.6;
+}
+.legal-section__text--pre {
+  white-space: pre-wrap;
+}
+.legal-source {
+  margin-top: 4rem;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}

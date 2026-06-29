@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+
+# Source control
+.git
+.gitignore
+
+# Build artifacts
+.next
+out
+build
+playwright-report
+test-results
+coverage
+
+# Dev tooling
+dev-docs
+e2e
+*.tsbuildinfo
+next-env.d.ts
+vitest.config.ts
+playwright.config.ts
+eslint.config.mjs
+.prettierrc
+.prettierignore
+
+# Environment files
+.env*
+!.env.local.example
+
+# OS metadata
+.DS_Store

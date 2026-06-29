@@ -1,0 +1,237 @@
+/* ══════════════════════════════════════════════════════
+   THEME: Editorial — Cinematic Magazine
+   ══════════════════════════════════════════════════════ */
+
+/* Header: transparent, magazine masthead feel */
+[data-preset='editorial'] .header {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+[data-preset='editorial'] .header__nav-link {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+}
+
+/* Hero: dramatic oversized serif title */
+[data-preset='editorial'] .hero__title {
+  font-size: 4.5rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  line-height: 1;
+}
+
+[data-preset='editorial'] .hero__subtitle {
+  font-family: var(--font-caption);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  font-style: italic;
+  margin-bottom: 48px;
+  opacity: 0.7;
+}
+
+[data-preset='editorial'] .hero__nav-link {
+  font-family: var(--font-caption);
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  border-bottom: none;
+}
+
+[data-preset='editorial'] .hero__nav-link:hover {
+  color: var(--accent);
+  border-bottom-color: transparent;
+}
+
+/* Photo grid: generous spacing, cinematic transitions */
+[data-preset='editorial'] .photo-grid {
+  column-gap: 32px;
+}
+
+[data-preset='editorial'] .photo-grid__item {
+  margin-bottom: 32px;
+}
+
+[data-preset='editorial'] .photo-grid__item img {
+  transition:
+    filter 1.5s ease,
+    transform 1.5s ease;
+  filter: saturate(0.7) brightness(0.95);
+}
+
+[data-preset='editorial'] .photo-grid__item:hover img {
+  filter: saturate(1) brightness(1);
+  transform: scale(1.01);
+}
+
+/* Album cards: text below, editorial layout */
+[data-preset='editorial'] .album-card {
+  border: none;
+  border-radius: 0;
+  aspect-ratio: 16 / 9;
+}
+
+[data-preset='editorial'] .album-card:hover {
+  transform: none;
+  border-color: transparent;
+}
+
+[data-preset='editorial'] .album-card__overlay {
+  justify-content: flex-start;
+  padding: 28px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
+}
+
+[data-preset='editorial'] .album-card__title {
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-preset='editorial'] .album-card__count {
+  font-family: var(--font-caption);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+[data-preset='editorial'] .album-card:hover .album-card__image {
+  transform: scale(1.015);
+  filter: brightness(0.8);
+  transition:
+    transform 1.5s ease,
+    filter 1.5s ease;
+}
+
+/* Section labels: pull-quote style with left border */
+[data-preset='editorial'] .section-label {
+  font-family: var(--font-caption);
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--text-secondary);
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+}
+
+/* Album header: large cinematic title */
+[data-preset='editorial'] .album-header__title {
+  font-size: 3rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* Album & Subpage Header overrides */
+[data-preset='editorial'] .album-header__title,
+[data-preset='editorial'] .subpage-title {
+  font-family: var(--font-serif);
+  font-size: 5rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+[data-preset='editorial'] .album-header__meta,
+[data-preset='editorial'] .subpage-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Footer: centered italic attribution */
+[data-preset='editorial'] .footer__name {
+  font-family: var(--font-caption);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+}
+
+/* Subpage grid */
+[data-preset='editorial'] .subpage-grid {
+  gap: 2px;
+}
+
+[data-preset='editorial'] .subpage-grid__item {
+  border: none;
+  aspect-ratio: 16 / 9;
+}
+
+[data-preset='editorial'] .subpage-grid__item-title {
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  font-weight: 300;
+  text-transform: none;
+}
+
+/* Subpage TOC: italic, cinematic – like a film chapter list */
+[data-preset='editorial'] .subpage-toc {
+  margin-bottom: 64px;
+}
+
+[data-preset='editorial'] .subpage-toc__entry + .subpage-toc__entry::before {
+  content: '/';
+  padding: 0 12px;
+  font-family: var(--font-caption);
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+[data-preset='editorial'] .subpage-toc__num {
+  font-family: var(--font-caption);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+[data-preset='editorial'] .subpage-toc__label {
+  font-family: var(--font-caption);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+[data-preset='editorial'] .subpage-toc__link {
+  color: var(--text-secondary);
+}
+
+[data-preset='editorial'] .subpage-toc__link:hover {
+  color: var(--accent);
+}
+
+/* Section: pull-quote accent border, large cinematic title */
+[data-preset='editorial'] .subpage-section__title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+[data-preset='editorial'] .subpage-section__desc {
+  font-family: var(--font-caption);
+  font-style: italic;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+[data-preset='editorial'] .subpage-section__rule {
+  background: none;
+  height: 0;
+  border-left: 3px solid var(--accent);
+  margin-bottom: -16px;
+  width: 40px;
+}

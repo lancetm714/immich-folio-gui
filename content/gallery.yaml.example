@@ -1,0 +1,57 @@
+# ── Gallery Structure ──────────────────────────────────────────────
+# This file defines WHICH albums and subpages are shown.
+# Global settings (theme, map, legal, title) now live in content/settings.yaml.
+
+# Hero images for the homepage carousel (Immich asset UUIDs)
+hero:
+  - "your-asset-uuid-1"
+  - "your-asset-uuid-2"
+
+# Standalone albums (shown on the home page)
+albums:
+  - "your-album-uuid-1"
+  - "your-album-uuid-2"
+
+# Subpages: group albums under custom URL paths
+subpages:
+  "Travel":
+    - "album-uuid-3"
+    - "album-uuid-4"
+  "Projects":
+    title: "My Creative Projects" # Optional: Header title, defaults to Navigation key ("Projects")
+    subtitle: "A collection of 2026 highlights in 35mm film." # Optional: Sub-text for headers
+    password: "your-password" # Optional protection
+    albums:
+      - "album-uuid-5"
+      - "album-uuid-6":
+          title: "Private Project #7"
+          description: "Shot on 35mm film in Vienna, spring 2025." # Optional: shown below album title
+          password: "scrypt:..." # Recommended: secure hash (generated via logs)
+
+# ── Subpage with Sections ──────────────────────────────────────────
+# Use sections to group albums by location, theme, or any other logic.
+# A typographic table of contents is rendered above the albums.
+# Sections are optional: leave them out and you get a flat album grid (as above).
+subpages:
+  - name: Japan
+    title: Japan
+    subtitle: "Reisen durch ein Land voller Kontraste."
+
+    sections:
+      - title: Tokyo
+        description: "Megacity, Neonlichter, Stille im Lärm."
+        albums:
+          - "album-uuid-tokyo-1"               # Uses Immich album name
+          - "album-uuid-tokyo-2": Shinjuku bei Nacht  # Custom title override
+          - "album-uuid-tokyo-3"
+
+      - title: Kyoto
+        description: "Tempel, Bambuswälder, goldener Herbst."
+        albums:
+          - "album-uuid-kyoto-1": Fushimi Inari
+          - "album-uuid-kyoto-2"
+
+      - title: Osaka
+        albums:                                # description is optional
+          - "album-uuid-osaka-1"
+          - "album-uuid-osaka-2"

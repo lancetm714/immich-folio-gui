@@ -1,0 +1,263 @@
+/* ══════════════════════════════════════════════════════
+   THEME: Classic — Gilded Gallery
+   ══════════════════════════════════════════════════════ */
+
+/* Header: centered nav with gold accent */
+[data-preset='classic'] .header {
+  background: rgba(18, 18, 16, 0.92);
+  border-bottom: 1px solid rgba(196, 154, 60, 0.15);
+}
+
+[data-preset='classic'][data-theme='light'] .header {
+  background: rgba(253, 251, 245, 0.92);
+}
+
+[data-preset='classic'] .header__nav {
+  justify-content: center;
+}
+
+[data-preset='classic'] .header__nav-link {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  padding: 20px 18px;
+}
+
+/* Hero: elegant centered card above banner */
+[data-preset='classic'] .hero__left {
+  padding: 80px 48px;
+}
+
+[data-preset='classic'] .hero__title {
+  font-size: 2.8rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+[data-preset='classic'] .hero__subtitle {
+  font-family: var(--font-caption);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+/* Decorative ornament beneath subtitle */
+[data-preset='classic'] .hero__subtitle::after {
+  content: '◆';
+  display: block;
+  margin-top: 20px;
+  font-size: 0.5rem;
+  color: var(--accent);
+  letter-spacing: 0;
+}
+
+[data-preset='classic'] .hero__nav-link {
+  font-family: var(--font-caption);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  font-style: italic;
+  text-transform: none;
+  border-bottom: none;
+}
+
+[data-preset='classic'] .hero__nav-link:hover {
+  color: var(--accent);
+  border-bottom-color: transparent;
+}
+
+/* Photo grid: warm passepartout, elegant hover */
+[data-preset='classic'] .photo-grid {
+  column-gap: var(--grid-gap, 20px);
+}
+
+[data-preset='classic'] .photo-grid__item {
+  margin-bottom: var(--grid-gap, 20px);
+}
+
+[data-preset='classic'] .photo-grid__item:hover img {
+  filter: brightness(0.9);
+  transform: scale(1.01);
+}
+
+/* Warm passepartout override */
+[data-preset='classic'][data-photo-frame='passepartout'] .photo-grid__item {
+  background: #1a1816;
+  border-color: rgba(196, 154, 60, 0.12);
+}
+
+[data-preset='classic'][data-photo-frame='passepartout'][data-theme='light'] .photo-grid__item {
+  background: #fffdf5;
+  border-color: rgba(196, 154, 60, 0.2);
+}
+
+/* Album cards: warm rounded, gold hover */
+[data-preset='classic'] .album-card {
+  border-radius: 12px;
+  border: 1px solid rgba(196, 154, 60, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+[data-preset='classic'][data-theme='light'] .album-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(196, 154, 60, 0.15);
+}
+
+[data-preset='classic'] .album-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-preset='classic'] .album-card__title {
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+[data-preset='classic'] .album-card__count {
+  font-family: var(--font-caption);
+  font-style: italic;
+}
+
+/* Section labels: decorative centered dividers */
+[data-preset='classic'] .section-label {
+  text-align: center;
+  font-family: var(--font-caption);
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+[data-preset='classic'] .section-label::before {
+  content: '— ';
+  color: var(--accent);
+}
+
+[data-preset='classic'] .section-label::after {
+  content: ' —';
+  color: var(--accent);
+}
+
+/* Album & Subpage header: elegant serif */
+[data-preset='classic'] .album-header__title,
+[data-preset='classic'] .subpage-title {
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  font-size: 2.2rem;
+}
+
+[data-preset='classic'] .album-header__meta,
+[data-preset='classic'] .subpage-subtitle {
+  font-family: var(--font-caption);
+  font-style: italic;
+}
+
+/* Footer: ornamental */
+[data-preset='classic'] .footer {
+  border-top: 1px solid rgba(196, 154, 60, 0.15);
+}
+
+[data-preset='classic'] .footer__name {
+  font-family: var(--font-caption);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+}
+
+/* Scroll-to-top: gold border */
+[data-preset='classic'] .scroll-to-top {
+  border-radius: 12px;
+}
+
+[data-preset='classic'] .scroll-to-top:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Subpage grid: warm borders */
+[data-preset='classic'] .subpage-grid__item {
+  border: 1px solid rgba(196, 154, 60, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+[data-preset='classic'] .subpage-grid__item-title {
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+/* Subpage TOC: Cinzel uppercase with gold ornament separators */
+[data-preset='classic'] .subpage-toc {
+  margin-bottom: 56px;
+  justify-content: center;
+}
+
+[data-preset='classic'] .subpage-toc__entry + .subpage-toc__entry::before {
+  content: '◆';
+  padding: 0 14px;
+  font-size: 0.45rem;
+  color: var(--accent);
+}
+
+[data-preset='classic'] .subpage-toc__num {
+  display: none;
+}
+
+[data-preset='classic'] .subpage-toc__label {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='classic'] .subpage-toc__link {
+  color: var(--text-muted);
+}
+
+[data-preset='classic'] .subpage-toc__link:hover {
+  color: var(--accent);
+}
+
+/* Section: ornamental centered divider rule */
+[data-preset='classic'] .subpage-section__header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+[data-preset='classic'] .subpage-section__title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+[data-preset='classic'] .subpage-section__desc {
+  font-family: var(--font-caption);
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+[data-preset='classic'] .subpage-section__rule {
+  background: none;
+  height: auto;
+  border: none;
+  text-align: center;
+  margin-top: 16px;
+}
+
+[data-preset='classic'] .subpage-section__rule::after {
+  content: '—◆—';
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}

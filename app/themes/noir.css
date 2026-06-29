@@ -1,0 +1,164 @@
+/* ══════════════════════════════════════════════════════
+   THEME: Noir — Darkroom Analog
+   ══════════════════════════════════════════════════════ */
+
+/* Header: transparent with subtle warm border */
+[data-preset='noir'] .header {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+}
+
+[data-preset='noir'] .header__nav-link {
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+}
+
+/* Photo grid: warm analog feel */
+[data-preset='noir'] .photo-grid__item img {
+  filter: sepia(0.08) contrast(1.02);
+  transition:
+    filter 0.8s ease,
+    transform 0.8s ease,
+    box-shadow 0.8s ease;
+}
+
+[data-preset='noir'] .photo-grid__item:hover img {
+  filter: sepia(0) contrast(1) brightness(0.88);
+  transform: scale(1.01);
+}
+
+/* Vignette hover effect */
+[data-preset='noir'] .photo-grid__item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0);
+  pointer-events: none;
+  transition: box-shadow 0.8s ease;
+}
+
+[data-preset='noir'] .photo-grid__item:hover::before {
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Film-edge EXIF labels */
+[data-preset='noir'] .photo-grid__item-exif {
+  font-family: var(--font-caption);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 200, 150, 0.7);
+}
+
+/* Album cards */
+[data-preset='noir'] .album-card {
+  border: none;
+  border-radius: 0;
+}
+
+[data-preset='noir'] .album-card:hover {
+  transform: none;
+  border-color: transparent;
+}
+
+[data-preset='noir'] .album-card__title {
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* Section labels */
+[data-preset='noir'] .section-label {
+  font-family: var(--font-caption);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Album & Subpage header */
+[data-preset='noir'] .album-header__title,
+[data-preset='noir'] .subpage-title {
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+/* Footer */
+[data-preset='noir'] .footer {
+  border-top: 1px solid rgba(255, 107, 53, 0.1);
+}
+
+[data-preset='noir'] .footer__name {
+  font-family: var(--font-caption);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+
+/* Subpage grid */
+[data-preset='noir'] .subpage-grid__item {
+  border: none;
+}
+
+[data-preset='noir'] .subpage-grid__item-title {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+/* Subpage TOC: monospace film-edge style, amber accent */
+[data-preset='noir'] .subpage-toc {
+  margin-bottom: 56px;
+}
+
+[data-preset='noir'] .subpage-toc__entry + .subpage-toc__entry::before {
+  content: '|';
+  padding: 0 12px;
+  font-family: var(--font-caption);
+  font-size: 0.65rem;
+  color: rgba(255, 107, 53, 0.3);
+}
+
+[data-preset='noir'] .subpage-toc__num {
+  font-family: var(--font-caption);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+[data-preset='noir'] .subpage-toc__label {
+  font-family: var(--font-caption);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+[data-preset='noir'] .subpage-toc__link {
+  color: var(--text-secondary);
+}
+
+[data-preset='noir'] .subpage-toc__link:hover {
+  color: var(--accent);
+}
+
+/* Section: amber hairline rule */
+[data-preset='noir'] .subpage-section__title {
+  font-weight: 300;
+  letter-spacing: 0.06em;
+}
+
+[data-preset='noir'] .subpage-section__desc {
+  font-family: var(--font-caption);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 200, 150, 0.5);
+}
+
+[data-preset='noir'] .subpage-section__rule {
+  background: linear-gradient(to right, var(--accent), transparent);
+  opacity: 0.35;
+  height: 1px;
+}

@@ -1,0 +1,65 @@
+# ── Dependencies ─────────────────────────────────────
+/node_modules
+/.pnp
+.pnp.*
+
+# Yarn (keep patches/plugins/releases)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── Next.js ──────────────────────────────────────────
+/.next/
+/out/
+/build
+next-env.d.ts
+
+# ── TypeScript ────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Testing & Coverage ───────────────────────────────
+/coverage
+/test-results/
+/playwright-report/
+
+# ── Logs ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Environment ──────────────────────────────────────
+.env*
+!.env.local.example
+
+# ── OS & Editor ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.pem
+.vscode/settings.json
+.idea/
+
+# ── Agent & Dev Tools ────────────────────────────────
+.agent/
+.Jules/
+
+# ── One-off Scripts (Root) ───────────────────────────
+/check_albums.js
+/check_albums.ts
+/git-filter-repo
+
+# ── Deployment ───────────────────────────────────────
+.vercel
+docker-compose.override.yml
+
+# ── User Content (personal gallery config) ───────────
+content/settings.yaml
+content/gallery.yaml
+content/about.md
+
+# ── Internal Dev Docs ────────────────────────────────
+docs/dev/
+docs/ideas.md
