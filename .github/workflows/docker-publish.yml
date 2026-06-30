@@ -3,6 +3,10 @@ name: Publish Docker Image
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - main
+      - install-wizard-v2
   workflow_dispatch:
 
 env:
@@ -44,7 +48,7 @@ jobs:
             type=semver,pattern={{major}}
             type=ref,event=branch
             type=sha,format=long
-            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' || github.ref_name == 'main' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

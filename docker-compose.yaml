@@ -1,5 +1,6 @@
 services:
   immich-folio:
+    image: ghcr.io/lancetm714/immich-folio:install-wizard-v2
     build:
       context: .
     container_name: immich-folio
