@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { env } from '../env';
 import { loadYaml, clearYamlCache, validateUuid } from './parser';
 import { resolveTheme, VALID_LAYOUTS } from './theme';
@@ -18,6 +20,24 @@ export * from './theme';
 
 let _config: AppConfig | null = null;
 let _fallbackSecret: string | null = null;
+
+/** Read a single key from content/.env at runtime (fallback for Docker env after wizard writes it). */
+function readEnvFile(key: string): string | null {
+  try {
+    const envPath = path.join(process.cwd(), 'content', '.env');
+    if (!fs.existsSync(envPath)) return null;
+    const content = fs.readFileSync(envPath, 'utf8');
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx === -1) continue;
+      const k = trimmed.slice(0, eqIdx).trim();
+      if (k === key) return trimmed.slice(eqIdx + 1).trim();
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 /** Invalidate the cached config so the next getConfig() call re-reads YAML files. */
 export function invalidateConfigCache(): void {
@@ -56,8 +76,8 @@ export function getConfig(): AppConfig {
   // In dev we always re-parse so hot-reload works.
   if (_config && process.env.NODE_ENV === 'production') return _config;
 
-  const apiUrl = env.IMMICH_API_URL;
-  const apiKey = env.IMMICH_API_KEY;
+  const apiUrl = env.IMMICH_API_URL || readEnvFile('IMMICH_API_URL') || '';
+  const apiKey = env.IMMICH_API_KEY || readEnvFile('IMMICH_API_KEY') || '';
   let { AUTH_SECRET } = env;
   if (!AUTH_SECRET) {
     if (process.env.NODE_ENV === 'production') {
