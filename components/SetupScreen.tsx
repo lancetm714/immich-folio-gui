@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 export function SetupScreen() {
   return (
@@ -44,7 +43,7 @@ export function SetupScreen() {
             gap: '1rem',
           }}
         >
-          <Link
+          <a
             href="/install"
             style={{
               display: 'inline-flex',
@@ -61,7 +60,7 @@ export function SetupScreen() {
             }}
           >
             Launch Setup Wizard
-          </Link>
+          </a>
           <div
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.03)',
