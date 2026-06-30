@@ -1,5 +1,7 @@
 services:
   immich-folio:
+    # Switch to this image once CI publishes to GHCR:
+    # image: ghcr.io/lancetm714/immich-folio:install-wizard-v2
     build:
       context: .
     container_name: immich-folio
