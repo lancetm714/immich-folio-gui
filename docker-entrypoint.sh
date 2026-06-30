@@ -19,11 +19,15 @@ fi
 if [ -d /app/content ]; then
   chown -R nextjs:nodejs /app/content 2>/dev/null || true
 
-  # Source persisted env vars from content/.env (written by install wizard)
+  # Load persisted env vars from content/.env (written by install wizard)
+  # Parses KEY=VALUE lines safely — values may contain spaces or '=' without quoting
   if [ -f /app/content/.env ]; then
-    set -a
-    . /app/content/.env
-    set +a
+    while IFS='=' read -r key value; do
+      case "$key" in
+        '#'*|'') continue;;
+        *) export "$key=$value";;
+      esac
+    done < /app/content/.env
   fi
 
   # Auto-generate AUTH_SECRET if still not set and persist it
