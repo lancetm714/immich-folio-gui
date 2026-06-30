@@ -1,6 +1,20 @@
 #!/bin/sh
-# Ensure the content directory is writable by the nextjs user (UID 1001).
-# This is needed when ./content is bind-mounted from the host.
+# This entrypoint:
+# 1. Maps PUID/PGID to the nextjs user for Synology NAS compatibility
+# 2. Sources persisted env vars from content/.env (written by install wizard)
+# 3. Auto-generates AUTH_SECRET if missing
+# 4. Drops privileges and runs the Next.js server
+
+# Map PUID/PGID to the nextjs user so bind-mounted files match host permissions
+PUID=${PUID:-1001}
+PGID=${PGID:-1001}
+
+if [ "$PGID" != "1001" ]; then
+  groupmod -o -g "$PGID" nodejs 2>/dev/null || true
+fi
+if [ "$PUID" != "1001" ]; then
+  usermod -o -u "$PUID" nextjs 2>/dev/null || true
+fi
 
 if [ -d /app/content ]; then
   chown -R nextjs:nodejs /app/content 2>/dev/null || true

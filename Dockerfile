@@ -34,8 +34,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# su-exec for dropping privileges in entrypoint
-RUN apk add --no-cache su-exec
+# Tools for dynamic UID/GID mapping (Synology NAS compat)
+RUN apk add --no-cache su-exec shadow
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/content ./content
