@@ -6,7 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import yaml from 'js-yaml';
-import type { GalleryYaml, SettingsYaml } from '../config/schema';
+import type { GalleryYaml, SettingsYaml, BlogPostMeta, BlogPostItem } from '../config/schema';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 const MAX_BACKUPS = 10; // Keep last 10 backups per file
@@ -126,6 +126,100 @@ export async function restoreBackup(backupFilename: string): Promise<void> {
 
   await fs.copyFile(backupPath, targetPath);
   console.log(`[Admin] 🔄 Restored ${originalFilename} from ${backupFilename}`);
+}
+
+const BLOG_DIR = path.join(CONTENT_DIR, 'blog');
+
+/** List all blog posts, sorted by date descending. */
+export async function listBlogPosts(): Promise<BlogPostMeta[]> {
+  try {
+    await fs.mkdir(BLOG_DIR, { recursive: true });
+    const files = await fs.readdir(BLOG_DIR);
+    const mdFiles = files.filter((f) => f.endsWith('.md'));
+    const posts: BlogPostMeta[] = [];
+
+    for (const file of mdFiles) {
+      const raw = await fs.readFile(path.join(BLOG_DIR, file), 'utf8');
+      const match = raw.match(/^(?:---\r?\n)([\s\S]*?)(?:\r?\n---\r?\n)/);
+      if (match) {
+        const meta = yaml.load(match[1]) as BlogPostMeta;
+        posts.push(meta);
+      }
+    }
+
+    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return posts;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return [];
+    throw err;
+  }
+}
+
+/** Read a single blog post by slug. */
+export async function readBlogPost(slug: string): Promise<BlogPostItem | null> {
+  try {
+    const filePath = path.join(BLOG_DIR, `${slug}.md`);
+    const raw = await fs.readFile(filePath, 'utf8');
+    const match = raw.match(/^(?:---\r?\n)([\s\S]*?)(?:\r?\n---\r?\n)([\s\S]*)$/);
+    if (match) {
+      const meta = yaml.load(match[1]) as BlogPostMeta;
+      return { ...meta, body: match[2].trim() };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Write a blog post (create or update). */
+export async function writeBlogPost(slug: string, meta: Record<string, unknown>, body: string): Promise<void> {
+  await fs.mkdir(BLOG_DIR, { recursive: true });
+  const filePath = path.join(BLOG_DIR, `${slug}.md`);
+
+  try {
+    await fs.access(filePath);
+    const backupDir = path.join(CONTENT_DIR, '.backups');
+    await fs.mkdir(backupDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    await fs.copyFile(filePath, path.join(backupDir, `blog-${slug}.md.${timestamp}.bak`));
+    await pruneBackups(backupDir, `blog-${slug}.md`);
+  } catch {
+    // File doesn't exist, no backup needed
+  }
+
+  const frontmatter = yaml.dump(meta, { lineWidth: 120, quotingType: '"', noRefs: true, sortKeys: false });
+  const content = `---\n${frontmatter}---\n\n${body}\n`;
+
+  const tmpPath = `${filePath}.tmp`;
+  await fs.writeFile(tmpPath, content, 'utf8');
+  await fs.rename(tmpPath, filePath);
+
+  console.log(`[Admin] Saved blog/${slug}.md`);
+
+  // Also save settings.yaml update to trigger mtime cache invalidation
+  await updateSettingsMtime();
+}
+
+/** Delete a blog post by slug. */
+export async function deleteBlogPost(slug: string): Promise<void> {
+  const filePath = path.join(BLOG_DIR, `${slug}.md`);
+  try {
+    await fs.unlink(filePath);
+    console.log(`[Admin] Deleted blog/${slug}.md`);
+  } catch {
+    // File doesn't exist, ignore
+  }
+}
+
+/** Touch settings.yaml to invalidate mtime-based config cache. */
+async function updateSettingsMtime(): Promise<void> {
+  try {
+    const settingsPath = path.join(CONTENT_DIR, 'settings.yaml');
+    const now = new Date();
+    await fs.utimes(settingsPath, now, now);
+  } catch {
+    // settings.yaml might not exist yet
+  }
 }
 
 /** Remove old backups, keeping only MAX_BACKUPS most recent. */

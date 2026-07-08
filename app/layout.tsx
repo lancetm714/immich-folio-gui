@@ -99,6 +99,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               Home
             </Link>
             <SubpageNav />
+            {config.blog && (
+              <Link href="/blog" className="header__nav-link">
+                Blog
+              </Link>
+            )}
             <Link href="/about" className="header__nav-link">
               About
             </Link>
