@@ -13,23 +13,17 @@ import { cookies } from 'next/headers';
 function readEnvFile(key: string): string | null {
   try {
     const envPath = path.join(process.cwd(), 'content', '.env');
-    console.log('[auth] readEnvFile path:', envPath, 'exists:', fs.existsSync(envPath));
     if (!fs.existsSync(envPath)) return null;
     const content = fs.readFileSync(envPath, 'utf8');
-    console.log('[auth] readEnvFile content:', content.substring(0, 200));
     for (const line of content.split('\n')) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) continue;
       const eqIdx = trimmed.indexOf('=');
       if (eqIdx === -1) continue;
       const k = trimmed.slice(0, eqIdx).trim();
-      if (k === key) {
-        const val = trimmed.slice(eqIdx + 1).trim();
-        console.log('[auth] readEnvFile found', key, '=', val ? '(set)' : '(empty)');
-        return val;
-      }
+      if (k === key) return trimmed.slice(eqIdx + 1).trim();
     }
-  } catch (e) { console.error('[auth] readEnvFile error:', e); }
+  } catch { /* ignore */ }
   return null;
 }
 
@@ -103,12 +97,7 @@ export async function isAdminAuthenticated(): Promise<boolean> {
 
 /** Check if admin panel is enabled (password is set). */
 export function isAdminEnabled(): boolean {
-  const fromEnv = env.ADMIN_PASSWORD;
-  const fromFile = readEnvFile('ADMIN_PASSWORD');
-  const cwd = process.cwd();
-  const hasProc = !!process.env.ADMIN_PASSWORD;
-  console.log('[auth] isAdminEnabled:', { fromEnv: !!fromEnv, fromFile: !!fromFile, cwd, hasProc });
-  return !!(fromEnv || fromFile);
+  return !!(env.ADMIN_PASSWORD || readEnvFile('ADMIN_PASSWORD'));
 }
 
 export { COOKIE_NAME, SESSION_DURATION_MS };
