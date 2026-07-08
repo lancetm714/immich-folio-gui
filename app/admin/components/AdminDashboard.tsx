@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import PageBuilder from './PageBuilder';
 import SettingsEditor from './SettingsEditor';
-import AboutEditor from './AboutEditor';
+import BlogEditor from './BlogEditor';
 
 interface Props {
   onLogout: () => void;
 }
 
-type Tab = 'pages' | 'settings' | 'about';
+type Tab = 'pages' | 'settings' | 'blog';
 
 export default function AdminDashboard({ onLogout }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('pages');
@@ -76,10 +76,10 @@ export default function AdminDashboard({ onLogout }: Props) {
               Settings
             </button>
             <button
-              className={`admin-tab ${activeTab === 'about' ? 'active' : ''}`}
-              onClick={() => setActiveTab('about')}
+              className={`admin-tab ${activeTab === 'blog' ? 'active' : ''}`}
+              onClick={() => setActiveTab('blog')}
             >
-              About
+              Blog
             </button>
           </nav>
         </div>
@@ -174,7 +174,7 @@ export default function AdminDashboard({ onLogout }: Props) {
       <main className="admin-main">
         {activeTab === 'pages' && <PageBuilder />}
         {activeTab === 'settings' && <SettingsEditor />}
-        {activeTab === 'about' && <AboutEditor />}
+        {activeTab === 'blog' && <BlogEditor />}
       </main>
     </div>
   );

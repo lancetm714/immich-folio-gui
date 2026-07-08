@@ -23,6 +23,7 @@
     "next": "16.2.4",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "react-markdown": "^10.1.0",
     "thumbhash": "^0.1.1"
   },
   "devDependencies": {
@@ -40,5 +41,10 @@
     "prettier": "^3.8.3",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "allowScripts": {
+    "esbuild@0.27.3": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.11.1": true
   }
 }

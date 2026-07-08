@@ -8,6 +8,7 @@ interface Settings {
   lang?: string;
   exifOnHover?: boolean;
   map?: boolean;
+  blog?: boolean;
   transitions?: boolean;
   theme?: {
     preset?: string;
@@ -328,6 +329,14 @@ export default function SettingsEditor() {
                     onChange={(e) => update('map', e.target.checked)}
                   />
                   Map enabled
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.blog !== false}
+                    onChange={(e) => update('blog', e.target.checked)}
+                  />
+                  Blog enabled
                 </label>
                 <label>
                   <input
