@@ -26,13 +26,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
   }
 
+  const isSecure =
+    request.nextUrl.protocol === 'https:' ||
+    request.headers.get('x-forwarded-proto') === 'https';
+
   const token = createAdminToken();
   const response = NextResponse.json({ success: true });
 
   response.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isSecure,
+    sameSite: 'lax',
     path: '/',
     maxAge: SESSION_DURATION_MS / 1000,
   });
@@ -51,12 +55,16 @@ export async function GET() {
 }
 
 /** DELETE: Logout. */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const isSecure =
+    request.nextUrl.protocol === 'https:' ||
+    request.headers.get('x-forwarded-proto') === 'https';
+
   const response = NextResponse.json({ success: true });
   response.cookies.set(COOKIE_NAME, '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isSecure,
+    sameSite: 'lax',
     path: '/',
     maxAge: 0,
   });
