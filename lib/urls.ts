@@ -80,13 +80,24 @@ export function assetExifSummary(asset: Pick<ImmichAsset, 'exifInfo'>): ExifSumm
   return { camera, lens, focalLength };
 }
 
+/** Orientations that rotate the image 90° or 270°, swapping effective w/h. */
+const SWAP_ORIENTATIONS = new Set([5, 6, 7, 8]);
+
 /**
  * Compute the natural aspect ratio (width / height) from EXIF dimensions.
+ * Accounts for EXIF orientation — if the image is rotated 90°/270°
+ * (orientations 5–8), width and height are swapped.
  * Returns undefined if dimensions are not available.
  */
 export function assetAspectRatio(asset: Pick<ImmichAsset, 'exifInfo'>): number | undefined {
-  const w = asset.exifInfo?.exifImageWidth;
-  const h = asset.exifInfo?.exifImageHeight;
-  if (w && h && h > 0) return w / h;
-  return undefined;
+  const exif = asset.exifInfo;
+  if (!exif) return undefined;
+  let w = exif.exifImageWidth;
+  let h = exif.exifImageHeight;
+  if (!w || !h || h <= 0) return undefined;
+  if (exif.orientation) {
+    const o = parseInt(exif.orientation, 10);
+    if (!isNaN(o) && SWAP_ORIENTATIONS.has(o)) [w, h] = [h, w];
+  }
+  return w / h;
 }

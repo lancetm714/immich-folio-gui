@@ -53,6 +53,7 @@ export interface ImmichExifInfo {
   country: string | null;
   dateTimeOriginal: string | null;
   description: string | null;
+  orientation: string | null;
 }
 
 export type ImageSize = 'thumbnail' | 'preview' | 'original';

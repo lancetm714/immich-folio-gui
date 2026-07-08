@@ -56,25 +56,34 @@ describe('assetPlaceholder', () => {
 });
 
 describe('assetExifSummary', () => {
+  const nullExif = {
+    make: null,
+    model: null,
+    lensModel: null,
+    focalLength: null,
+    fNumber: null,
+    exposureTime: null,
+    iso: null,
+    exifImageWidth: null,
+    exifImageHeight: null,
+    latitude: null,
+    longitude: null,
+    city: null,
+    state: null,
+    country: null,
+    dateTimeOriginal: null,
+    description: null,
+    orientation: null,
+  };
+
   it('returns camera, lens, and focal length from exifInfo', () => {
     const result = assetExifSummary({
       exifInfo: {
+        ...nullExif,
         make: 'Leica',
         model: 'M11-P',
         lensModel: 'Summilux-M 50mm',
         focalLength: 50,
-        fNumber: null,
-        exposureTime: null,
-        iso: null,
-        exifImageWidth: null,
-        exifImageHeight: null,
-        latitude: null,
-        longitude: null,
-        city: null,
-        state: null,
-        country: null,
-        dateTimeOriginal: null,
-        description: null,
       },
     });
     expect(result).toEqual({
@@ -90,51 +99,35 @@ describe('assetExifSummary', () => {
 
   it('returns undefined when all relevant fields are null', () => {
     expect(
-      assetExifSummary({
-        exifInfo: {
-          make: null,
-          model: null,
-          lensModel: null,
-          focalLength: null,
-          fNumber: null,
-          exposureTime: null,
-          iso: null,
-          exifImageWidth: null,
-          exifImageHeight: null,
-          latitude: null,
-          longitude: null,
-          city: null,
-          state: null,
-          country: null,
-          dateTimeOriginal: null,
-          description: null,
-        },
-      }),
+      assetExifSummary({ exifInfo: { ...nullExif } }),
     ).toBeUndefined();
   });
 });
 
 describe('assetAspectRatio', () => {
+  const nullExif = {
+    make: null,
+    model: null,
+    lensModel: null,
+    focalLength: null,
+    fNumber: null,
+    exposureTime: null,
+    iso: null,
+    exifImageWidth: null,
+    exifImageHeight: null,
+    latitude: null,
+    longitude: null,
+    city: null,
+    state: null,
+    country: null,
+    dateTimeOriginal: null,
+    description: null,
+    orientation: null,
+  };
+
   it('computes width / height ratio', () => {
     const result = assetAspectRatio({
-      exifInfo: {
-        make: null,
-        model: null,
-        lensModel: null,
-        focalLength: null,
-        fNumber: null,
-        exposureTime: null,
-        iso: null,
-        exifImageWidth: 3000,
-        exifImageHeight: 2000,
-        latitude: null,
-        longitude: null,
-        city: null,
-        state: null,
-        country: null,
-        dateTimeOriginal: null,
-        description: null,
-      },
+      exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
     });
     expect(result).toBe(1.5);
   });
@@ -146,25 +139,83 @@ describe('assetAspectRatio', () => {
   it('returns undefined when height is 0', () => {
     expect(
       assetAspectRatio({
-        exifInfo: {
-          make: null,
-          model: null,
-          lensModel: null,
-          focalLength: null,
-          fNumber: null,
-          exposureTime: null,
-          iso: null,
-          exifImageWidth: 100,
-          exifImageHeight: 0,
-          latitude: null,
-          longitude: null,
-          city: null,
-          state: null,
-          country: null,
-          dateTimeOriginal: null,
-          description: null,
-        },
+        exifInfo: { ...nullExif, exifImageWidth: 100, exifImageHeight: 0 },
       }),
     ).toBeUndefined();
+  });
+
+  it('returns undefined when width is null', () => {
+    expect(
+      assetAspectRatio({
+        exifInfo: { ...nullExif, exifImageWidth: null, exifImageHeight: 2000 },
+      }),
+    ).toBeUndefined();
+  });
+
+  describe('EXIF orientation swap', () => {
+    // A portrait photo from a phone: physical file is 4032x3024 but
+    // orientation=6 (rotate 90° CW) means display is 3024x4032 → ratio ~0.75
+    const portraitAsset = {
+      exifImageWidth: 4032,
+      exifImageHeight: 3024,
+    };
+
+    it('swaps w/h for orientation 6 (rotate 90° CW)', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '6' },
+      });
+      // swapped: 3024 / 4032 ≈ 0.75
+      expect(result).toBeCloseTo(0.75, 5);
+    });
+
+    it('swaps w/h for orientation 8 (rotate 270° CW)', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '8' },
+      });
+      expect(result).toBeCloseTo(0.75, 5);
+    });
+
+    it('swaps w/h for orientation 5', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '5' },
+      });
+      expect(result).toBeCloseTo(0.75, 5);
+    });
+
+    it('swaps w/h for orientation 7', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '7' },
+      });
+      expect(result).toBeCloseTo(0.75, 5);
+    });
+
+    it('does not swap for orientation 1 (normal)', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '1' },
+      });
+      // not swapped: 4032 / 3024 ≈ 1.333
+      expect(result).toBeCloseTo(1.33333, 4);
+    });
+
+    it('does not swap for orientation 3 (rotate 180°)', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '3' },
+      });
+      expect(result).toBeCloseTo(1.33333, 4);
+    });
+
+    it('handles missing orientation string gracefully', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: null },
+      });
+      expect(result).toBeCloseTo(1.33333, 4);
+    });
+
+    it('handles non-numeric orientation string gracefully', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, ...portraitAsset, orientation: '' },
+      });
+      expect(result).toBeCloseTo(1.33333, 4);
+    });
   });
 });
