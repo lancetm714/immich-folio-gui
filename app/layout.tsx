@@ -11,8 +11,7 @@ import { SubpageNav } from '@/components/SubpageNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { Footer } from '@/components/Footer';
-import { SetupScreen } from '@/components/SetupScreen';
-import { getConfig, getGoogleFontsUrl, AppConfig } from '@/lib/config';
+import { getConfig, getGoogleFontsUrl } from '@/lib/config';
 // DevToolbarLoader is a Client Component (ssr: false is only allowed there)
 import { DevToolbarLoader } from '@/components/DevToolbarLoader';
 
@@ -62,16 +61,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     '--radius-md': `${Math.round(theme.radius * 1.5)}px`,
     '--radius-lg': `${theme.radius * 2}px`,
   };
-
-  if ((config as AppConfig & { needsSetup?: boolean }).needsSetup) {
-    return (
-      <html lang="en" suppressHydrationWarning>
-        <body>
-          <SetupScreen />
-        </body>
-      </html>
-    );
-  }
 
   return (
     <html
