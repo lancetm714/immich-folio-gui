@@ -125,97 +125,114 @@ describe('assetAspectRatio', () => {
     orientation: null,
   };
 
-  it('computes width / height ratio', () => {
-    const result = assetAspectRatio({
-      exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
-    });
-    expect(result).toBe(1.5);
-  });
-
-  it('returns undefined when dimensions are missing', () => {
-    expect(assetAspectRatio({ exifInfo: undefined })).toBeUndefined();
-  });
-
-  it('returns undefined when height is 0', () => {
-    expect(
-      assetAspectRatio({
-        exifInfo: { ...nullExif, exifImageWidth: 100, exifImageHeight: 0 },
-      }),
-    ).toBeUndefined();
-  });
-
-  it('returns undefined when width is null', () => {
-    expect(
-      assetAspectRatio({
-        exifInfo: { ...nullExif, exifImageWidth: null, exifImageHeight: 2000 },
-      }),
-    ).toBeUndefined();
-  });
-
-  describe('EXIF orientation swap', () => {
-    // A portrait photo from a phone: physical file is 4032x3024 but
-    // orientation=6 (rotate 90° CW) means display is 3024x4032 → ratio ~0.75
-    const portraitAsset = {
-      exifImageWidth: 4032,
-      exifImageHeight: 3024,
-    };
-
-    it('swaps w/h for orientation 6 (rotate 90° CW)', () => {
+  describe('display dimensions (width/height at top level)', () => {
+    it('uses display width/height when present (orientation-corrected)', () => {
+      // A portrait photo: display dims are 3024x4032 but raw EXIF is 4032x3024
       const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '6' },
+        width: 3024,
+        height: 4032,
+        exifInfo: { ...nullExif, exifImageWidth: 4032, exifImageHeight: 3024 },
       });
-      // swapped: 3024 / 4032 ≈ 0.75
+      // 3024 / 4032 ≈ 0.75
       expect(result).toBeCloseTo(0.75, 5);
     });
 
-    it('swaps w/h for orientation 8 (rotate 270° CW)', () => {
+    it('falls back to EXIF dimensions when display dimensions are absent', () => {
       const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '8' },
+        exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
       });
-      expect(result).toBeCloseTo(0.75, 5);
+      expect(result).toBe(1.5);
     });
 
-    it('swaps w/h for orientation 5', () => {
+    it('falls back to EXIF dimensions when display width is null', () => {
       const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '5' },
+        width: null,
+        height: 4032,
+        exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
       });
-      expect(result).toBeCloseTo(0.75, 5);
+      expect(result).toBe(1.5);
     });
 
-    it('swaps w/h for orientation 7', () => {
+    it('falls back to EXIF dimensions when display height is null', () => {
       const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '7' },
+        width: 3024,
+        height: null,
+        exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
       });
-      expect(result).toBeCloseTo(0.75, 5);
+      expect(result).toBe(1.5);
+    });
+  });
+
+  describe('EXIF dimensions (fallback path)', () => {
+    it('computes width / height ratio from exifInfo', () => {
+      const result = assetAspectRatio({
+        exifInfo: { ...nullExif, exifImageWidth: 3000, exifImageHeight: 2000 },
+      });
+      expect(result).toBe(1.5);
     });
 
-    it('does not swap for orientation 1 (normal)', () => {
-      const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '1' },
-      });
-      // not swapped: 4032 / 3024 ≈ 1.333
-      expect(result).toBeCloseTo(1.33333, 4);
+    it('returns undefined when no exifInfo', () => {
+      expect(assetAspectRatio({ exifInfo: undefined })).toBeUndefined();
     });
 
-    it('does not swap for orientation 3 (rotate 180°)', () => {
-      const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '3' },
-      });
-      expect(result).toBeCloseTo(1.33333, 4);
+    it('returns undefined when height is 0', () => {
+      expect(
+        assetAspectRatio({
+          exifInfo: { ...nullExif, exifImageWidth: 100, exifImageHeight: 0 },
+        }),
+      ).toBeUndefined();
     });
 
-    it('handles missing orientation string gracefully', () => {
-      const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: null },
-      });
-      expect(result).toBeCloseTo(1.33333, 4);
+    it('returns undefined when width is null', () => {
+      expect(
+        assetAspectRatio({
+          exifInfo: { ...nullExif, exifImageWidth: null, exifImageHeight: 2000 },
+        }),
+      ).toBeUndefined();
     });
 
-    it('handles non-numeric orientation string gracefully', () => {
-      const result = assetAspectRatio({
-        exifInfo: { ...nullExif, ...portraitAsset, orientation: '' },
+    describe('orientation swap', () => {
+      // A portrait photo from a phone: physical file is 4032x3024 but
+      // orientation=6 (rotate 90° CW) means display is 3024x4032 → ratio ~0.75
+      const portraitAsset = {
+        exifImageWidth: 4032,
+        exifImageHeight: 3024,
+      };
+
+      it('swaps w/h for orientation 6 (rotate 90° CW)', () => {
+        const result = assetAspectRatio({
+          exifInfo: { ...nullExif, ...portraitAsset, orientation: '6' },
+        });
+        expect(result).toBeCloseTo(0.75, 5);
       });
-      expect(result).toBeCloseTo(1.33333, 4);
+
+      it('swaps w/h for orientation 8 (rotate 270° CW)', () => {
+        const result = assetAspectRatio({
+          exifInfo: { ...nullExif, ...portraitAsset, orientation: '8' },
+        });
+        expect(result).toBeCloseTo(0.75, 5);
+      });
+
+      it('does not swap for orientation 1 (normal)', () => {
+        const result = assetAspectRatio({
+          exifInfo: { ...nullExif, ...portraitAsset, orientation: '1' },
+        });
+        expect(result).toBeCloseTo(1.33333, 4);
+      });
+
+      it('handles missing orientation string gracefully', () => {
+        const result = assetAspectRatio({
+          exifInfo: { ...nullExif, ...portraitAsset, orientation: null },
+        });
+        expect(result).toBeCloseTo(1.33333, 4);
+      });
+
+      it('handles non-numeric orientation string gracefully', () => {
+        const result = assetAspectRatio({
+          exifInfo: { ...nullExif, ...portraitAsset, orientation: '' },
+        });
+        expect(result).toBeCloseTo(1.33333, 4);
+      });
     });
   });
 });

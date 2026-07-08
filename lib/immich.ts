@@ -34,6 +34,10 @@ export interface ImmichAsset {
   fileCreatedAt: string;
   exifInfo?: ImmichExifInfo;
   isTrashed: boolean;
+  /** Display width (orientation-corrected). Present on full asset responses. */
+  width?: number | null;
+  /** Display height (orientation-corrected). Present on full asset responses. */
+  height?: number | null;
 }
 
 export interface ImmichExifInfo {

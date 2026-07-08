@@ -84,12 +84,19 @@ export function assetExifSummary(asset: Pick<ImmichAsset, 'exifInfo'>): ExifSumm
 const SWAP_ORIENTATIONS = new Set([5, 6, 7, 8]);
 
 /**
- * Compute the natural aspect ratio (width / height) from EXIF dimensions.
- * Accounts for EXIF orientation — if the image is rotated 90°/270°
- * (orientations 5–8), width and height are swapped.
- * Returns undefined if dimensions are not available.
+ * Compute the natural aspect ratio (width / height) of an asset.
+ *
+ * Resolution order:
+ *   1. Display `width` / `height` from the asset top-level (orientation-corrected)
+ *   2. Raw EXIF dimensions, swapping w/h when orientation requires it
+ *
+ * Returns undefined when no usable dimensions are found.
  */
-export function assetAspectRatio(asset: Pick<ImmichAsset, 'exifInfo'>): number | undefined {
+export function assetAspectRatio(asset: Pick<ImmichAsset, 'width' | 'height' | 'exifInfo'>): number | undefined {
+  // Prefer display dimensions (orientation-corrected by Immich)
+  if (asset.width && asset.height && asset.height > 0) return asset.width / asset.height;
+
+  // Fallback: raw EXIF dimensions with orientation swap
   const exif = asset.exifInfo;
   if (!exif) return undefined;
   let w = exif.exifImageWidth;
