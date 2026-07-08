@@ -6,6 +6,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import './globals.css';
 import { SubpageNav } from '@/components/SubpageNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -63,7 +64,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     '--radius-lg': `${theme.radius * 2}px`,
   };
 
-  if ((config as AppConfig & { needsSetup?: boolean }).needsSetup) {
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || '';
+  const isAdmin = pathname.startsWith('/admin');
+  if (!isAdmin && (config as AppConfig & { needsSetup?: boolean }).needsSetup) {
     return (
       <html lang="en" suppressHydrationWarning>
         <body>
