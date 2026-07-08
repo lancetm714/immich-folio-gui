@@ -943,7 +943,7 @@
 
 .photo-grid--showcase .photo-grid__featured {
   grid-column: 1 / -1;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--grid-aspect-ratio, 16 / 9);
   margin-bottom: 0;
 }
 
