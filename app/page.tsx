@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { immich } from '@/lib/immich';
 import { getConfig } from '@/lib/config';
 import { imageUrl, assetPlaceholder } from '@/lib/urls';
+import { SetupScreen } from '@/components/SetupScreen';
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { FadeIn } from '@/components/FadeIn';
 
@@ -74,7 +75,7 @@ export default async function HomePage() {
   const config = getConfig();
 
   if (config.needsSetup) {
-    return null;
+    return <SetupScreen />;
   }
 
   const [subpages, albums] = await Promise.all([
