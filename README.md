@@ -117,16 +117,18 @@ theme: studio # or: minimal, editorial, classic, noir, monograph
 
 ```yaml
 services:
-  lightbox:
-    build: .
+  immich-folio:
+    image: ghcr.io/lancetm714/immich-folio-gui:latest
     container_name: immich-folio
     restart: unless-stopped
     ports:
       - '7211:7211'
-    env_file:
-      - .env.local
+    environment:
+      # Synology: match the owner UID:GID of your content/ directory
+      - PUID=1026
+      - PGID=100
     volumes:
-      - ./content:/app/content:ro
+      - /volume1/docker/immich-folio/content:/app/content
 ```
 
 Run with:
