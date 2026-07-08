@@ -89,6 +89,47 @@ export async function writeSettingsYaml(data: SettingsYaml): Promise<void> {
   await writeYamlFile('settings.yaml', data);
 }
 
+/** Read about.md and return { meta, body } or null. */
+export async function readAboutMd(): Promise<{ meta: Record<string, unknown>; body: string } | null> {
+  try {
+    const raw = await fs.readFile(path.join(CONTENT_DIR, 'about.md'), 'utf8');
+    const match = raw.match(/^(?:---\r?\n)([\s\S]*?)(?:\r?\n---\r?\n)([\s\S]*)$/);
+    if (match) {
+      return { meta: (yaml.load(match[1]) || {}) as Record<string, unknown>, body: match[2].trim() };
+    }
+    return { meta: {}, body: raw.trim() };
+  } catch {
+    return null;
+  }
+}
+
+/** Write about.md with frontmatter. */
+export async function writeAboutMd(meta: Record<string, unknown>, body: string): Promise<void> {
+  const filePath = path.join(CONTENT_DIR, 'about.md');
+  await fs.mkdir(CONTENT_DIR, { recursive: true });
+
+  // Backup if exists
+  try {
+    await fs.access(filePath);
+    const backupDir = path.join(CONTENT_DIR, '.backups');
+    await fs.mkdir(backupDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    await fs.copyFile(filePath, path.join(backupDir, `about.md.${timestamp}.bak`));
+    await pruneBackups(backupDir, 'about.md');
+  } catch {
+    // File doesn't exist, no backup needed
+  }
+
+  const frontmatter = yaml.dump(meta, { lineWidth: 120, quotingType: '"', noRefs: true, sortKeys: false });
+  const content = `---\n${frontmatter}---\n\n${body}\n`;
+
+  const tmpPath = `${filePath}.tmp`;
+  await fs.writeFile(tmpPath, content, 'utf8');
+  await fs.rename(tmpPath, filePath);
+
+  console.log('[Admin] ✅ Saved about.md');
+}
+
 /** List available backups for a file. */
 export async function listBackups(filename: string): Promise<string[]> {
   const backupDir = path.join(CONTENT_DIR, '.backups');

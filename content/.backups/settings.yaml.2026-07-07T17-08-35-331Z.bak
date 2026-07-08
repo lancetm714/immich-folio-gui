@@ -1,0 +1,32 @@
+# ── Site Settings (managed by Immich Folio Admin) ─────────────────
+title: My Portfolio
+subtitle: A visual journal
+lang: en
+seo:
+  title: My Portfolio
+  description: ""
+  noIndex: false
+  noFollow: false
+exifOnHover: false
+map: false
+transitions: true
+theme:
+  preset: classic
+  accent: "#e60012"
+  photoFrame: shadow
+  grain: false
+  headerDot: false
+  heroStyle: split
+grid:
+  columns: 3
+  gap: 12
+  aspectRatio: "1"
+  layout: masonry
+legal:
+  enabled: false
+  name: ""
+  address: ""
+  zipCity: ""
+  country: ""
+footer:
+  name: Lance Martin

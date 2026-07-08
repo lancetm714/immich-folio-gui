@@ -129,6 +129,7 @@ class ImmichClient {
     try {
       const headers: Record<string, string> = {
         'x-api-key': this.config.immich.apiKey,
+        Accept: 'application/octet-stream',
       };
       if (rangeHeader) {
         headers['Range'] = rangeHeader;
@@ -137,7 +138,11 @@ class ImmichClient {
       const res = await fetch(url, { headers });
 
       if ((!res.ok && res.status !== 206) || !res.body) {
-        console.error(`[Immich] Failed to stream video ${assetId}: ${res.status}`);
+        if (res.status === 403) {
+          console.error(`[Immich] Forbidden streaming video ${assetId} — API key may need "asset:view" scope`);
+        } else {
+          console.error(`[Immich] Failed to stream video ${assetId}: ${res.status}`);
+        }
         return null;
       }
 
@@ -173,11 +178,16 @@ class ImmichClient {
       const res = await fetch(url, {
         headers: {
           'x-api-key': this.config.immich.apiKey,
+          Accept: 'application/octet-stream',
         },
       });
 
       if (!res.ok || !res.body) {
-        console.error(`[Immich] Failed to stream ${assetId}: ${res.status}`);
+        if (res.status === 403) {
+          console.error(`[Immich] Forbidden streaming ${assetId} — API key may need "asset:view" scope`);
+        } else {
+          console.error(`[Immich] Failed to stream ${assetId}: ${res.status}`);
+        }
         return null;
       }
 
@@ -194,7 +204,6 @@ class ImmichClient {
 
   /**
    * Get ALL configured albums (filtered by the full allowlist).
-   * Uses ?shared=true to only fetch albums that have been shared in Immich.
    */
   async getAlbums(): Promise<ImmichAlbum[]> {
     const cacheKey = 'albums-list';
@@ -207,7 +216,7 @@ class ImmichClient {
 
     this.pendingAlbumsPromise = (async () => {
       try {
-        const all = await this.request<ImmichAlbum[]>('/albums?shared=true');
+        const all = await this.request<ImmichAlbum[]>('/albums');
         if (!all) return [];
 
         const allowedIds = new Set(this.config.albums);
@@ -340,6 +349,15 @@ class ImmichClient {
         const album = await this.request<ImmichAlbum>(`/albums/${encodeURIComponent(albumId)}`);
         if (!album) return null;
 
+        // Immich API v1.128+ no longer returns assets in the album response.
+        // Fall back to fetching them from the timeline endpoint.
+        if (!album.assets || album.assets.length === 0) {
+          const assets = await this.fetchAlbumAssets(albumId);
+          if (assets) {
+            album.assets = assets;
+          }
+        }
+
         // Filter out trashed assets
         album.assets = (album.assets || []).filter((a) => !a.isTrashed);
 
@@ -358,6 +376,49 @@ class ImmichClient {
 
     this.pendingAlbumPromises.set(albumId, promise);
     return promise;
+  }
+
+  /**
+   * Fetch album assets from the timeline endpoint.
+   * Used as a fallback when /albums/{id} doesn't include assets (Immich v1.128+).
+   *
+   * The timeline /bucket endpoint returns a column-oriented format:
+   *   { id: string[], isImage: boolean[], thumbhash: (string|null)[], ... }
+   * We transpose it into ImmichAsset[].
+   */
+  private async fetchAlbumAssets(albumId: string): Promise<ImmichAsset[]> {
+    const encodedId = encodeURIComponent(albumId);
+    const allAssets: ImmichAsset[] = [];
+
+    const buckets = await this.request<{ timeBucket: string }[]>(`/timeline/buckets?albumId=${encodedId}`);
+    if (!buckets) return [];
+
+    for (const bucket of buckets) {
+      // The response is a column-oriented object, not an array
+      const raw = await this.request<{
+        id: string[];
+        isImage: boolean[];
+        thumbhash: (string | null)[];
+        fileCreatedAt: string[];
+        isTrashed: boolean[];
+      }>(`/timeline/bucket?timeBucket=${encodeURIComponent(bucket.timeBucket)}&albumId=${encodedId}&size=10000`);
+
+      if (!raw || !Array.isArray(raw.id)) continue;
+
+      for (let i = 0; i < raw.id.length; i++) {
+        allAssets.push({
+          id: raw.id[i],
+          type: raw.isImage[i] ? 'IMAGE' : 'VIDEO',
+          originalFileName: '',
+          originalMimeType: raw.isImage[i] ? 'image/jpeg' : 'video/mp4',
+          thumbhash: raw.thumbhash[i] ?? null,
+          fileCreatedAt: raw.fileCreatedAt[i],
+          isTrashed: raw.isTrashed[i],
+        });
+      }
+    }
+
+    return allAssets.length > 0 ? allAssets : [];
   }
 
   /**
@@ -440,10 +501,14 @@ class ImmichClient {
 
   /**
    * Check if the Immich server is reachable.
+   * Tries /server/version first (stable across versions),
+   * falls back to /server/ping for older servers.
    */
   async ping(): Promise<boolean> {
-    const res = await this.request<{ res: string }>('/server/ping');
-    return !!res;
+    const res = await this.request<{ version: string }>('/server/version');
+    if (res) return true;
+    const res2 = await this.request<{ res: string }>('/server/ping');
+    return !!res2;
   }
 }
 

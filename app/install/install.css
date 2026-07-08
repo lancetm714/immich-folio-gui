@@ -429,6 +429,143 @@
   flex-wrap: wrap;
 }
 
+/* ── Details / Collapsible ────────────────────────────── */
+.install-details {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--install-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.install-details-summary {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--install-text-dim);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.install-details-summary:hover {
+  color: var(--install-text);
+}
+
+.install-details-body {
+  padding: 0.75rem;
+  border-top: 1px solid var(--install-border);
+}
+
+/* ── Per-Album Override Rows ──────────────────────────── */
+.install-override-row {
+  border: 1px solid var(--install-border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.install-override-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.install-override-uuid {
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--install-text-dim);
+  word-break: break-all;
+}
+
+/* ── Small / Ghost Buttons ────────────────────────────── */
+.install-btn-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border: 1px solid var(--install-border);
+  background: transparent;
+  color: var(--install-text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.install-btn-small:hover {
+  background: var(--install-surface);
+}
+
+.install-btn-danger {
+  color: var(--install-error);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.install-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.install-btn-sm {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.85rem;
+}
+
+/* ── Subpage Cards ────────────────────────────────────── */
+.install-subpages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.install-subpage-card {
+  border: 1px solid var(--install-border);
+  border-radius: 6px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.install-subpage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--install-border);
+}
+
+.install-subpage-num {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--install-text-dim);
+}
+
+/* ── Section Cards (within subpages) ──────────────────── */
+.install-section-card {
+  border: 1px solid var(--install-border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.install-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--install-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 600px) {
   .install-layout {

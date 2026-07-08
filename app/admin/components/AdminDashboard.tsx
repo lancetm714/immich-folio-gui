@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import PageBuilder from './PageBuilder';
 import SettingsEditor from './SettingsEditor';
+import AboutEditor from './AboutEditor';
 
 interface Props {
   onLogout: () => void;
 }
 
-type Tab = 'pages' | 'settings';
+type Tab = 'pages' | 'settings' | 'about';
 
 export default function AdminDashboard({ onLogout }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('pages');
@@ -73,6 +74,12 @@ export default function AdminDashboard({ onLogout }: Props) {
               onClick={() => setActiveTab('settings')}
             >
               Settings
+            </button>
+            <button
+              className={`admin-tab ${activeTab === 'about' ? 'active' : ''}`}
+              onClick={() => setActiveTab('about')}
+            >
+              About
             </button>
           </nav>
         </div>
@@ -167,6 +174,7 @@ export default function AdminDashboard({ onLogout }: Props) {
       <main className="admin-main">
         {activeTab === 'pages' && <PageBuilder />}
         {activeTab === 'settings' && <SettingsEditor />}
+        {activeTab === 'about' && <AboutEditor />}
       </main>
     </div>
   );

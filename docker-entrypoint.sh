@@ -23,6 +23,9 @@ if [ -d /app/content ]; then
   # Parses KEY=VALUE lines safely — values may contain spaces or '=' without quoting
   if [ -f /app/content/.env ]; then
     while IFS='=' read -r key value; do
+      # Strip \r from CRLF files
+      key=$(echo "$key" | tr -d '\r')
+      value=$(echo "$value" | tr -d '\r')
       case "$key" in
         '#'*|'') continue;;
         *) export "$key=$value";;

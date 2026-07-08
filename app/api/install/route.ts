@@ -7,6 +7,58 @@ import type { GalleryYaml, SettingsYaml } from '@/lib/config/schema';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 
+type AlbumEntryObjectPartial = { title?: string; description?: string; password?: string; heroImage?: string };
+
+function parseAlbumEntries(idsStr: string, overridesJson: string) {
+  const ids = (idsStr || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (ids.length === 0) return [];
+
+  let overrides: Record<string, Record<string, string>> = {};
+  try {
+    overrides = JSON.parse(overridesJson || '{}');
+  } catch { /* ignore */ }
+
+  return ids.map((uuid) => {
+    const ov = overrides[uuid];
+    if (!ov || (!ov.titleOverride && !ov.description && !ov.password && !ov.heroImage)) {
+      return uuid;
+    }
+    if (ov.titleOverride && !ov.description && !ov.password && !ov.heroImage) {
+      return { [uuid]: ov.titleOverride };
+    }
+    const albumObj: AlbumEntryObjectPartial = {};
+    if (ov.titleOverride) albumObj.title = ov.titleOverride;
+    if (ov.description) albumObj.description = ov.description;
+    if (ov.password) albumObj.password = ov.password;
+    if (ov.heroImage) albumObj.heroImage = ov.heroImage;
+    return { [uuid]: albumObj };
+  });
+}
+
+function parseSubpageAlbums(uuidsStr: string): Array<string | Record<string, string>> {
+  return (uuidsStr || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export async function GET() {
+  const galleryPath = path.join(CONTENT_DIR, 'gallery.yaml');
+  const apiKey = process.env.IMMICH_API_KEY;
+  const apiUrl = process.env.IMMICH_API_URL;
+  let needsSetup = true;
+  try {
+    await fs.access(galleryPath);
+    if (apiKey && apiUrl) needsSetup = false;
+  } catch {
+    // gallery.yaml doesn't exist
+  }
+  return NextResponse.json({ needsSetup });
+}
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
 
@@ -18,8 +70,25 @@ export async function POST(request: Request) {
   }
 
   try {
-    const baseUrl = body.immichApiUrl.replace(/\/+$/, '');
-    const apiUrl = baseUrl.match(/\/api\/?$/) ? baseUrl : `${baseUrl}/api`;
+    const baseUrl = body.immichApiUrl.replace(/\/+$/, '').replace(/\/api\/?$/i, '');
+
+    // Build theme object
+    const themeObj: Record<string, unknown> = {
+      preset: body.themePreset || 'studio',
+      accent: body.accentColor || '#e60012',
+      photoFrame: body.photoFrame || 'passepartout',
+      grain: body.grain !== false,
+      headerDot: body.headerDot !== false,
+      heroStyle: body.heroStyle || 'split',
+    };
+    // Only add font overrides if set
+    if (body.themeFontHeading || body.themeFontBody || body.themeFontCaption) {
+      themeObj.fonts = {};
+      if (body.themeFontHeading) themeObj.fonts = { ...(themeObj.fonts as object), heading: body.themeFontHeading };
+      if (body.themeFontBody) themeObj.fonts = { ...(themeObj.fonts as object), body: body.themeFontBody };
+      if (body.themeFontCaption) themeObj.fonts = { ...(themeObj.fonts as object), caption: body.themeFontCaption };
+    }
+    if (body.themeRadius) themeObj.radius = body.themeRadius;
 
     // Build settings.yaml
     const settings: SettingsYaml = {
@@ -35,14 +104,7 @@ export async function POST(request: Request) {
       exifOnHover: body.exifOnHover !== false,
       map: body.mapEnabled === true,
       transitions: body.transitions !== false,
-      theme: {
-        preset: body.themePreset || 'studio',
-        accent: body.accentColor || '#e60012',
-        photoFrame: body.photoFrame || 'passepartout',
-        grain: body.grain !== false,
-        headerDot: body.headerDot !== false,
-        heroStyle: body.heroStyle || 'split',
-      },
+      theme: themeObj as SettingsYaml['theme'],
       grid: {
         columns: body.gridColumns || 3,
         gap: body.gridGap ?? 12,
@@ -68,14 +130,73 @@ export async function POST(request: Request) {
             country: body.legalCountry || '',
             email: body.legalEmail || undefined,
             phone: body.legalPhone || undefined,
+            taxId: body.legalTaxId || undefined,
+            vatId: body.legalVatId || undefined,
+            extraInfo: body.legalExtraInfo || undefined,
           }
         : { enabled: false, name: '', address: '', zipCity: '', country: '' },
     };
 
-    // Build gallery.yaml
+    // Build gallery.yaml with subpages and per-album overrides
+    const galleryAlbums = parseAlbumEntries(body.albumIds, body.albumOverridesJson);
+
+    let gallerySubpages: GalleryYaml['subpages'] = [];
+    try {
+      const spData = JSON.parse(body.subpagesJson || '[]') as Array<{
+        name: string;
+        title?: string;
+        subtitle?: string;
+        password?: string;
+        gridColumns?: number;
+        gridGap?: number;
+        gridAspectRatio?: string;
+        gridLayout?: string;
+        albumUuids?: string;
+        sections?: Array<{ title: string; description?: string; albumUuids?: string }>;
+      }>;
+      gallerySubpages = spData
+        .filter((sp) => sp.name.trim())
+        .map((sp) => {
+          const entry: Record<string, unknown> = {
+            name: sp.name,
+          };
+          if (sp.title) entry.title = sp.title;
+          if (sp.subtitle) entry.subtitle = sp.subtitle;
+          if (sp.password) entry.password = sp.password;
+
+          const grid: Record<string, unknown> = {};
+          if (sp.gridColumns != null && sp.gridColumns !== 3) grid.columns = sp.gridColumns;
+          if (sp.gridGap != null && sp.gridGap !== 12) grid.gap = sp.gridGap;
+          if (sp.gridAspectRatio && sp.gridAspectRatio !== '1') grid.aspectRatio = sp.gridAspectRatio;
+          if (sp.gridLayout && sp.gridLayout !== 'masonry') grid.layout = sp.gridLayout;
+          if (Object.keys(grid).length > 0) entry.grid = grid;
+
+          const albums = parseSubpageAlbums(sp.albumUuids || '');
+          if (albums.length > 0) entry.albums = albums;
+
+          if (sp.sections && sp.sections.length > 0) {
+            entry.sections = sp.sections
+              .filter((sec) => sec.title.trim())
+              .map((sec) => {
+                const secEntry: Record<string, unknown> = { title: sec.title };
+                if (sec.description) secEntry.description = sec.description;
+                const secAlbums = parseSubpageAlbums(sec.albumUuids || '');
+                if (secAlbums.length > 0) secEntry.albums = secAlbums;
+                return secEntry;
+              });
+          }
+
+          return entry as GalleryYaml['subpages'] extends Array<infer U> ? U : never;
+        });
+    } catch { /* invalid JSON, leave empty */ }
+
     const gallery: GalleryYaml = {
-      hero: body.heroImages || [],
-      albums: body.albumIds || [],
+      hero: (body.heroImages || '')
+        .split(',')
+        .map((s: string) => s.trim())
+        .filter(Boolean),
+      albums: galleryAlbums.length > 0 ? (galleryAlbums as NonNullable<GalleryYaml['albums']>) : undefined,
+      ...(Array.isArray(gallerySubpages) && gallerySubpages.length > 0 ? { subpages: gallerySubpages } : {}),
     };
 
     // Build about.md if portrait, name, or bio provided
@@ -111,7 +232,7 @@ export async function POST(request: Request) {
     // Build .env content
     const envVars: string[] = [
       '# Immich Folio Configuration (generated by Setup Wizard)',
-      `IMMICH_API_URL=${apiUrl}`,
+      `IMMICH_API_URL=${baseUrl}`,
       `IMMICH_API_KEY=${body.immichApiKey}`,
       body.authSecret ? `AUTH_SECRET=${body.authSecret}` : '',
       body.adminPassword ? `ADMIN_PASSWORD=${body.adminPassword}` : '',
@@ -119,6 +240,8 @@ export async function POST(request: Request) {
       body.siteSubtitle ? `SITE_SUBTITLE=${body.siteSubtitle}` : '',
       `CACHE_TTL=${body.cacheTtl ?? 300}`,
       `RATE_LIMIT_RPM=${body.rateLimitRpm ?? 120}`,
+      body.trustedProxies ? `TRUSTED_PROXIES=${body.trustedProxies}` : '',
+      body.webhookSecret ? `WEBHOOK_SECRET=${body.webhookSecret}` : '',
     ].filter(Boolean);
     const envContent = envVars.join('\n') + '\n';
 

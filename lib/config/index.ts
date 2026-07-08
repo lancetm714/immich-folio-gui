@@ -18,7 +18,6 @@ import {
 export * from './schema';
 export * from './theme';
 
-let _config: AppConfig | null = null;
 let _fallbackSecret: string | null = null;
 
 /** Read a single key from content/.env at runtime (fallback for Docker env after wizard writes it). */
@@ -39,9 +38,8 @@ function readEnvFile(key: string): string | null {
   return null;
 }
 
-/** Invalidate the cached config so the next getConfig() call re-reads YAML files. */
+/** Invalidate the YAML mtime cache so the next getConfig() call re-reads files. */
 export function invalidateConfigCache(): void {
-  _config = null;
   clearYamlCache();
 }
 
@@ -70,27 +68,18 @@ export function buildSubpageGrid(raw?: {
 }
 
 export function getConfig(): AppConfig {
-  // _config is a per-worker in-memory cache.
-  // invalidateConfigCache() clears it + the underlying YAML mtime cache,
-  // so after an admin save every worker re-parses on next request.
-  // In dev we always re-parse so hot-reload works.
-  if (_config && process.env.NODE_ENV === 'production') return _config;
-
-  const apiUrl = env.IMMICH_API_URL || readEnvFile('IMMICH_API_URL') || '';
+  const apiUrl = (env.IMMICH_API_URL || readEnvFile('IMMICH_API_URL') || '').replace(/\/api\/?$/i, '');
   const apiKey = env.IMMICH_API_KEY || readEnvFile('IMMICH_API_KEY') || '';
-  let { AUTH_SECRET } = env;
+  let AUTH_SECRET = env.AUTH_SECRET || readEnvFile('AUTH_SECRET') || undefined;
   if (!AUTH_SECRET) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(
-        'SECURITY ERROR: AUTH_SECRET is not set in production. Please set a long random string as AUTH_SECRET in your .env.',
-      );
-    }
     if (!_fallbackSecret) {
       _fallbackSecret = crypto.randomBytes(32).toString('hex');
     }
-    console.warn(
-      '\n⚠️  SECURITY WARNING: AUTH_SECRET is not set. Generating a temporary random secret for this session.\n   Please set a long random string as AUTH_SECRET in your .env for better security.\n',
-    );
+    if (apiUrl && apiKey) {
+      console.warn(
+        '\n⚠️  SECURITY WARNING: AUTH_SECRET is not set. Using a temporary random secret for this session.\n   Set AUTH_SECRET in content/.env to make it persistent across restarts.\n',
+      );
+    }
     AUTH_SECRET = _fallbackSecret;
   }
   const authSecret = AUTH_SECRET;
@@ -99,8 +88,7 @@ export function getConfig(): AppConfig {
   const settings = loadYaml<SettingsYaml>('settings.yaml') || {};
 
   if (!gallery || !apiKey || !apiUrl) {
-    // Return dummy config if gallery.yaml is missing
-    _config = {
+    return {
       immich: { apiUrl: `${apiUrl}/api`, apiKey },
       authSecret,
       albums: [],
@@ -132,7 +120,6 @@ export function getConfig(): AppConfig {
       trustedProxies: env.TRUSTED_PROXIES,
       needsSetup: true,
     };
-    return _config;
   }
 
   const theme = resolveTheme(settings.theme);
@@ -171,48 +158,6 @@ export function getConfig(): AppConfig {
   const standaloneAlbumIds = (gallery.albums ?? []).map((entry) =>
     processAlbumEntry(entry, 'gallery.yaml albums'),
   );
-  if (
-    standaloneAlbumIds.length === 0 &&
-    (!gallery.subpages ||
-      (Array.isArray(gallery.subpages)
-        ? gallery.subpages.length === 0
-        : Object.keys(gallery.subpages).length === 0))
-  ) {
-    // Return needsSetup config so the install wizard can render
-    _config = {
-      immich: { apiUrl: `${apiUrl}/api`, apiKey },
-      authSecret,
-      albums: [],
-      standaloneAlbums: [],
-      subpages: [],
-      siteTitle: env.SITE_TITLE || 'Immich Folio',
-      siteSubtitle: env.SITE_SUBTITLE || 'Setup Required',
-      lang: 'en',
-      seo: {
-        title: 'Setup Required',
-        description: 'Please configure Immich Folio',
-        noIndex: true,
-        noFollow: true,
-      },
-      heroImages: [],
-      exifOnHover: true,
-      grid: { columns: 3, gap: 12, aspectRatio: '1', layout: 'masonry' },
-      theme: resolveTheme('studio'),
-      footer: null,
-      legal: { enabled: false, name: '', address: '', zipCity: '', country: '' },
-      map: false,
-      transitions: false,
-      albumOverrides: {},
-      albumDescriptions: {},
-      albumPasswords: {},
-      albumHeroImages: {},
-      cacheTtl: env.CACHE_TTL * 1000,
-      rateLimitRpm: env.RATE_LIMIT_RPM,
-      trustedProxies: env.TRUSTED_PROXIES,
-      needsSetup: true,
-    };
-    return _config;
-  }
 
   let subpages: SubpageConfig[] = [];
 
@@ -287,7 +232,7 @@ export function getConfig(): AppConfig {
   const subpageAlbumIds = new Set(subpages.flatMap((sp) => sp.albumIds));
   const allAlbumIds = [...new Set([...standaloneAlbumIds, ...subpageAlbumIds])];
 
-  _config = {
+  return {
     immich: { apiUrl: `${apiUrl}/api`, apiKey },
     authSecret,
     albums: allAlbumIds,
@@ -352,5 +297,4 @@ export function getConfig(): AppConfig {
     trustedProxies: env.TRUSTED_PROXIES,
     needsSetup: false,
   };
-  return _config;
 }

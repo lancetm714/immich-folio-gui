@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const THEME_PRESETS = [
   { id: 'studio', label: 'Studio', desc: 'Bold red accent', dot: '#e60012' },
@@ -45,6 +46,34 @@ const ASPECT_RATIOS = [
 
 const STEPS = ['Connection', 'Site', 'Theme', 'Grid', 'Footer', 'Security'] as const;
 
+interface AlbumOverride {
+  uuid: string;
+  titleOverride: string;
+  description: string;
+  password: string;
+  heroImage: string;
+}
+
+interface SubpageSectionForm {
+  title: string;
+  description: string;
+  albumUuids: string;
+}
+
+interface SubpageForm {
+  id: string;
+  name: string;
+  title: string;
+  subtitle: string;
+  password: string;
+  gridColumns: number;
+  gridGap: number;
+  gridAspectRatio: string;
+  gridLayout: string;
+  albumUuids: string;
+  sections: SubpageSectionForm[];
+}
+
 interface FormData {
   immichApiUrl: string;
   immichApiKey: string;
@@ -64,6 +93,10 @@ interface FormData {
   heroStyle: string;
   grain: boolean;
   headerDot: boolean;
+  themeFontHeading: string;
+  themeFontBody: string;
+  themeFontCaption: string;
+  themeRadius: number;
   gridLayout: string;
   gridColumns: number;
   gridGap: number;
@@ -79,6 +112,9 @@ interface FormData {
   legalCountry: string;
   legalEmail: string;
   legalPhone: string;
+  legalTaxId: string;
+  legalVatId: string;
+  legalExtraInfo: string;
   aboutPortrait: string;
   aboutName: string;
   aboutLocation: string;
@@ -86,11 +122,15 @@ interface FormData {
   aboutBio: string;
   heroImages: string;
   albumIds: string;
+  albumOverridesJson: string;
+  subpagesJson: string;
   adminPassword: string;
   adminPasswordConfirm: string;
   authSecret: string;
   cacheTtl: number;
   rateLimitRpm: number;
+  trustedProxies: string;
+  webhookSecret: string;
 }
 
 const INITIAL_DATA: FormData = {
@@ -112,6 +152,10 @@ const INITIAL_DATA: FormData = {
   heroStyle: 'split',
   grain: true,
   headerDot: true,
+  themeFontHeading: '',
+  themeFontBody: '',
+  themeFontCaption: '',
+  themeRadius: 0,
   gridLayout: 'masonry',
   gridColumns: 3,
   gridGap: 12,
@@ -127,6 +171,9 @@ const INITIAL_DATA: FormData = {
   legalCountry: '',
   legalEmail: '',
   legalPhone: '',
+  legalTaxId: '',
+  legalVatId: '',
+  legalExtraInfo: '',
   aboutPortrait: '',
   aboutName: '',
   aboutLocation: '',
@@ -134,14 +181,29 @@ const INITIAL_DATA: FormData = {
   aboutBio: '',
   heroImages: '',
   albumIds: '',
+  albumOverridesJson: '{}',
+  subpagesJson: '[]',
   adminPassword: '',
   adminPasswordConfirm: '',
   authSecret: '',
   cacheTtl: 300,
   rateLimitRpm: 120,
+  trustedProxies: '',
+  webhookSecret: '',
 };
 
 export default function InstallPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/install')
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.needsSetup) router.replace('/');
+      })
+      .catch(() => {});
+  }, [router]);
+
   const [step, setStep] = useState(0);
   const [data, setData] = useState<FormData>(INITIAL_DATA);
   const [testing, setTesting] = useState(false);
@@ -396,6 +458,33 @@ function ConnectionStep({
             {connectionStatus.message}
           </div>
         )}
+      </div>
+
+      <h2 style={{ marginTop: '1.5rem' }}>Advanced</h2>
+
+      <div className="install-field">
+        <label>Trusted Proxies</label>
+        <input
+          value={data.trustedProxies}
+          onChange={(e) => update('trustedProxies', e.target.value)}
+          placeholder="10.0.0.1, 192.168.1.100"
+        />
+        <div className="install-hint">
+          Comma-separated IPs trusted for X-Forwarded-For (e.g., behind Nginx/Traefik)
+        </div>
+      </div>
+
+      <div className="install-field">
+        <label>Webhook Secret</label>
+        <input
+          type="password"
+          value={data.webhookSecret}
+          onChange={(e) => update('webhookSecret', e.target.value)}
+          placeholder="Optional: HMAC secret for Immich webhook"
+        />
+        <div className="install-hint">
+          Enables automatic cache invalidation when Immich albums change
+        </div>
       </div>
     </>
   );
@@ -672,11 +761,52 @@ function ThemeStep({
         />
         <label htmlFor="headerDot">Navigation dot indicator</label>
       </div>
+
+      <h2 style={{ fontSize: '1rem', marginTop: '1.5rem' }}>Font Overrides</h2>
+      <p className="install-desc">Leave empty to use preset defaults.</p>
+      <div className="install-field-row">
+        <div className="install-field">
+          <label>Heading Font</label>
+          <input
+            value={data.themeFontHeading}
+            onChange={(e) => update('themeFontHeading', e.target.value)}
+            placeholder="e.g. Playfair Display"
+          />
+        </div>
+        <div className="install-field">
+          <label>Body Font</label>
+          <input
+            value={data.themeFontBody}
+            onChange={(e) => update('themeFontBody', e.target.value)}
+            placeholder="e.g. DM Sans"
+          />
+        </div>
+        <div className="install-field">
+          <label>Caption Font</label>
+          <input
+            value={data.themeFontCaption}
+            onChange={(e) => update('themeFontCaption', e.target.value)}
+            placeholder="e.g. EB Garamond"
+          />
+        </div>
+      </div>
+
+      <div className="install-field">
+        <label>Border Radius (px)</label>
+        <input
+          type="number"
+          min={0}
+          max={24}
+          value={data.themeRadius}
+          onChange={(e) => update('themeRadius', parseInt(e.target.value, 10) || 0)}
+        />
+        <div className="install-hint">Leave 0 for preset default</div>
+      </div>
     </>
   );
 }
 
-/* ── Step 4: Grid ──────────────────────────────────────── */
+/* ── Step 4: Grid + Albums + Subpages ──────────────────── */
 
 function GridStep({
   data,
@@ -685,6 +815,95 @@ function GridStep({
   data: FormData;
   update: (f: keyof FormData, v: string | boolean | number) => void;
 }) {
+  /* ── Album overrides state ─────────────────────────── */
+  const [overrides, setOverrides] = useState<Record<string, AlbumOverride>>(() => {
+    try {
+      return JSON.parse(data.albumOverridesJson);
+    } catch {
+      return {};
+    }
+  });
+
+  function updateOverride(uuid: string, field: keyof AlbumOverride, value: string) {
+    const next = { ...overrides };
+    if (!next[uuid]) next[uuid] = { uuid, titleOverride: '', description: '', password: '', heroImage: '' };
+    next[uuid] = { ...next[uuid], [field]: value };
+    setOverrides(next);
+    update('albumOverridesJson', JSON.stringify(next));
+  }
+
+  function removeOverride(uuid: string) {
+    const next = { ...overrides };
+    delete next[uuid];
+    setOverrides(next);
+    update('albumOverridesJson', JSON.stringify(next));
+  }
+
+  const albumUuidList = data.albumIds.split(',').map((s) => s.trim()).filter(Boolean);
+
+  /* ── Subpages state ────────────────────────────────── */
+  const [subpages, setSubpages] = useState<SubpageForm[]>(() => {
+    try {
+      return JSON.parse(data.subpagesJson);
+    } catch {
+      return [];
+    }
+  });
+
+  function serializeSubpages(sp: SubpageForm[]) {
+    setSubpages(sp);
+    update('subpagesJson', JSON.stringify(sp));
+  }
+
+  function addSubpage() {
+    serializeSubpages([
+      ...subpages,
+      {
+        id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+        name: '',
+        title: '',
+        subtitle: '',
+        password: '',
+        gridColumns: 3,
+        gridGap: 12,
+        gridAspectRatio: '1',
+        gridLayout: 'masonry',
+        albumUuids: '',
+        sections: [],
+      },
+    ]);
+  }
+
+  function updateSubpage(id: string, field: keyof SubpageForm, value: string | number | SubpageSectionForm[]) {
+    serializeSubpages(
+      subpages.map((sp) => (sp.id === id ? { ...sp, [field]: value } : sp)),
+    );
+  }
+
+  function removeSubpage(id: string) {
+    serializeSubpages(subpages.filter((sp) => sp.id !== id));
+  }
+
+  function addSection(subpageId: string) {
+    const section: SubpageSectionForm = { title: '', description: '', albumUuids: '' };
+    const sp = subpages.find((s) => s.id === subpageId);
+    if (sp) updateSubpage(subpageId, 'sections', [...sp.sections, section]);
+  }
+
+  function updateSection(subpageId: string, idx: number, field: keyof SubpageSectionForm, value: string) {
+    const sp = subpages.find((s) => s.id === subpageId);
+    if (!sp) return;
+    const sections = [...sp.sections];
+    sections[idx] = { ...sections[idx], [field]: value };
+    updateSubpage(subpageId, 'sections', sections);
+  }
+
+  function removeSection(subpageId: string, idx: number) {
+    const sp = subpages.find((s) => s.id === subpageId);
+    if (!sp) return;
+    updateSubpage(subpageId, 'sections', sp.sections.filter((_, i) => i !== idx));
+  }
+
   return (
     <>
       <h2>Grid Layout</h2>
@@ -759,7 +978,12 @@ function GridStep({
         ))}
       </div>
 
-      <h2 style={{ marginTop: '1.5rem' }}>Album &amp; Hero IDs</h2>
+      {/* ── Standalone Albums ──────────────────────────── */}
+      <h2 style={{ marginTop: '1.5rem' }}>Standalone Albums</h2>
+      <p className="install-desc">
+        Albums shown directly on the homepage. Add subpages below to group albums.
+      </p>
+
       <div className="install-field">
         <label>Album UUIDs (comma-separated)</label>
         <textarea
@@ -768,8 +992,71 @@ function GridStep({
           placeholder="album-uuid-1, album-uuid-2"
           style={{ minHeight: '60px' }}
         />
-        <div className="install-hint">You can manage albums later in the admin panel</div>
       </div>
+
+      {/* ── Per-album overrides ────────────────────────── */}
+      {albumUuidList.length > 0 && (
+        <details className="install-details">
+          <summary className="install-details-summary">
+            Per-Album Overrides ({Object.keys(overrides).length} configured)
+          </summary>
+          <div className="install-details-body">
+            {albumUuidList.map((uuid) => {
+              const ov = overrides[uuid] || { uuid, titleOverride: '', description: '', password: '', heroImage: '' };
+              return (
+                <div key={uuid} className="install-override-row">
+                  <div className="install-override-header">
+                    <code className="install-override-uuid">{uuid}</code>
+                    {overrides[uuid] && (
+                      <button className="install-btn-small install-btn-danger" onClick={() => removeOverride(uuid)}>
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="install-field-row">
+                    <div className="install-field">
+                      <label>Title Override</label>
+                      <input
+                        value={ov.titleOverride}
+                        onChange={(e) => updateOverride(uuid, 'titleOverride', e.target.value)}
+                        placeholder="Custom title"
+                      />
+                    </div>
+                    <div className="install-field">
+                      <label>Description</label>
+                      <input
+                        value={ov.description}
+                        onChange={(e) => updateOverride(uuid, 'description', e.target.value)}
+                        placeholder="Album description"
+                      />
+                    </div>
+                  </div>
+                  <div className="install-field-row">
+                    <div className="install-field">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        value={ov.password}
+                        onChange={(e) => updateOverride(uuid, 'password', e.target.value)}
+                        placeholder="Optional password"
+                      />
+                    </div>
+                    <div className="install-field">
+                      <label>Hero Image UUID</label>
+                      <input
+                        value={ov.heroImage}
+                        onChange={(e) => updateOverride(uuid, 'heroImage', e.target.value)}
+                        placeholder="Asset UUID"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      )}
+
       <div className="install-field">
         <label>Hero Image Asset UUIDs (comma-separated)</label>
         <input
@@ -777,7 +1064,208 @@ function GridStep({
           onChange={(e) => update('heroImages', e.target.value)}
           placeholder="asset-uuid-1, asset-uuid-2"
         />
+        <div className="install-hint">Displayed in the homepage hero carousel</div>
       </div>
+
+      {/* ── Subpage Builder ────────────────────────────── */}
+      <h2 style={{ marginTop: '1.5rem' }}>Subpages</h2>
+      <p className="install-desc">
+        Subpages group albums under custom URL paths (e.g. /travel/japan).
+      </p>
+
+      {subpages.length > 0 && (
+        <div className="install-subpages">
+          {subpages.map((sp, idx) => (
+            <div key={sp.id} className="install-subpage-card">
+              <div className="install-subpage-header">
+                <span className="install-subpage-num">Subpage {idx + 1}</span>
+                <button
+                  className="install-btn-small install-btn-danger"
+                  onClick={() => removeSubpage(sp.id)}
+                >
+                  Remove
+                </button>
+              </div>
+
+              <div className="install-field-row">
+                <div className="install-field" style={{ flex: 2 }}>
+                  <label>Name *</label>
+                  <input
+                    value={sp.name}
+                    onChange={(e) => updateSubpage(sp.id, 'name', e.target.value)}
+                    placeholder="e.g. Japan"
+                  />
+                  <div className="install-hint">Used as URL slug and navigation label</div>
+                </div>
+                <div className="install-field">
+                  <label>Title</label>
+                  <input
+                    value={sp.title}
+                    onChange={(e) => updateSubpage(sp.id, 'title', e.target.value)}
+                    placeholder="Optional display title"
+                  />
+                </div>
+                <div className="install-field">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    value={sp.password}
+                    onChange={(e) => updateSubpage(sp.id, 'password', e.target.value)}
+                    placeholder="Optional"
+                  />
+                </div>
+              </div>
+
+              <div className="install-field">
+                <label>Subtitle</label>
+                <input
+                  value={sp.subtitle}
+                  onChange={(e) => updateSubpage(sp.id, 'subtitle', e.target.value)}
+                  placeholder="A collection of highlights"
+                />
+              </div>
+
+              <details className="install-details" style={{ marginBottom: '0.75rem' }}>
+                <summary className="install-details-summary">Grid Overrides (optional)</summary>
+                <div className="install-details-body">
+                  <div className="install-field-row">
+                    <div className="install-field">
+                      <label>Columns</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={8}
+                        value={sp.gridColumns}
+                        onChange={(e) =>
+                          updateSubpage(sp.id, 'gridColumns', parseInt(e.target.value, 10) || 3)
+                        }
+                      />
+                    </div>
+                    <div className="install-field">
+                      <label>Gap (px)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={48}
+                        value={sp.gridGap}
+                        onChange={(e) =>
+                          updateSubpage(sp.id, 'gridGap', parseInt(e.target.value, 10) || 12)
+                        }
+                      />
+                    </div>
+                    <div className="install-field">
+                      <label>Aspect Ratio</label>
+                      <select
+                        value={sp.gridAspectRatio}
+                        onChange={(e) => updateSubpage(sp.id, 'gridAspectRatio', e.target.value)}
+                      >
+                        {ASPECT_RATIOS.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="install-field">
+                      <label>Layout</label>
+                      <select
+                        value={sp.gridLayout}
+                        onChange={(e) => updateSubpage(sp.id, 'gridLayout', e.target.value)}
+                      >
+                        {LAYOUTS.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <div className="install-field">
+                <label>Album UUIDs</label>
+                <textarea
+                  value={sp.albumUuids}
+                  onChange={(e) => updateSubpage(sp.id, 'albumUuids', e.target.value)}
+                  placeholder="album-uuid-1, album-uuid-2"
+                  style={{ minHeight: '40px' }}
+                />
+              </div>
+
+              {/* ── Sections ──────────────────────────────── */}
+              <details className="install-details">
+                <summary className="install-details-summary">
+                  Sections ({sp.sections.length})
+                </summary>
+                <div className="install-details-body">
+                  {sp.sections.map((sec, si) => (
+                    <div key={si} className="install-section-card">
+                      <div className="install-section-header">
+                        <span>Section {si + 1}</span>
+                        <button
+                          className="install-btn-small install-btn-danger"
+                          onClick={() => removeSection(sp.id, si)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="install-field-row">
+                        <div className="install-field">
+                          <label>Title *</label>
+                          <input
+                            value={sec.title}
+                            onChange={(e) =>
+                              updateSection(sp.id, si, 'title', e.target.value)
+                            }
+                            placeholder="e.g. Tokyo"
+                          />
+                        </div>
+                        <div className="install-field">
+                          <label>Description</label>
+                          <input
+                            value={sec.description}
+                            onChange={(e) =>
+                              updateSection(sp.id, si, 'description', e.target.value)
+                            }
+                            placeholder="Optional description"
+                          />
+                        </div>
+                      </div>
+                      <div className="install-field">
+                        <label>Album UUIDs</label>
+                        <textarea
+                          value={sec.albumUuids}
+                          onChange={(e) =>
+                            updateSection(sp.id, si, 'albumUuids', e.target.value)
+                          }
+                          placeholder="album-uuid-1, album-uuid-2"
+                          style={{ minHeight: '36px' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="install-btn install-btn-ghost install-btn-sm"
+                    onClick={() => addSection(sp.id)}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    + Add Section
+                  </button>
+                </div>
+              </details>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        className="install-btn install-btn-ghost"
+        onClick={addSubpage}
+        style={{ marginTop: '0.75rem' }}
+      >
+        + Add Subpage
+      </button>
     </>
   );
 }
@@ -901,6 +1389,32 @@ function FooterStep({
               />
             </div>
           </div>
+          <div className="install-field-row">
+            <div className="install-field">
+              <label>Tax ID</label>
+              <input
+                value={data.legalTaxId}
+                onChange={(e) => update('legalTaxId', e.target.value)}
+                placeholder="DE123456789"
+              />
+            </div>
+            <div className="install-field">
+              <label>VAT ID</label>
+              <input
+                value={data.legalVatId}
+                onChange={(e) => update('legalVatId', e.target.value)}
+                placeholder="12/345/67890"
+              />
+            </div>
+          </div>
+          <div className="install-field">
+            <label>Extra Legal Info</label>
+            <textarea
+              value={data.legalExtraInfo}
+              onChange={(e) => update('legalExtraInfo', e.target.value)}
+              placeholder="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: Max Mustermann"
+            />
+          </div>
         </>
       )}
     </>
@@ -995,6 +1509,12 @@ function SecurityStep({
             <span className="install-summary-label">API Key</span>
             <span className="install-summary-value">{data.immichApiKey.substring(0, 8)}...</span>
           </div>
+          {data.trustedProxies && (
+            <div className="install-summary-row">
+              <span className="install-summary-label">Proxies</span>
+              <span className="install-summary-value">{data.trustedProxies}</span>
+            </div>
+          )}
         </div>
         <div className="install-summary-section">
           <h3>Site</h3>
@@ -1009,6 +1529,10 @@ function SecurityStep({
           <div className="install-summary-row">
             <span className="install-summary-label">Layout</span>
             <span className="install-summary-value">{data.gridLayout}</span>
+          </div>
+          <div className="install-summary-row">
+            <span className="install-summary-label">Subpages</span>
+            <span className="install-summary-value">{JSON.parse(data.subpagesJson || '[]').length}</span>
           </div>
         </div>
       </div>

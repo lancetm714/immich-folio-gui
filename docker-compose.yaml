@@ -1,37 +1,13 @@
 services:
   immich-folio:
-    # Switch to this image once CI publishes to GHCR:
-    # image: ghcr.io/lancetm714/immich-folio:install-wizard-v2
-    build:
-      context: .
+    image: ghcr.io/lancetm714/immich-folio-gui:latest
     container_name: immich-folio
     restart: unless-stopped
     ports:
       - '7211:7211'
     environment:
-      # ── Required ───────────────────────────────────
-      # Set a long random secret. If unset, the container auto-generates one
-      # and persists it to content/.env for stability across restarts.
-      - AUTH_SECRET=
-
-      # ── Immich connection ──────────────────────────
-      - IMMICH_API_URL=
-      - IMMICH_API_KEY=
-
-      # ── Synology NAS (optional) ────────────────────
-      # Set these to match the owner of your content/ directory on the host
-      # (typically the admin user's UID:GID from the Synology control panel).
-      # Defaults to 1001:1001 if unset.
+      # Synology: match the owner UID:GID of your content/ directory
       - PUID=1026
       - PGID=100
-
-      # ── Optional ───────────────────────────────────
-      - ADMIN_PASSWORD=
-      - SITE_TITLE=
-      - SITE_SUBTITLE=
-      - CACHE_TTL=300
-      - RATE_LIMIT_RPM=120
     volumes:
-      # Mount your content directory so albums, settings,
-      # and about page are persistent and editable.
-      - ./content:/app/content
+      - /volume1/docker/immich-folio/content:/app/content
