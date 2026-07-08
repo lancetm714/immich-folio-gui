@@ -4,8 +4,27 @@
  */
 
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { env } from '../env';
 import { cookies } from 'next/headers';
+
+function readEnvFile(key: string): string | null {
+  try {
+    const envPath = path.join(process.cwd(), 'content', '.env');
+    if (!fs.existsSync(envPath)) return null;
+    const content = fs.readFileSync(envPath, 'utf8');
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx === -1) continue;
+      const k = trimmed.slice(0, eqIdx).trim();
+      if (k === key) return trimmed.slice(eqIdx + 1).trim();
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 const COOKIE_NAME = 'folio_admin_session';
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -53,7 +72,7 @@ export function verifyAdminToken(token: string): boolean {
 
 /** Verify admin password. */
 export function verifyAdminPassword(password: string): boolean {
-  const adminPw = env.ADMIN_PASSWORD;
+  const adminPw = env.ADMIN_PASSWORD || readEnvFile('ADMIN_PASSWORD') || undefined;
   if (!adminPw) return false;
 
   // Constant-time comparison
@@ -77,7 +96,7 @@ export async function isAdminAuthenticated(): Promise<boolean> {
 
 /** Check if admin panel is enabled (password is set). */
 export function isAdminEnabled(): boolean {
-  return !!env.ADMIN_PASSWORD;
+  return !!(env.ADMIN_PASSWORD || readEnvFile('ADMIN_PASSWORD'));
 }
 
 export { COOKIE_NAME, SESSION_DURATION_MS };
