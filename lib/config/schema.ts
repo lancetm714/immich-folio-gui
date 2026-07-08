@@ -93,6 +93,7 @@ export interface AppConfig {
   footer: FooterConfig | null;
   legal: LegalConfig;
   map: boolean;
+  blog: boolean;
   transitions: boolean;
   albumOverrides: Record<string, string>;
   albumDescriptions: Record<string, string>;
@@ -148,6 +149,7 @@ export interface SettingsYaml {
   };
   exifOnHover?: boolean;
   map?: boolean;
+  blog?: boolean;
   transitions?: boolean;
   theme?:
     | string
@@ -169,6 +171,20 @@ export interface SettingsYaml {
   };
   footer?: FooterConfig;
   legal?: Partial<LegalConfig>;
+}
+
+export interface BlogPostMeta {
+  title: string;
+  slug: string;
+  date: string;
+  tags?: string[];
+  coverImage?: string;
+  published?: boolean;
+  excerpt?: string;
+}
+
+export interface BlogPostItem extends BlogPostMeta {
+  body: string;
 }
 
 export function slugify(name: string): string {
